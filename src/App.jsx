@@ -5,22 +5,37 @@ const PRESET_PROJECTS = [
   {
     name: "Aangepaste Spaghetti-lepel",
     description: "Een mechanisch vergrote greep voor een eetlepel zonder medische claim, puur voor ergonomisch comfort tijdens het eten.",
-    answers: { q1: 'no', q2: 'no', q3: 'no', q4: 'yes', q5: 'no', q6: 'optionA', q7: 'optionA' }
+    answers: { q1: 'no', q2: 'no', q3: 'no', q4: 'no', q5: 'yes', q6: 'no', q7: 'optionA', q8: 'optionA' }
+  },
+  {
+    name: "Drempelhulp voor Robothond",
+    description: "Een simpele houten oprijplaat in huis zodat een recreatieve speelgoed- of robothond makkelijk over de drempel kan rijden.",
+    answers: { q1: 'no', q2: 'no', q3: 'no', q4: 'no', q5: 'yes', q6: 'no', q7: 'optionA', q8: 'optionA' }
   },
   {
     name: "Universele Bekerhouder Rolstoel",
     description: "Een 3D-geprinte bekerhouder die met een klem aan de armleuning van de rolstoel wordt bevestigd, zonder schroeven of boren.",
-    answers: { q1: 'no', q2: 'no', q3: 'no', q4: 'no', q5: 'no', q6: 'optionA', q7: 'optionB' }
-  },
-  {
-    name: "Aangepaste Joystick Rolstoel",
-    description: "Het modificeren van de printplaat en joystick-besturing van een elektrische rolstoel voor fijnere controle.",
-    answers: { q1: 'no', q2: 'no', q3: 'yes', q4: 'no', q5: 'no', q6: 'optionB', q7: 'optionB' }
+    answers: { q1: 'no', q2: 'no', q3: 'no', q4: 'no', q5: 'no', q6: 'no', q7: 'optionA', q8: 'optionB' }
   },
   {
     name: "Wasbare Neopreen Armsteun",
     description: "Een op maat gemaakte neopreen hoes voor een armsteun die direct in contact komt met de huid voor meer dan 3 uur per dag.",
-    answers: { q1: 'no', q2: 'no', q3: 'no', q4: 'no', q5: 'yes', q6: 'optionA', q7: 'optionA' }
+    answers: { q1: 'no', q2: 'no', q3: 'no', q4: 'no', q5: 'no', q6: 'yes', q7: 'optionA', q8: 'optionA' }
+  },
+  {
+    name: "Bluetooth Schakelaar App",
+    description: "Een mobiele applicatie die via Bluetooth een relaiskastje aanstuurt om de verlichting in de Fokus-woning te regelen.",
+    answers: { q1: 'no', q2: 'no', q3: 'no', q4: 'yes', q5: 'no', q6: 'no', q7: 'optionB', q8: 'optionA' }
+  },
+  {
+    name: "Aangepaste Joystick Rolstoel",
+    description: "Het modificeren van de printplaat en joystick-besturing van een elektrische rolstoel voor fijnere controle.",
+    answers: { q1: 'no', q2: 'no', q3: 'yes', q4: 'no', q5: 'no', q6: 'no', q7: 'optionB', q8: 'optionB' }
+  },
+  {
+    name: "Mechanische Remverlenger",
+    description: "Een verlengstuk voor de handrem van de rolstoel dat onder zware handmatige mechanische belasting staat tijdens het remmen.",
+    answers: { q1: 'no', q2: 'yes', q3: 'no', q4: 'no', q5: 'no', q6: 'no', q7: 'optionB', q8: 'optionA' }
   }
 ];
 
@@ -31,10 +46,11 @@ export default function App() {
     q1: null, // Vitale functies (yes/no)
     q2: null, // Transfers & Lichaamskrachten (yes/no)
     q3: null, // Harde modificatie (yes/no)
-    q4: null, // Comfort/Recreatie (yes/no)
-    q5: null, // Huidcontact (yes/no)
-    q6: null, // Gevolgen falen (optionA/optionB)
-    q7: null  // Bevestiging basishulpmiddel (optionA/optionB)
+    q4: null, // Actieve elektronica / Software (yes/no)
+    q5: null, // Comfort/Recreatie (yes/no)
+    q6: null, // Huidcontact (yes/no)
+    q7: null, // Gevolgen falen (optionA/optionB)
+    q8: null  // Bevestiging basishulpmiddel (optionA/optionB)
   });
   
   // FMEA-lite state
@@ -62,13 +78,13 @@ export default function App() {
     }
   }, [step]);
 
-  // Vragenlijst structuur
+  // Vragenlijst structuur met de nieuwe Software/Elektronica vraag ingevoegd in Blok 1
   const questions = [
     {
       id: 'q1',
       title: '1. Vitale Functies',
       text: 'Grijpt het product direct of indirect in op vitale functies?',
-      description: 'Denk hierbij aan ademhaling, actieve voeding via sonde, medicatietoediening, of actieve medische bewakingssystemen.',
+      description: 'Denk hierbij aan ademhaling, actieve voeding via sonde, medicatietoediening (bijv. microlax-pompen), of actieve medische bewakingssystemen.',
       type: 'binary',
       icon: (
         <svg className="w-8 h-8 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -80,7 +96,7 @@ export default function App() {
       id: 'q2',
       title: '2. Transfers & Lichaamskrachten',
       text: 'Moet het product het volledige lichaamsgewicht dragen of ondersteunen?',
-      description: 'Denk aan hulpmiddelen voor actieve transfers (bijv. tilliften, sta-op-hulpen, fixatiegordels, of kritische structurele frame-onderdelen).',
+      description: 'Denk aan hulpmiddelen voor actieve transfers (bijv. tilliften, sta-op-hulpen, mechanische remverlengers, of kritische structurele frame-onderdelen).',
       type: 'binary',
       icon: (
         <svg className="w-8 h-8 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -92,7 +108,7 @@ export default function App() {
       id: 'q3',
       title: '3. Modificatie aan Bestaand CE-Hulpmiddel',
       text: 'Gaan jullie een "harde" modificatie uitvoeren aan een bestaand CE-hulpmiddel?',
-      description: 'Bijvoorbeeld constructief boren in een rolstoelframe, solderen of knippen in actieve elektronica, of het aanpassen van de joystick/besturingssoftware.',
+      description: 'Bijvoorbeeld boren in een rolstoelframe, solderen of splitsen in bestaande kabels, of het fysiek aanpassen van de fabrikant-onderdelen.',
       type: 'binary',
       icon: (
         <svg className="w-8 h-8 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -103,9 +119,22 @@ export default function App() {
     },
     {
       id: 'q4',
-      title: '4. Beoogd Comfort & Vrijetijdsdoel',
+      title: '4. Actieve Elektronica & Software',
+      text: 'Bevat de aanpassing software, apps, of actieve elektronische componenten?',
+      description: 'Denk aan standalone software (zoals besturings-apps of sturingsprogramma\'s), microcontrollers, sensoren, of onderdelen die op stroom (batterij of netstroom) werken. Deze vallen onder zware MDR Rule 11 eisen en EMC-veiligheidsrichtlijnen.',
+      type: 'binary',
+      icon: (
+        <svg className="w-8 h-8 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 5h10a2 2 0 012 2v10a2 2 0 01-2 2H7a2 2 0 01-2-2V7a2 2 0 012-2z" />
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 9h6v6H9V9z" />
+        </svg>
+      )
+    },
+    {
+      id: 'q5',
+      title: '5. Beoogd Comfort & Vrijetijdsdoel',
       text: 'Is er uitsluitend sprake van een comfort-, recreatie- of ergonomisch doel?',
-      description: 'Het hulpmiddel herstelt of compenseert geen fysiologische functie, maar verhoogt het comfort of maakt een hobby mogelijk waarbij falen geen direct letsel of verlies van primaire zelfredzaamheid veroorzaakt. (Bijv. schilderspenseelhouder, Netflix-tabletsteun).',
+      description: 'Het hulpmiddel herstelt of compenseert geen fysiologische functie, maar verhoogt het comfort of maakt een hobby mogelijk waarbij falen geen direct letsel of verlies van primaire zelfredzaamheid veroorzaakt. (Bijv. schilderspenseelhouder, Netflix-tabletsteun, drempelhulp voor speelgoed-robothond).',
       type: 'binary',
       icon: (
         <svg className="w-8 h-8 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -114,8 +143,8 @@ export default function App() {
       )
     },
     {
-      id: 'q5',
-      title: '5. Huidcontact & Druk',
+      id: 'q6',
+      title: '6. Huidcontact & Druk',
       text: 'Komt het hulpmiddel langdurig of onder mechanische druk in direct contact met de blote huid?',
       description: 'Denk aan direct huidcontact langer dan 2 uur aaneengesloten, of klemverbindingen die constante druk uitoefenen op kwetsbaar weefsel (risico op decubitus/huiddefecten).',
       type: 'binary',
@@ -126,14 +155,14 @@ export default function App() {
       )
     },
     {
-      id: 'q6',
-      title: '6. Gevolgen van Mechanisch Falen',
+      id: 'q7',
+      title: '7. Gevolgen van Mechanisch Falen',
       text: 'Wat is het directe gevolg als het product tijdens normaal gebruik plotseling afbreekt of weigert?',
-      description: 'Bepaal de ernst van een onverwacht mechanisch defect.',
+      description: 'Bepaal de ernst van een onverwacht mechanisch of functioneel defect.',
       type: 'choice',
       options: [
         { value: 'optionA', label: 'Optie A: Licht ongemak', desc: 'Hooguit lichte irritatie, morsen of kortstondig ongemak (bijv. gemorst glas drinken of een pen die valt).' },
-        { value: 'optionB', label: 'Optie B: Verlies van zelfredzaamheid of veiligheid', desc: 'De uitdager raakt zijn zelfredzaamheid kwijt (kan bijv. de ruimte niet verlaten, niet communiceren) of er ontstaat een onveilige situatie tot derden ingrijpen.' }
+        { value: 'optionB', label: 'Optie B: Verlies van zelfredzaamheid of veiligheid', desc: 'De uitdager raakt zijn zelfredzaamheid kwyt (kan bijv. de kamer niet zelfstandig verlaten, niet communiceren) of er ontstaat een onveilige situatie tot derden ingrijpen.' }
       ],
       icon: (
         <svg className="w-8 h-8 text-amber-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -142,8 +171,8 @@ export default function App() {
       )
     },
     {
-      id: 'q7',
-      title: '7. Bevestiging (Zachte Modificatie)',
+      id: 'q8',
+      title: '8. Bevestiging (Zachte Modificatie)',
       text: 'Wordt het hulpmiddel bevestigd aan een bestaand CE-gemarkeerd basishulpmiddel?',
       description: 'Zachte modificaties worden aan een bestaand product gehangen zonder ingrijpende aanpassingen.',
       type: 'choice',
@@ -167,17 +196,16 @@ export default function App() {
     if (activeAnswers.q1 === 'yes') return { status: 'ROOD', code: 'vital_functions', title: 'Vitale Functies', message: 'Dit project grijpt direct in op vitale fysiologische functies van de uitdager. Dit brengt onaanvaardbaar hoge risico\'s met zich mee voor co-creatie door studenten.' };
     if (activeAnswers.q2 === 'yes') return { status: 'ROOD', code: 'transfers_forces', title: 'Transfers & Lichaamskrachten', message: 'Dit project is onderhevig aan zware mechanische belasting of beïnvloedt actieve patiënttransfers. Bij falen is er direct risico op ernstig fysiek letsel.' };
     if (activeAnswers.q3 === 'yes') return { status: 'ROOD', code: 'hard_modification', title: 'Harde Modificatie', message: 'Dit project omvat een harde constructieve of elektronische ingreep in een bestaand CE-hulpmiddel. Hierdoor vervalt de fabrieksgarantie en verschuift alle aansprakelijkheid.' };
+    if (activeAnswers.q4 === 'yes') return { status: 'ROOD', code: 'active_electronics_software', title: 'Actieve Elektronica of Software', message: 'Dit project maakt gebruik van actieve elektronica, een stroomvoorziening of standalone software (apps). Vanwege de complexe MDR-classificatie (Rule 11 voor software) en elektromagnetische compatibiliteit (EMC) is dit niet toegestaan binnen FysiekFabriek.' };
 
-    // Als we nog niet alle rode vragen hebben ingevuld, maar er is er al één "yes", dan stopt het daar direct.
-    
     // Blok 2: Groene Afslag
-    if (activeAnswers.q4 === 'yes') {
+    if (activeAnswers.q5 === 'yes') {
       return { status: 'GROEN', code: 'comfort_recreation', title: 'Lifehacks, Comfort & Vrijetijd', message: 'Gefeliciteerd! Dit project dient uitsluitend een ergonomisch of vrijetijdsdoel en valt buiten de wetgevingskaders van de MDR.' };
     }
 
     // Blok 3: Oranje Scenario's (MDR-licht)
     // Controleer of alle benodigde vragen voor oranje zijn beantwoord
-    const hasUnansweredOranje = [activeAnswers.q5, activeAnswers.q6, activeAnswers.q7].some(val => val === null);
+    const hasUnansweredOranje = [activeAnswers.q6, activeAnswers.q7, activeAnswers.q8].some(val => val === null);
     if (hasUnansweredOranje && !customAnswers) {
       return { status: 'IN_BEHANDELING', message: 'Bezig met analyseren...' };
     }
@@ -185,15 +213,15 @@ export default function App() {
     let isModerate = false;
     const reasons = [];
 
-    if (activeAnswers.q5 === 'yes') {
+    if (activeAnswers.q6 === 'yes') {
       isModerate = true;
       reasons.push('Langdurig of drukgeladen direct huidcontact (risico op decubitus/weefselschade).');
     }
-    if (activeAnswers.q6 === 'optionB') {
+    if (activeAnswers.q7 === 'optionB') {
       isModerate = true;
       reasons.push('Bij mechanisch falen verliest de uitdager direct zijn zelfredzaamheid of ontstaat een onveilige situatie.');
     }
-    if (activeAnswers.q7 === 'optionB') {
+    if (activeAnswers.q8 === 'optionB') {
       isModerate = true;
       reasons.push('Het product wordt bevestigd aan een bestaand CE-gemarkeerd hulpmiddel (zachte modificatie). Beoordeling op onbedoelde effecten is vereist.');
     }
@@ -203,7 +231,7 @@ export default function App() {
         status: 'ORANJE_MATIG', 
         code: 'orange_moderate', 
         reasons,
-        message: 'Dit project valt formeel onder de MDR (laag risico) maar heeft specifieke aandachtspunten. Co-creatie mag, mits er een technisch dossier wordt opgesteld en een expert (Michel) het ontwerp fiateert.'
+        message: 'Dit project valt formeel onder de MDR (laag risico) maar heeft specifieke risicofactoren. Co-creatie mag, mits er een digitaal technisch dossier wordt opgesteld en een expert (Michel) het ontwerp fiateert.'
       };
     } else {
       return { 
@@ -214,7 +242,6 @@ export default function App() {
     }
   };
 
-  // Huidige status schatten tijdens het invullen van de vragen (voor het dynamische stoplicht)
   const getCurrentGlow = () => {
     if (step === 'intro') return 'none';
     if (step === 'result') {
@@ -225,13 +252,13 @@ export default function App() {
     }
 
     // Tijdens quiz: check of er al een rood antwoord is gegeven
-    if (answers.q1 === 'yes' || answers.q2 === 'yes' || answers.q3 === 'yes') {
+    if (answers.q1 === 'yes' || answers.q2 === 'yes' || answers.q3 === 'yes' || answers.q4 === 'yes') {
       return 'red';
     }
-    if (answers.q4 === 'yes') {
+    if (answers.q5 === 'yes') {
       return 'green';
     }
-    if (currentQ >= 4) {
+    if (currentQ >= 5) {
       return 'orange';
     }
     return 'pulse';
@@ -242,11 +269,11 @@ export default function App() {
     setAnswers(nextAnswers);
 
     // Directe uitsluitsels (Redirection naar resultaat)
-    if ((currentQ === 0 || currentQ === 1 || currentQ === 2) && val === 'yes') {
+    if ((currentQ === 0 || currentQ === 1 || currentQ === 2 || currentQ === 3) && val === 'yes') {
       setStep('result');
       return;
     }
-    if (currentQ === 3 && val === 'yes') {
+    if (currentQ === 4 && val === 'yes') {
       setStep('result');
       return;
     }
@@ -276,7 +303,7 @@ export default function App() {
 
   const startTriage = () => {
     setAnswers({
-      q1: null, q2: null, q3: null, q4: null, q5: null, q6: null, q7: null
+      q1: null, q2: null, q3: null, q4: null, q5: null, q6: null, q7: null, q8: null
     });
     setCurrentQ(0);
     setStep('quiz');
@@ -302,7 +329,6 @@ export default function App() {
     setFmeaHazards(fmeaHazards.filter(h => h.id !== id));
   };
 
-  // Exporteren van resultaten
   const copyReportToClipboard = () => {
     const triage = getTriageResult();
     const reportText = `
@@ -348,8 +374,17 @@ Gegenereerd met de FysiekFabriek Triage Tool.
 =============================================
     `;
 
-    document.execCommand('copy') || navigator.clipboard.writeText(reportText);
-    alert('Rapport is gekopieerd naar het klembord!');
+    const textArea = document.createElement("textarea");
+    textArea.value = reportText;
+    document.body.appendChild(textArea);
+    textArea.select();
+    try {
+      document.execCommand('copy');
+      alert('Rapport is gekopieerd naar het klembord!');
+    } catch (err) {
+      console.error('Kopieerfout: ', err);
+    }
+    document.body.removeChild(textArea);
   };
 
   const glowClass = getCurrentGlow();
@@ -466,9 +501,9 @@ Gegenereerd met de FysiekFabriek Triage Tool.
 
           {/* Quick Informative Info block */}
           <div className="bg-slate-800/60 rounded-2xl border border-slate-700/60 p-5 shadow-lg w-full max-w-xs text-xs text-slate-400 space-y-3">
-            <h4 className="font-bold text-slate-300 uppercase tracking-wider text-[11px] border-b border-slate-700/60 pb-2">MDR Richtlijnen FysiekFabriek</h4>
-            <p><strong>De paradox van MDR:</strong> De wetgever eist veiligheid, maar erkent in de herziene MDR-plannen ook dat rigide regels de innovatie voor kleine groepen patiënten verstikken.</p>
-            <p><strong>Onze Oplossing:</strong> We omzeilen de regels niet met disclaimers, maar hanteren risicoproportionaliteit. Laag risico mag in co-creatie, hoog risico gaat naar de professional.</p>
+            <h4 className="font-bold text-slate-300 uppercase tracking-wider text-[11px] border-b border-slate-700/60 pb-2">Actieve Software & Elektronica</h4>
+            <p><strong>Nieuwe Regelgevende Blokken:</strong> Grijpt een project in op stroomvoorziening, sensoren, printplaten, of standalone apps? Dan verschuift het risicoprofiel direct naar <strong>Rood</strong>.</p>
+            <p><strong>Waarom?</strong> Elektromagnetische storingen en softwarefouten (Rule 11) kunnen onverwacht optreden bij medisch kwetsbare gebruikers. Dit valt daarom buiten de studentenformule.</p>
           </div>
         </div>
 
@@ -539,19 +574,19 @@ Gegenereerd met de FysiekFabriek Triage Tool.
               {/* Presets Grid */}
               <div className="space-y-3 pt-4 border-t border-slate-700/60">
                 <h4 className="text-xs font-bold text-slate-400 uppercase tracking-widest">Snel testen met voorbeeld-projecten</h4>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
                   {PRESET_PROJECTS.map((p, idx) => (
                     <button
                       key={idx}
                       onClick={() => selectPreset(p)}
-                      className="text-left bg-slate-900/40 hover:bg-slate-900/80 border border-slate-700/50 rounded-xl p-4 transition-all hover:border-slate-600 flex flex-col justify-between group"
+                      className="text-left bg-slate-900/40 hover:bg-slate-900/80 border border-slate-700/50 rounded-xl p-3.5 transition-all hover:border-slate-600 flex flex-col justify-between group"
                     >
                       <div>
-                        <h5 className="font-bold text-sm text-slate-200 group-hover:text-sky-400 transition-colors">{p.name}</h5>
-                        <p className="text-xs text-slate-400 mt-1 line-clamp-2">{p.description}</p>
+                        <h5 className="font-bold text-xs text-slate-200 group-hover:text-sky-400 transition-colors">{p.name}</h5>
+                        <p className="text-[11px] text-slate-400 mt-1 line-clamp-2">{p.description}</p>
                       </div>
-                      <span className="text-[10px] font-bold text-slate-500 mt-3 flex items-center gap-1">
-                        Snelkoppeling laden
+                      <span className="text-[10px] font-bold text-slate-500 mt-3.5 flex items-center gap-1 self-start">
+                        Laad test-case
                         <svg className="w-3 h-3 transform group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                         </svg>
@@ -718,16 +753,16 @@ Gegenereerd met de FysiekFabriek Triage Tool.
                       <span className="text-2xl">🛑</span>
                       <div>
                         <h4 className="font-extrabold text-white text-base">Let op: Co-creatie niet toegestaan</h4>
-                        <p className="text-xs mt-1">Dit project overschrijdt de veilige grenzen voor studententeams of hobbyisten. De risico\'s voor de patiëntveiligheid zijn bij falen inherent te hoog.</p>
+                        <p className="text-xs mt-1">Dit project overschrijdt de veilige grenzen voor studententeams of hobbyisten. Vanwege vitale impact, mechanische belasting, of de aanwezigheid van actieve stroom/software mag dit product niet in co-creatie gebouwd worden.</p>
                       </div>
                     </div>
                     
                     <div className="space-y-3">
                       <h4 className="font-bold text-white text-sm">Vervolgstappen:</h4>
                       <ol className="list-decimal pl-5 space-y-2 text-xs">
-                        <li><strong>Stop de aanmelding:</strong> Neem deze casus niet aan via de FysiekFabriek studenten- of vrijetijdsformule.</li>
+                        <li><strong>Wijs het project af voor co-creatie:</strong> Leg de uitdaging niet neer bij studenten of hobbyisten.</li>
                         <li><strong>Professionele overdracht:</strong> Geef de uitdaging rechtstreeks door aan een gecertificeerd professioneel adaptatietechnicus (zoals Michel Verkaik) of de revalidatiewerkplaats van Rijndam Revalidatie.</li>
-                        <li><strong>Dossierarchivering:</strong> Sla dit triagerapport op in de database van FysiekFabriek als bewijs van actieve risico- en procesbeheersing.</li>
+                        <li><strong>Dossierarchivering:</strong> Sla dit triagerapport op in de database van FysiekFabriek als bewijs van actieve risicobeheersing en conformiteit.</li>
                       </ol>
                     </div>
                   </div>
@@ -834,7 +869,7 @@ Gegenereerd met de FysiekFabriek Triage Tool.
                             <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1">Beheersmaatregel</label>
                             <input 
                               type="text" 
-                              placeholder="bijv. Minimale wanddikte 4mm en PETG filament" 
+                              placeholder="bijv. Minimale wanddikte 4mm en PETG" 
                               value={newMitigation}
                               onChange={(e) => setNewMitigation(e.target.value)}
                               className="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-1.5 text-xs text-white focus:outline-none"
@@ -845,7 +880,7 @@ Gegenereerd met de FysiekFabriek Triage Tool.
                               onClick={addHazard}
                               className="w-full bg-sky-600 hover:bg-sky-500 text-white font-extrabold py-1.5 px-3 rounded-lg transition-colors text-xs"
                             >
-                              Voeg toe
+                              Voeg
                             </button>
                           </div>
                         </div>
@@ -896,7 +931,7 @@ Gegenereerd met de FysiekFabriek Triage Tool.
                       <span className="text-2xl">🎉</span>
                       <div>
                         <h4 className="font-extrabold text-white text-base">Vrije co-creatie toegestaan!</h4>
-                        <p className="text-xs mt-1">Geen zware medische procedures nodig. Studenten kunnen vrij ontwerpen, brainstormen en bouwen binnen de creatieve kaders van FysiekFabriek.</p>
+                        <p className="text-xs mt-1">Geen zware medische procedures of certificering nodig. Studenten kunnen vrij ontwerpen, brainstormen en bouwen binnen de creatieve kaders van FysiekFabriek.</p>
                       </div>
                     </div>
 
