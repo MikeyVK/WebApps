@@ -90,7 +90,11 @@ export default function App() {
         <svg className="w-8 h-8 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
         </svg>
-      )
+      ),
+      examples: {
+        red: "Beugel voor beademingsslang, sondevloeistof-regelaar, gemotoriseerde microlax-tangen of actieve decubitus-matrassen.",
+        ok: "Een bekerhouder, smartphone-statief, ergonomische bestekgreep of extra grip op een handmatige huiskraan."
+      }
     },
     {
       id: 'q2',
@@ -102,7 +106,11 @@ export default function App() {
         <svg className="w-8 h-8 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
         </svg>
-      )
+      ),
+      examples: {
+        red: "Tilliften, sta-op-hulp beugels, kritische structurele frame-onderdelen of een mechanische remverlenger.",
+        ok: "Een zachte opvulling voor een armsteun, een bekerclip op een tafelblad of een lichte penhouder."
+      }
     },
     {
       id: 'q3',
@@ -115,7 +123,11 @@ export default function App() {
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
         </svg>
-      )
+      ),
+      examples: {
+        red: "Boren in het dragende aluminium frame van een rolstoel, solderen/splitsen in de originele motorkabels.",
+        ok: "Een bekerhouder of tassenhaak die met een klemverbinding schroefloos op de armleuning is bevestigd."
+      }
     },
     {
       id: 'q4',
@@ -128,7 +140,11 @@ export default function App() {
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 5h10a2 2 0 012 2v10a2 2 0 01-2 2H7a2 2 0 01-2-2V7a2 2 0 012-2z" />
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 9h6v6H9V9z" />
         </svg>
-      )
+      ),
+      examples: {
+        red: "Een bluetooth-app die via een relaiskastje de verlichting regelt, een verwarmd kussen op accu's.",
+        ok: "Een volledig mechanische drukknopvergroter of een mechanische schuifhendel."
+      }
     },
     {
       id: 'q5',
@@ -140,7 +156,11 @@ export default function App() {
         <svg className="w-8 h-8 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
         </svg>
-      )
+      ),
+      examples: {
+        red: "Een kraan-draaihulp (compenseert direct een ADL-beperking voor hygiëne, dus een formeel medisch compensatiedoel).",
+        ok: "Een houder voor een schilderskwast, een Netflix-tabletsteun, drempelhulp voor een robothond of speelgoed."
+      }
     },
     {
       id: 'q6',
@@ -152,7 +172,11 @@ export default function App() {
         <svg className="w-8 h-8 text-amber-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 11c0 3.517-1.009 6.799-2.753 9.571m-3.44-2.04l.054-.09A13.916 13.916 0 009 11M3 11a9 9 0 019-9m0 0a9 9 0 019 9m-9-9v12m0 0a9 9 0 019 9m-9-9m-5.436-5.436l.054-.09A13.916 13.916 0 0112 11" />
         </svg>
-      )
+      ),
+      examples: {
+        red: "Een zitschaal inlay, orthese-aanpassing of een armsteunkussen dat meer dan 2 uur continu strak op de blote huid drukt.",
+        ok: "Een bestekgreep met een elastisch bandje dat alleen tijdens de maaltijd kortstondig de hand raakt."
+      }
     },
     {
       id: 'q7',
@@ -168,7 +192,11 @@ export default function App() {
         <svg className="w-8 h-8 text-amber-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
         </svg>
-      )
+      ),
+      examples: {
+        red: "Een mechanische houder voor een deuropener-knop (als deze breekt, raakt de uitdager opgesloten in de kamer).",
+        ok: "Een bekerhouder of een spaghetti-lepel (bij breuk morst alleen wat drinken of eten, geen direct gevaar)."
+      }
     },
     {
       id: 'q8',
@@ -184,7 +212,11 @@ export default function App() {
         <svg className="w-8 h-8 text-amber-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
         </svg>
-      )
+      ),
+      examples: {
+        red: "Een clip-on werkblad dat over de armleuningen van een rolstoel schuift of een zware laptoptafel.",
+        ok: "Een volledig losse ergonomische spaghetti-lepel of een losse bestekgreep."
+      }
     }
   ];
 
@@ -432,13 +464,13 @@ Gegenereerd met de FysiekFabriek Triage Tool.
       </header>
 
       {/* Main Content Dashboard */}
-      <main className="flex-grow max-w-7xl w-full mx-auto p-4 md:p-8 grid grid-cols-1 lg:grid-cols-12 gap-8">
+      <main className="flex-grow max-w-7xl w-full mx-auto p-4 md:p-8 grid grid-cols-1 lg:grid-cols-12 gap-8 animate-fade-in">
         
         {/* Left Column: Interactive Stoplight Visualizer */}
-        <div className="lg:col-span-4 flex flex-col items-center justify-start gap-6">
+        <div className="lg:col-span-3 flex flex-col items-center justify-start gap-6">
           <div className="bg-slate-800 rounded-3xl border border-slate-700 p-6 shadow-xl w-full max-w-xs flex flex-col items-center relative overflow-hidden">
             <div className="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-sky-500 via-indigo-500 to-purple-500"></div>
-            <h3 className="text-sm font-bold text-slate-400 uppercase tracking-widest mb-6">Live Stoplicht Status</h3>
+            <h3 className="text-sm font-bold text-slate-400 uppercase tracking-widest mb-6 text-center">Live Stoplicht Status</h3>
             
             {/* The actual physical stoplight case */}
             <div className="w-32 bg-slate-950 rounded-3xl p-5 shadow-inner border border-slate-800 flex flex-col gap-6 items-center relative">
@@ -507,8 +539,10 @@ Gegenereerd met de FysiekFabriek Triage Tool.
           </div>
         </div>
 
-        {/* Right Column: Dynamic Wizard Cards / Results Screen */}
-        <div className="lg:col-span-8 flex flex-col justify-start">
+        {/* Middle Column: Dynamic Wizard Cards / Results Screen */}
+        <div className={`${
+          step === 'intro' ? 'lg:col-span-9' : 'lg:col-span-6'
+        } flex flex-col justify-start`}>
           
           {/* INTRO STEP */}
           {step === 'intro' && (
@@ -624,6 +658,29 @@ Gegenereerd met de FysiekFabriek Triage Tool.
                   <p className="text-slate-300 text-sm md:text-base leading-relaxed">{questions[currentQ].description}</p>
                 </div>
               </div>
+
+              {/* Specific Question Examples (Sub-panel) */}
+              {questions[currentQ].examples && (
+                <div className="bg-slate-900/40 border border-slate-700/40 rounded-2xl p-4 space-y-3">
+                  <div className="flex items-center gap-1.5 text-xs font-bold text-slate-300 uppercase tracking-wider">
+                    <span>💡 Praktijkvoorbeelden ter vergelijking:</span>
+                  </div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
+                    <div className="bg-red-950/30 border border-red-500/20 rounded-xl p-3 space-y-1">
+                      <span className="font-extrabold text-red-400 flex items-center gap-1">
+                        <span>🔴</span> Rood (Niet toegestaan)
+                      </span>
+                      <p className="text-slate-300 leading-relaxed">{questions[currentQ].examples.red}</p>
+                    </div>
+                    <div className="bg-emerald-950/30 border border-emerald-500/20 rounded-xl p-3 space-y-1">
+                      <span className="font-extrabold text-emerald-400 flex items-center gap-1">
+                        <span>🟢</span> Toegestaan (FF-Formule)
+                      </span>
+                      <p className="text-slate-300 leading-relaxed">{questions[currentQ].examples.ok}</p>
+                    </div>
+                  </div>
+                </div>
+              )}
 
               {/* Controls */}
               <div className="flex flex-col sm:flex-row justify-between gap-4 pt-4 border-t border-slate-700/60">
@@ -976,6 +1033,74 @@ Gegenereerd met de FysiekFabriek Triage Tool.
           )}
 
         </div>
+
+        {/* Right Column: Live Answers & Progress Tracker */}
+        {step !== 'intro' && (
+          <div className="lg:col-span-3 flex flex-col gap-6 animate-fade-in">
+            <div className="bg-slate-800 rounded-3xl border border-slate-700 p-5 shadow-xl w-full space-y-4">
+              <div className="border-b border-slate-700 pb-3">
+                <h3 className="text-sm font-bold text-slate-200 uppercase tracking-wider">Triage Voortgang</h3>
+                <p className="text-[10px] text-slate-400 mt-0.5">Klik op een beantwoord blok om terug te gaan</p>
+              </div>
+              <div className="space-y-3">
+                {questions.map((q, idx) => {
+                  const answer = answers[q.id];
+                  const isAnswered = answer !== null;
+                  const isCurrent = currentQ === idx && step === 'quiz';
+                  
+                  let badgeColor = "bg-slate-900 text-slate-500 border-slate-800";
+                  let badgeText = "Openstaand";
+                  
+                  if (isAnswered) {
+                    if (answer === 'yes') {
+                      badgeColor = "bg-red-950/60 text-red-400 border-red-500/30";
+                      badgeText = "Ja";
+                    } else if (answer === 'no') {
+                      badgeColor = "bg-emerald-950/60 text-emerald-400 border-emerald-500/30";
+                      badgeText = "Nee";
+                    } else {
+                      // Options A/B
+                      const option = q.options?.find(o => o.value === answer);
+                      badgeColor = "bg-amber-950/60 text-amber-400 border-amber-500/30";
+                      badgeText = option ? option.label.split(':')[0] : answer;
+                    }
+                  } else if (isCurrent) {
+                    badgeColor = "bg-sky-950 text-sky-400 border-sky-500/50 animate-pulse";
+                    badgeText = "Actief...";
+                  }
+
+                  return (
+                    <div 
+                      key={q.id} 
+                      onClick={() => {
+                        if (step === 'quiz' && isAnswered) {
+                          setCurrentQ(idx);
+                        }
+                      }}
+                      className={`p-2.5 rounded-xl border text-xs transition-all ${
+                        isCurrent 
+                          ? 'bg-slate-700/50 border-sky-500/40 ring-1 ring-sky-500/20 shadow-md shadow-sky-500/5' 
+                          : isAnswered && step === 'quiz' 
+                          ? 'bg-slate-900/40 border-slate-700/60 hover:bg-slate-700/20 cursor-pointer hover:border-slate-500/40' 
+                          : 'bg-slate-900/10 border-slate-800/40 opacity-55'
+                      }`}
+                    >
+                      <div className="flex items-center justify-between gap-2">
+                        <span className={`font-semibold ${isCurrent ? 'text-sky-400' : isAnswered ? 'text-slate-200' : 'text-slate-500'}`}>
+                          Vraag {idx + 1}
+                        </span>
+                        <span className={`text-[9px] px-1.5 py-0.5 rounded-md font-bold border ${badgeColor}`}>
+                          {badgeText}
+                        </span>
+                      </div>
+                      <p className="text-[11px] text-slate-400 truncate mt-1">{q.text}</p>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          </div>
+        )}
 
       </main>
 
