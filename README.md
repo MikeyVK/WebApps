@@ -1,71 +1,90 @@
-# FysiekFabriek Triage & Portal
+# WebApps Monorepo - Triage & Portals
 
-Dit project is de centrale portal van **FysiekFabriek & Fokus** voor het beoordelen, triageren en registreren van maatwerk hulpmiddelen. Het stelt studenten, makers en uitdagers in staat om te bepalen of een projectveiligheidsrisico past binnen de informele co-creatie formule van FysiekFabriek, of dat het moet worden overgedragen aan een professioneel adaptatietechnicus.
-
----
-
-## 🚀 Applicaties in de Portal
-
-Het project is ingericht als een multi-page portaal met twee kernapplicaties:
-
-1.  **Stoplicht Triage Tool** (`/triage`): 
-    *   Evalueert projecten aan de hand van het stoplichtmodel (Rood, Oranje, Groen).
-    *   Gebaseerd op de EU MDR 2017/745 verordeningen en risico-evaluatiemethodiek.
-    *   Bevat een FMEA-lite (Failure Mode and Effects Analysis) matrix voor risico-inventarisatie van Oranje projecten.
-    *   Genereert een kopieerbaar triage-rapport.
-2.  **Fokus Intake Checklist** (`/flowchart`):
-    *   Evalueert uitdagers en uitdagingen op basis van 11 criteria (o.a. fysieke beperking, meerderjarig, gewone dagelijkse activiteit).
-    *   Houdt een dossiergeschiedenis lokaal bij met behulp van browser `localStorage`.
-    *   Biedt de mogelijkheid om dossiers op te slaan als printbare PDF.
+This repository is a monorepo containing the portals and triage applications for evaluating, triaging, and registering custom physical aid devices. It allows students, makers, and challengers to determine whether a project safety risk fits within the informal co-creation formula of FysiekFabriek, or needs to be referred to a professional adaptation technician.
 
 ---
 
-## 🛠️ Technologiestack & Structuur
+## 🚀 Applications & Workspaces
 
-*   **Framework**: [React](https://react.dev/) (v19) gebundeld met [Vite](https://vite.dev/) (v8)
-*   **Routing**: [React Router](https://reactrouter.com/) (`react-router-dom` v7)
+The repository is structured as an npm workspaces monorepo under the `apps/` directory:
+
+1.  **Central Portal** (`apps/portal`):
+    *   The primary landing portal for WebApps.
+    *   Styled with the Navy Blue (`#0f294a`) and Peach/Orange (`#f19d76`) corporate branding.
+    *   Contains zero mentions of the word *1Voudig*.
+    *   Provides links to individual scans and the sub-portal.
+2.  **FysiekFabriek Portal** (`apps/fysiek_fabriek_portal`):
+    *   A dedicated sub-portal specifically for FysiekFabriek tools.
+3.  **Project Intake Scan** (`apps/project_intake_scan`):
+    *   Fokus Checklist app checking against the 11 Fokus criteria.
+    *   Fully type-safe TypeScript React app.
+    *   Persists scan history locally in browser `localStorage` using key `project_intake_scan_history`.
+4.  **Maatwerk Risico Scan** (`apps/maatwerk_risico_scan`):
+    *   MDR Stoplicht triage tool (Red, Orange, Green classifications).
+    *   Fully type-safe TypeScript React app.
+    *   Includes a FMEA-lite risk assessment matrix for Orange projects.
+    *   Pure rendering confetti animation for Green outcomes.
+
+---
+
+## 🛠️ Technology Stack
+
+*   **Monorepo Tooling**: npm workspaces
+*   **Framework**: [React](https://react.dev/) (v19) bundled with [Vite](https://vite.dev/) (v8)
 *   **Styling**: [Tailwind CSS](https://tailwindcss.com/) (v4)
+*   **Language**: [TypeScript](https://www.typescriptlang.org/) (strict mode)
 *   **Icons**: [Lucide React](https://lucide.dev/) (`lucide-react`)
-
-### Belangrijke Bestanden & Mappen
-*   [App.jsx](file:///c:/1Voudig/99_Programming/FysiekFabriek-Triage/src/App.jsx): De router die de applicaties aan elkaar koppelt.
-*   [pages/HomePage.jsx](file:///c:/1Voudig/99_Programming/FysiekFabriek-Triage/src/pages/HomePage.jsx): Het centrale startportaal.
-*   [pages/TriageStoplicht.jsx](file:///c:/1Voudig/99_Programming/FysiekFabriek-Triage/src/pages/TriageStoplicht.jsx): De Stoplicht Triage applicatie.
-*   [pages/FysiekFabriekFlowchart.tsx](file:///c:/1Voudig/99_Programming/FysiekFabriek-Triage/src/pages/FysiekFabriekFlowchart.tsx): De Fokus Intake Checklist applicatie (TypeScript/TSX).
-*   [index.css](file:///c:/1Voudig/99_Programming/FysiekFabriek-Triage/src/index.css): Globale CSS-stijlen en Tailwind v4 configuratie.
+*   **Linter**: [ESLint](https://eslint.org/) (v9)
 
 ---
 
-## 💻 Lokale Ontwikkeling
+## 💻 Local Development
 
-### 1. Installeren van Dependencies
-Zorg dat je Node.js geïnstalleerd hebt en voer uit in de project root:
+### 1. Install Dependencies
+Run from the root directory to install dependencies and link workspaces:
 ```bash
 npm install
 ```
 
-### 2. Dev Server opstarten
-Start de lokale Vite ontwikkelserver:
-```bash
-npm run dev
-```
-De applicatie is daarna live bereikbaar op [http://localhost:5173/](http://localhost:5173/).
+### 2. Running Workspace Applications
+You can start any application individually from the root directory:
+
+*   **Start Central Portal**:
+    ```bash
+    npm run dev -w portal
+    ```
+*   **Start FysiekFabriek Portal**:
+    ```bash
+    npm run dev -w fysiek_fabriek_portal
+    ```
+*   **Start Project Intake Scan**:
+    ```bash
+    npm run dev -w project_intake_scan
+    ```
+*   **Start Maatwerk Risico Scan**:
+    ```bash
+    npm run dev -w maatwerk_risico_scan
+    ```
+
+### 3. Global Linting and Type Checking
+Run from the root directory:
+
+*   **Lint all code**:
+    ```bash
+    npm run lint
+    ```
+*   **Type check all workspaces**:
+    ```bash
+    npx tsc --noEmit
+    ```
 
 ---
 
 ## 🏛️ Phase-Gate Agent Protocol (`pgmcp`)
 
-Dit project maakt actief gebruik van de **Phase-Gate MCP (Model Context Protocol) Server** om gestructureerde, veilige en gecontroleerde samenwerking tussen AI-agents en menselijke ontwikkelaars mogelijk te maken.
+This project actively utilizes the **Phase-Gate MCP (Model Context Protocol) Server** to enforce quality control, testing (TDD), and structured branch phases.
 
-### Server Config & Omgeving
-*   **Lokale virtuele omgeving**: De Python-omgeving bevindt zich in de map [`.venv/`](file:///c:/1Voudig/99_Programming/FysiekFabriek-Triage/.venv).
-*   **Server Root**: De configuratie, handleidingen en templates van de phase gate server zijn opgeslagen in [`.pgmcp/`](file:///c:/1Voudig/99_Programming/FysiekFabriek-Triage/.pgmcp).
-
-### Belangrijke Richtlijnen voor Agents
-1.  **Git & GitHub Operations**: Gebruik altijd de specifieke MCP-tools (`git_*` / `create_issue` / `submit_pr` / etc.) in plaats van ruwe terminalcommando's via `run_in_terminal` of `run_command`.
-2.  **Architectuur Contract**: Alle code-aanpassingen moeten voldoen aan de standaarden in `.pgmcp/docs/coding_standards/ARCHITECTURE_PRINCIPLES.md`.
-3.  **TDD (Test-Driven Development)**: Ontwikkeling volgt strikt de RED → GREEN → REFACTOR cyclus.
-4.  **Three-Agent Model**:
-    *   `@co`: Coördinatie autoriteit en epic workflow eigenaar.
-    *   `@imp`: Child-issue implementatie executor (productiecode & tests).
-    *   `@qa`: QA autoriteit (read-only, tests en kwaliteitsgates runnen).
+### Directory Layout
+*   `docs/development/issue1/`: planning, research, and validation documentation for issue #1.
+*   `.pgmcp/`: server configuration, schemas, and templates.
+*   `.venv/`: local Python virtual environment for running the MCP server.

@@ -1,7 +1,4 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
-
-export default function HomePage() {
+export default function App() {
   return (
     <div className="min-h-screen bg-slate-900 text-slate-100 flex flex-col font-sans relative overflow-x-hidden antialiased">
       {/* Background decoration */}
@@ -22,7 +19,14 @@ export default function HomePage() {
               <p className="text-xs text-slate-400 font-semibold uppercase tracking-wider">Hulpmiddelen & Risicobeoordeling</p>
             </div>
           </div>
-          <span className="text-xs text-slate-400 bg-slate-700/50 px-3 py-1.5 rounded-full font-mono">Platform v2.0</span>
+          <div className="flex items-center gap-4">
+            <a href="/" className="text-xs font-bold text-slate-300 hover:text-sky-400 transition-colors bg-slate-700/40 px-3 py-1.5 rounded-lg border border-slate-700/60 flex items-center gap-1">
+              <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+              </svg>
+              <span>Algemene Portal</span>
+            </a>
+          </div>
         </div>
       </header>
 
@@ -31,21 +35,21 @@ export default function HomePage() {
         
         {/* Welcome Section */}
         <div className="text-center space-y-4 max-w-2xl">
-          <span className="text-xs font-bold text-sky-400 uppercase tracking-widest bg-sky-950/50 px-3 py-1.5 rounded-md">Centraal Dashboard</span>
+          <span className="text-xs font-bold text-sky-400 uppercase tracking-widest bg-sky-950/50 px-3 py-1.5 rounded-md">FysiekFabriek Dashboard</span>
           <h2 className="text-3xl md:text-5xl font-black text-white tracking-tight leading-none">
             Welkom bij de <span className="bg-gradient-to-r from-sky-400 to-indigo-400 bg-clip-text text-transparent">FysiekFabriek Tools</span>
           </h2>
           <p className="text-slate-400 text-sm md:text-base leading-relaxed">
-            Selecteer hieronder een van de applicaties om aan de slag te gaan met de triage, risicoanalyses, of het in kaart brengen van fysieke uitdagingen.
+            Selecteer hieronder een van de specifieke FysiekFabriek applicaties om aan de slag te gaan met de intake of de risico-triage.
           </p>
         </div>
 
         {/* Grid cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 w-full max-w-4xl">
           
-          {/* Card 1: Stoplicht Triage */}
-          <Link 
-            to="/triage"
+          {/* Card 1: Maatwerk Risico Scan (Stoplicht Triage) */}
+          <a 
+            href="/maatwerk_risico_scan/"
             className="group bg-slate-800 hover:bg-slate-800/80 border border-slate-700 hover:border-sky-500/50 rounded-3xl p-8 flex flex-col justify-between gap-6 shadow-xl transition-all hover:-translate-y-1 hover:shadow-sky-500/5 relative overflow-hidden"
           >
             <div className="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-sky-500 to-indigo-500" />
@@ -55,22 +59,22 @@ export default function HomePage() {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
               </div>
-              <h3 className="text-xl font-bold text-white group-hover:text-sky-400 transition-colors">Stoplicht Triage Tool</h3>
+              <h3 className="text-xl font-bold text-white group-hover:text-sky-400 transition-colors">Maatwerk Risico Scan</h3>
               <p className="text-slate-400 text-xs leading-relaxed">
-                Evalueer snel projecten aan de hand van het stoplichtmodel (Rood, Oranje, Groen). Inclusief een interactieve FMEA-lite risicoanalyse voor Oranje projecten en automatische rapportgeneratie.
+                Evalueer snel projecten aan de hand van het stoplichtmedisch model (Rood, Oranje, Groen). Inclusief een interactieve FMEA-lite risicoanalyse voor Oranje projecten en automatische rapportgeneratie.
               </p>
             </div>
             <div className="text-xs font-bold text-sky-400 flex items-center gap-1.5 mt-4 self-start">
-              <span>Start Triage</span>
+              <span>Start Risico Scan</span>
               <svg className="w-4 h-4 transform group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
               </svg>
             </div>
-          </Link>
+          </a>
 
-          {/* Card 2: Fokus Flowchart */}
-          <Link 
-            to="/flowchart"
+          {/* Card 2: Project Intake Scan (Fokus Flowchart) */}
+          <a 
+            href="/project_intake_scan/"
             className="group bg-slate-800 hover:bg-slate-800/80 border border-slate-700 hover:border-[#F26522]/50 rounded-3xl p-8 flex flex-col justify-between gap-6 shadow-xl transition-all hover:-translate-y-1 hover:shadow-orange-500/5 relative overflow-hidden"
           >
             <div className="absolute top-0 left-0 w-full h-1.5 bg-[#F26522]" />
@@ -80,18 +84,18 @@ export default function HomePage() {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
                 </svg>
               </div>
-              <h3 className="text-xl font-bold text-white group-hover:text-[#F26522] transition-colors">Fokus Intake Checklist</h3>
+              <h3 className="text-xl font-bold text-white group-hover:text-[#F26522] transition-colors">Project Intake Scan</h3>
               <p className="text-slate-400 text-xs leading-relaxed">
                 Doorloop de 11 criteria voor uitdagers en uitdagingen om te bepalen of een specifiek hulpmiddelenproject past binnen de Fokus-formule. Houdt een dossier-geschiedenis lokaal bij.
               </p>
             </div>
             <div className="text-xs font-bold text-[#F26522] flex items-center gap-1.5 mt-4 self-start">
-              <span>Start Intake</span>
+              <span>Start Intake Scan</span>
               <svg className="w-4 h-4 transform group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
               </svg>
             </div>
-          </Link>
+          </a>
 
         </div>
 

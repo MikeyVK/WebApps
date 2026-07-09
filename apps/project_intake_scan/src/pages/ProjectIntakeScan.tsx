@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { 
   User, 
   ChevronRight, 
@@ -17,17 +17,33 @@ import {
   ShieldAlert, 
   RotateCw, 
   Printer, 
-  FileCheck, 
   Home, 
   Info, 
-  Sparkles,
   ArrowRight,
   Ban,
   Eye
 } from 'lucide-react';
-import { Link } from 'react-router-dom';
 
-const QUESTIONS = [
+interface Question {
+  id: number;
+  phase: number;
+  category: string;
+  headerColor: string;
+  phaseName: string;
+  title: string;
+  questionText: string;
+  description: string;
+  icon: React.ComponentType<{ className?: string }>;
+  expectedAnswer: boolean;
+  failTitle: string;
+  failMessage: string;
+  failReason: string;
+  hasExamples?: boolean;
+  examplesRed?: string[];
+  examplesGreen?: string[];
+}
+
+const QUESTIONS: Question[] = [
   {
     id: 1,
     phase: 1,
@@ -207,7 +223,20 @@ const QUESTIONS = [
   }
 ];
 
-export default function FysiekFabriekFlowchart() {
+interface ProjectScanResult {
+  id: number;
+  date: string;
+  project: {
+    title: string;
+    targetUser: string;
+    description: string;
+  };
+  answers: Record<number, boolean>;
+  status: 'success' | 'failed';
+  failedAtQuestion: Question | null;
+}
+
+export default function ProjectIntakeScan() {
   const [currentView, setCurrentView] = useState('dashboard');
   const [projectInfo, setProjectInfo] = useState({
     title: "",
@@ -215,27 +244,24 @@ export default function FysiekFabriekFlowchart() {
     description: ""
   });
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
-  const [answers, setAnswers] = useState({});
-  const [savedProjects, setSavedProjects] = useState([]);
-  const [formError, setFormError] = useState("");
-
-  // Laad geschiedenis uit localStorage
-  useEffect(() => {
-    const localData = localStorage.getItem('fysiek_fabriek_projects_v2');
+  const [answers, setAnswers] = useState<Record<number, boolean>>({});
+  const [savedProjects, setSavedProjects] = useState<ProjectScanResult[]>(() => {
+    const localData = localStorage.getItem('project_intake_scan_history');
     if (localData) {
       try {
-        setSavedProjects(JSON.parse(localData));
+        return JSON.parse(localData);
       } catch (e) {
         console.error("Fout bij laden van projecten", e);
       }
     }
-  }, []);
+    return [];
+  });
+  const [formError, setFormError] = useState("");
 
-  const saveProjectsToLocalStorage = (updatedList) => {
+  const saveProjectsToLocalStorage = (updatedList: ProjectScanResult[]) => {
     setSavedProjects(updatedList);
-    localStorage.setItem('fysiek_fabriek_projects_v2', JSON.stringify(updatedList));
+    localStorage.setItem('project_intake_scan_history', JSON.stringify(updatedList));
   };
-
   const handleStartNew = () => {
     setProjectInfo({ title: "", targetUser: "", description: "" });
     setAnswers({});
@@ -244,7 +270,7 @@ export default function FysiekFabriekFlowchart() {
     setCurrentView('setup');
   };
 
-  const handleStartWizard = (e) => {
+  const handleStartWizard = (e: React.FormEvent) => {
     e.preventDefault();
     if (!projectInfo.title.trim()) {
       setFormError("Vul a.u.b. een titel in voor deze uitdaging.");
@@ -262,7 +288,7 @@ export default function FysiekFabriekFlowchart() {
     setCurrentView('wizard');
   };
 
-  const handleAnswer = (answerValue) => {
+  const handleAnswer = (answerValue: boolean) => {
     const currentQuestion = QUESTIONS[currentQuestionIndex];
     if (!currentQuestion) return;
 
@@ -272,7 +298,7 @@ export default function FysiekFabriekFlowchart() {
     const isFailed = answerValue !== currentQuestion.expectedAnswer;
 
     if (isFailed) {
-      const newResult = {
+      const newResult: ProjectScanResult = {
         id: Date.now(),
         date: new Date().toLocaleDateString('nl-NL'),
         project: projectInfo,
@@ -285,7 +311,7 @@ export default function FysiekFabriekFlowchart() {
       setCurrentView('result');
     } else {
       if (currentQuestionIndex === QUESTIONS.length - 1) {
-        const newResult = {
+        const newResult: ProjectScanResult = {
           id: Date.now(),
           date: new Date().toLocaleDateString('nl-NL'),
           project: projectInfo,
@@ -310,15 +336,13 @@ export default function FysiekFabriekFlowchart() {
     }
   };
 
-  // Navigeer terug naar een eerdere stap en schoon de status op
-  const handleGoBackToQuestion = (questionId) => {
+  const handleGoBackToQuestion = (questionId: number) => {
     const qIndex = QUESTIONS.findIndex(q => q.id === questionId);
     if (qIndex !== -1) {
       setCurrentQuestionIndex(qIndex);
       setCurrentView('wizard');
 
-      // Behoud alleen antwoorden voor vragen die chronologisch VOOR de gekozen vraag liggen
-      const cleanedAnswers = {};
+      const cleanedAnswers: Record<number, boolean> = {};
       QUESTIONS.forEach(q => {
         if (q.id < questionId && answers[q.id] !== undefined) {
           cleanedAnswers[q.id] = answers[q.id];
@@ -326,7 +350,6 @@ export default function FysiekFabriekFlowchart() {
       });
       setAnswers(cleanedAnswers);
 
-      // Verwijder de laatste mislukte run geruisloos uit de geschiedenis om duplicaten te voorkomen
       if (savedProjects.length > 0) {
         const updatedList = savedProjects.slice(1);
         saveProjectsToLocalStorage(updatedList);
@@ -334,13 +357,13 @@ export default function FysiekFabriekFlowchart() {
     }
   };
 
-  const handleDeleteProject = (id, e) => {
+  const handleDeleteProject = (id: number, e: React.MouseEvent) => {
     e.stopPropagation();
     const filtered = savedProjects.filter(p => p.id !== id);
     saveProjectsToLocalStorage(filtered);
   };
 
-  const handlePrint = (e) => {
+  const handlePrint = (e: React.MouseEvent) => {
     e.preventDefault();
     window.print();
   };
@@ -349,7 +372,6 @@ export default function FysiekFabriekFlowchart() {
   const progressPercent = Math.round((currentQuestionIndex / QUESTIONS.length) * 100);
   const currentResult = savedProjects[0] || null;
 
-  // Groeperingshulp voor live checkbox check in de wizard
   const isYellowHeaderChecked = answers[1] === true && answers[2] === true && answers[3] === true;
   const isGreyHeaderChecked = answers[4] === true && answers[5] === true;
   const isPeachHeaderChecked = answers[6] === true && answers[7] === true;
@@ -359,7 +381,6 @@ export default function FysiekFabriekFlowchart() {
   return (
     <div className="min-h-screen bg-amber-50/20 text-slate-900 font-sans flex flex-col selection:bg-orange-100 print:bg-white print:text-black">
       
-      {/* CSS @media print injectie voor een perfecte PDF print-opmaak */}
       <style>{`
         @media print {
           body, html {
@@ -396,13 +417,13 @@ export default function FysiekFabriekFlowchart() {
           </div>
 
           <div className="flex items-center space-x-3">
-            <Link 
-              to="/"
+            <a 
+              href="/"
               className="px-4 py-2 bg-slate-100 hover:bg-slate-200 border-2 border-slate-800 rounded-xl text-xs font-bold uppercase tracking-wider transition-all shadow-[2px_2px_0px_0px_rgba(30,41,59,1)] hover:translate-y-[1px] hover:shadow-[1px_1px_0px_0px_rgba(30,41,59,1)] text-slate-800 flex items-center gap-1"
             >
               <Home className="w-3.5 h-3.5" />
               <span>Naar Home Portal</span>
-            </Link>
+            </a>
             <button 
               onClick={() => setCurrentView('dashboard')}
               className={`px-4 py-2 border-2 border-slate-800 rounded-xl text-xs font-bold uppercase tracking-wider transition-all shadow-[2px_2px_0px_0px_rgba(30,41,59,1)] hover:translate-y-[1px] hover:shadow-[1px_1px_0px_0px_rgba(30,41,59,1)] ${currentView === 'dashboard' ? 'text-white bg-slate-900' : 'text-slate-800 bg-white'}`}
@@ -583,7 +604,7 @@ export default function FysiekFabriekFlowchart() {
                 </label>
                 <textarea 
                   id="description"
-                  rows="3"
+                  rows={3}
                   placeholder="Wat is er precies nodig en welke dagelijkse handeling moet hiermee worden vergemakkelijkt?"
                   value={projectInfo.description}
                   onChange={(e) => setProjectInfo({ ...projectInfo, description: e.target.value })}
@@ -632,7 +653,7 @@ export default function FysiekFabriekFlowchart() {
                     <span className="font-extrabold text-xs text-slate-900">{progressPercent}%</span>
                   </div>
                   <div className="w-20 h-2 bg-slate-100 border border-slate-300 rounded-full overflow-hidden">
-                    <div className="bg-slate-900 h-full transition-all duration-300" style={{ width: `${progressPercent}%` }} />
+                     <div className="bg-slate-950 h-full transition-all duration-300" style={{ width: `${progressPercent}%` }} />
                   </div>
                 </div>
               </div>
@@ -935,7 +956,7 @@ export default function FysiekFabriekFlowchart() {
                 <p className="text-slate-500 text-xs font-semibold">De hulpvraag conflicteert met één of meerdere richtlijnen. Pas de details aan of bekijk de toelichtende adviezen hieronder.</p>
                 <div className="pt-2">
                   <button
-                    onClick={() => handleGoBackToQuestion(currentResult.failedAtQuestion?.id)}
+                    onClick={() => currentResult.failedAtQuestion && handleGoBackToQuestion(currentResult.failedAtQuestion.id)}
                     className="inline-flex items-center space-x-1.5 bg-[#F26522] border-2 border-slate-800 hover:bg-orange-600 text-white px-5 py-2.5 rounded-xl text-xs font-black uppercase tracking-wider shadow-[2px_2px_0px_0px_rgba(30,41,59,1)] transition-all cursor-pointer"
                   >
                     <ChevronLeft className="w-4 h-4" />

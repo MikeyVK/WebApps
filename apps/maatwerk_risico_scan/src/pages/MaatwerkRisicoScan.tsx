@@ -1,7 +1,12 @@
 import React, { useState, useEffect } from 'react';
 
-// Preset projecten om de werking direct te demonstreren
-const PRESET_PROJECTS = [
+interface PresetProject {
+  name: string;
+  description: string;
+  answers: Record<string, string | null>;
+}
+
+const PRESET_PROJECTS: PresetProject[] = [
   {
     name: "Aangepaste Spaghetti-lepel",
     description: "Een mechanisch vergrote greep voor een eetlepel zonder medische claim, puur voor ergonomisch comfort tijdens het eten.",
@@ -39,47 +44,162 @@ const PRESET_PROJECTS = [
   }
 ];
 
-export default function TriageStoplicht() {
-  const [step, setStep] = useState('intro'); // 'intro', 'quiz', 'result'
-  const [currentQ, setCurrentQ] = useState(0);
-  const [answers, setAnswers] = useState({
-    q1: null, // Vitale functies (yes/no)
-    q2: null, // Transfers & Lichaamskrachten (yes/no)
-    q3: null, // Harde modificatie (yes/no)
-    q4: null, // Actieve elektronica / Software (yes/no)
-    q5: null, // Comfort/Recreatie (yes/no)
-    q6: null, // Huidcontact (yes/no)
-    q7: null, // Gevolgen falen (optionA/optionB)
-    q8: null  // Bevestiging basishulpmiddel (optionA/optionB)
+interface FmeaHazard {
+  id: number;
+  hazard: string;
+  severity: string;
+  mitigation: string;
+}
+
+interface QuestionOption {
+  value: string;
+  label: string;
+  desc: string;
+}
+
+interface TriageQuestion {
+  id: 'q1' | 'q2' | 'q3' | 'q4' | 'q5' | 'q6' | 'q7' | 'q8';
+  title: string;
+  text: string;
+  description: string;
+  type: 'binary' | 'choice';
+  icon: React.ReactNode;
+  examples?: {
+    red: string;
+    ok: string;
+  };
+  options?: QuestionOption[];
+}
+
+interface TriageResult {
+  status: 'ROOD' | 'GROEN' | 'ORANJE_MATIG' | 'ORANJE_LICHT' | 'IN_BEHANDELING';
+  code?: string;
+  title?: string;
+  message: string;
+  reasons?: string[];
+}
+
+export default function MaatwerkRisicoScan() {
+  const [step, setStep] = useState<'intro' | 'quiz' | 'result'>('intro');
+  const [currentQ, setCurrentQ] = useState<number>(0);
+  const [answers, setAnswers] = useState<Record<string, string | null>>({
+    q1: null,
+    q2: null,
+    q3: null,
+    q4: null,
+    q5: null,
+    q6: null,
+    q7: null,
+    q8: null
   });
   
-  // FMEA-lite state
-  const [fmeaHazards, setFmeaHazards] = useState([
+  const [fmeaHazards, setFmeaHazards] = useState<FmeaHazard[]>([
     { id: 1, hazard: 'Scherpe randen na 3D-printen', severity: '2', mitigation: 'Handmatig naschuren en randen afronden in CAD' },
     { id: 2, hazard: 'Losraken door trillingen', severity: '3', mitigation: 'Gebruik van borgmoeren en periodieke controle voorschrijven' }
   ]);
-  const [newHazard, setNewHazard] = useState('');
-  const [newSeverity, setNewSeverity] = useState('2');
-  const [newMitigation, setNewMitigation] = useState('');
+  const [newHazard, setNewHazard] = useState<string>('');
+  const [newSeverity, setNewSeverity] = useState<string>('2');
+  const [newMitigation, setNewMitigation] = useState<string>('');
 
-  // Projectinfo voor het eindrapport
-  const [projectName, setProjectName] = useState('');
-  const [projectDescription, setProjectDescription] = useState('');
-  const [challengerName, setChallengerName] = useState('');
+  const [projectName, setProjectName] = useState<string>('');
+  const [projectDescription, setProjectDescription] = useState<string>('');
+  const [challengerName, setChallengerName] = useState<string>('');
+interface ConfettiParticle {
+  id: number;
+  top: number;
+  left: number;
+  color: string;
+  delay: number;
+  duration: number;
+}
 
-  // Confetti effect triggeren voor GROEN
-  const [showConfetti, setShowConfetti] = useState(false);
+  const [showConfetti, setShowConfetti] = useState<boolean>(false);
+  const [confettiParticles, setConfettiParticles] = useState<ConfettiParticle[]>([]);
+  // Logic om het resultaat realtime of aan het einde te berekenen
+  const getTriageResult = (customAnswers?: Record<string, string | null> | null): TriageResult => {
+    const activeAnswers = customAnswers || answers;
+    
+    // Blok 1: Rood Filters (Harde uitsluitingen)
+    if (activeAnswers.q1 === 'yes') return { status: 'ROOD', code: 'vital_functions', title: 'Vitale Functies', message: 'Dit project grijpt direct in op vitale fysiologische functies van de uitdager. Dit brengt onaanvaardbaar hoge risico\'s met zich mee voor co-creatie door studenten.' };
+    if (activeAnswers.q2 === 'yes') return { status: 'ROOD', code: 'transfers_forces', title: 'Transfers & Lichaamskrachten', message: 'Dit project is onderhevig aan zware mechanische belasting of beïnvloedt actieve patiënttransfers. Bij falen is er direct risico op ernstig fysiek letsel.' };
+    if (activeAnswers.q3 === 'yes') return { status: 'ROOD', code: 'hard_modification', title: 'Harde Modificatie', message: 'Dit project omvat een harde constructieve of elektronische ingreep in een bestaand CE-hulpmiddel. Hierdoor vervalt de fabrieksgarantie en verschuift alle aansprakelijkheid.' };
+    if (activeAnswers.q4 === 'yes') return { status: 'ROOD', code: 'active_electronics_software', title: 'Actieve Elektronica of Software', message: 'Dit project maakt gebruik van actieve elektronica, een stroomvoorziening of standalone software (apps). Vanwege de complexe MDR-classificatie (Rule 11 voor software) en elektromagnetische compatibiliteit (EMC) is dit niet toegestaan binnen FysiekFabriek.' };
+
+    // Blok 2: Groene Afslag
+    if (activeAnswers.q5 === 'yes') {
+      return { status: 'GROEN', code: 'comfort_recreation', title: 'Lifehacks, Comfort & Vrijetijd', message: 'Gefeliciteerd! Dit project dient uitsluitend een ergonomisch of vrijetijdsdoel en valt buiten de wetgevingskaders van de MDR.' };
+    }
+
+    // Blok 3: Oranje Scenario's (MDR-licht)
+    const hasUnansweredOranje = [activeAnswers.q6, activeAnswers.q7, activeAnswers.q8].some(val => val === null);
+    if (hasUnansweredOranje && !customAnswers) {
+      return { status: 'IN_BEHANDELING', message: 'Bezig met analyseren...' };
+    }
+
+    let isModerate = false;
+    const reasons: string[] = [];
+
+    if (activeAnswers.q6 === 'yes') {
+      isModerate = true;
+      reasons.push('Langdurig of drukgeladen direct huidcontact (risico op decubitus/weefselschade).');
+    }
+    if (activeAnswers.q7 === 'optionB') {
+      isModerate = true;
+      reasons.push('Bij mechanisch falen verliest de uitdager direct zijn zelfredzaamheid of ontstaat een onveilige situatie.');
+    }
+    if (activeAnswers.q8 === 'optionB') {
+      isModerate = true;
+      reasons.push('Het product wordt bevestigd aan een bestaand CE-gemarkeerd hulpmiddel (zachte modificatie). Beoordeling op onbedoelde effecten is vereist.');
+    }
+
+    if (isModerate) {
+      return { 
+        status: 'ORANJE_MATIG', 
+        code: 'orange_moderate', 
+        reasons,
+        message: 'Dit project valt formeel onder de MDR (laag risico) maar heeft specifieke risicofactoren. Co-creatie mag, mits er een digitaal technisch dossier wordt opgesteld en een expert (Michel) het ontwerp fiateert.'
+      };
+    } else {
+      return { 
+        status: 'ORANJE_LICHT', 
+        code: 'orange_light',
+        message: 'Dit project heeft een medische/compenserende insteek met een zeer laag risicoprofiel. Co-creatie is toegestaan onder naleving van de basis-kwaliteitschecklist.'
+      };
+    }
+  };
+
+  const triage = getTriageResult();
 
   useEffect(() => {
-    if (step === 'result' && getTriageResult().status === 'GROEN') {
-      setShowConfetti(true);
-      const timer = setTimeout(() => setShowConfetti(false), 5000);
-      return () => clearTimeout(timer);
-    }
-  }, [step]);
+    if (step === 'result' && triage.status === 'GROEN') {
+      const colors = ['#10B981', '#3B82F6', '#F59E0B', '#EF4444', '#EC4899'];
+      const particles: ConfettiParticle[] = Array.from({ length: 60 }).map((_, i) => ({
+        id: i,
+        top: Math.random() * 100,
+        left: Math.random() * 100,
+        color: colors[Math.floor(Math.random() * colors.length)],
+        delay: Math.random() * 2,
+        duration: 2 + Math.random() * 3
+      }));
+      
+      const setupTimer = setTimeout(() => {
+        setConfettiParticles(particles);
+        setShowConfetti(true);
+      }, 0);
 
-  // Vragenlijst structuur met de nieuwe Software/Elektronica vraag ingevoegd in Blok 1
-  const questions = [
+      const timer = setTimeout(() => {
+        setShowConfetti(false);
+        setConfettiParticles([]);
+      }, 5000);
+
+      return () => {
+        clearTimeout(setupTimer);
+        clearTimeout(timer);
+      };
+    }
+  }, [step, triage.status]);
+
+  const questions: TriageQuestion[] = [
     {
       id: 'q1',
       title: '1. Vitale Functies',
@@ -181,7 +301,7 @@ export default function TriageStoplicht() {
     {
       id: 'q7',
       title: '7. Gevolgen van Mechanisch Falen',
-      text: 'Wat is het directe gevolg als het product tijdens normaal gebruik plotseling afbreekt of weigert?',
+      text: 'Wat is het directe gevolg als het product tijdens normaal gebruik plotseline afbreekt of weigert?',
       description: 'Bepaal de ernst van een onverwacht mechanisch of functioneel defect.',
       type: 'choice',
       options: [
@@ -220,60 +340,6 @@ export default function TriageStoplicht() {
     }
   ];
 
-  // Logic om het resultaat realtime of aan het einde te berekenen
-  const getTriageResult = (customAnswers = null) => {
-    const activeAnswers = customAnswers || answers;
-    
-    // Blok 1: Rood Filters (Harde uitsluitingen)
-    if (activeAnswers.q1 === 'yes') return { status: 'ROOD', code: 'vital_functions', title: 'Vitale Functies', message: 'Dit project grijpt direct in op vitale fysiologische functies van de uitdager. Dit brengt onaanvaardbaar hoge risico\'s met zich mee voor co-creatie door studenten.' };
-    if (activeAnswers.q2 === 'yes') return { status: 'ROOD', code: 'transfers_forces', title: 'Transfers & Lichaamskrachten', message: 'Dit project is onderhevig aan zware mechanische belasting of beïnvloedt actieve patiënttransfers. Bij falen is er direct risico op ernstig fysiek letsel.' };
-    if (activeAnswers.q3 === 'yes') return { status: 'ROOD', code: 'hard_modification', title: 'Harde Modificatie', message: 'Dit project omvat een harde constructieve of elektronische ingreep in een bestaand CE-hulpmiddel. Hierdoor vervalt de fabrieksgarantie en verschuift alle aansprakelijkheid.' };
-    if (activeAnswers.q4 === 'yes') return { status: 'ROOD', code: 'active_electronics_software', title: 'Actieve Elektronica of Software', message: 'Dit project maakt gebruik van actieve elektronica, een stroomvoorziening of standalone software (apps). Vanwege de complexe MDR-classificatie (Rule 11 voor software) en elektromagnetische compatibiliteit (EMC) is dit niet toegestaan binnen FysiekFabriek.' };
-
-    // Blok 2: Groene Afslag
-    if (activeAnswers.q5 === 'yes') {
-      return { status: 'GROEN', code: 'comfort_recreation', title: 'Lifehacks, Comfort & Vrijetijd', message: 'Gefeliciteerd! Dit project dient uitsluitend een ergonomisch of vrijetijdsdoel en valt buiten de wetgevingskaders van de MDR.' };
-    }
-
-    // Blok 3: Oranje Scenario's (MDR-licht)
-    // Controleer of alle benodigde vragen voor oranje zijn beantwoord
-    const hasUnansweredOranje = [activeAnswers.q6, activeAnswers.q7, activeAnswers.q8].some(val => val === null);
-    if (hasUnansweredOranje && !customAnswers) {
-      return { status: 'IN_BEHANDELING', message: 'Bezig met analyseren...' };
-    }
-
-    let isModerate = false;
-    const reasons = [];
-
-    if (activeAnswers.q6 === 'yes') {
-      isModerate = true;
-      reasons.push('Langdurig of drukgeladen direct huidcontact (risico op decubitus/weefselschade).');
-    }
-    if (activeAnswers.q7 === 'optionB') {
-      isModerate = true;
-      reasons.push('Bij mechanisch falen verliest de uitdager direct zijn zelfredzaamheid of ontstaat een onveilige situatie.');
-    }
-    if (activeAnswers.q8 === 'optionB') {
-      isModerate = true;
-      reasons.push('Het product wordt bevestigd aan een bestaand CE-gemarkeerd hulpmiddel (zachte modificatie). Beoordeling op onbedoelde effecten is vereist.');
-    }
-
-    if (isModerate) {
-      return { 
-        status: 'ORANJE_MATIG', 
-        code: 'orange_moderate', 
-        reasons,
-        message: 'Dit project valt formeel onder de MDR (laag risico) maar heeft specifieke risicofactoren. Co-creatie mag, mits er een digitaal technisch dossier wordt opgesteld en een expert (Michel) het ontwerp fiateert.'
-      };
-    } else {
-      return { 
-        status: 'ORANJE_LICHT', 
-        code: 'orange_light',
-        message: 'Dit project heeft een medische/compenserende insteek met een zeer laag risicoprofiel. Co-creatie is toegestaan onder naleving van de basis-kwaliteitschecklist.'
-      };
-    }
-  };
-
   const getCurrentGlow = () => {
     if (step === 'intro') return 'none';
     if (step === 'result') {
@@ -283,7 +349,6 @@ export default function TriageStoplicht() {
       return 'orange';
     }
 
-    // Tijdens quiz: check of er al een rood antwoord is gegeven
     if (answers.q1 === 'yes' || answers.q2 === 'yes' || answers.q3 === 'yes' || answers.q4 === 'yes') {
       return 'red';
     }
@@ -296,11 +361,10 @@ export default function TriageStoplicht() {
     return 'pulse';
   };
 
-  const handleAnswer = (val) => {
+  const handleAnswer = (val: string) => {
     const nextAnswers = { ...answers, [questions[currentQ].id]: val };
     setAnswers(nextAnswers);
 
-    // Directe uitsluitsels (Redirection naar resultaat)
     if ((currentQ === 0 || currentQ === 1 || currentQ === 2 || currentQ === 3) && val === 'yes') {
       setStep('result');
       return;
@@ -310,7 +374,6 @@ export default function TriageStoplicht() {
       return;
     }
 
-    // Volgende vraag of naar resultaten
     if (currentQ < questions.length - 1) {
       setCurrentQ(currentQ + 1);
     } else {
@@ -326,7 +389,7 @@ export default function TriageStoplicht() {
     }
   };
 
-  const selectPreset = (preset) => {
+  const selectPreset = (preset: PresetProject) => {
     setProjectName(preset.name);
     setProjectDescription(preset.description);
     setAnswers(preset.answers);
@@ -341,7 +404,6 @@ export default function TriageStoplicht() {
     setStep('quiz');
   };
 
-  // FMEA-lite toevoegen
   const addHazard = () => {
     if (!newHazard || !newMitigation) return;
     setFmeaHazards([
@@ -357,12 +419,11 @@ export default function TriageStoplicht() {
     setNewMitigation('');
   };
 
-  const removeHazard = (id) => {
+  const removeHazard = (id: number) => {
     setFmeaHazards(fmeaHazards.filter(h => h.id !== id));
   };
 
   const copyReportToClipboard = () => {
-    const triage = getTriageResult();
     const reportText = `
 =============================================
 FYSIEKFABRIEK TRIAGE-RAPPORT
@@ -420,23 +481,22 @@ Gegenereerd met de FysiekFabriek Triage Tool.
   };
 
   const glowClass = getCurrentGlow();
-  const triage = getTriageResult();
 
   return (
     <div className="min-h-screen bg-slate-900 text-slate-100 flex flex-col font-sans relative overflow-x-hidden antialiased">
       {/* Confetti Animation Layer */}
       {showConfetti && (
         <div className="absolute inset-0 pointer-events-none z-50 overflow-hidden">
-          {[...Array(60)].map((_, i) => (
+          {confettiParticles.map((p) => (
             <div
-              key={i}
+              key={p.id}
               className="absolute w-3 h-3 rounded-sm opacity-80 animate-ping"
               style={{
-                top: `${Math.random() * 100}%`,
-                left: `${Math.random() * 100}%`,
-                backgroundColor: ['#10B981', '#3B82F6', '#F59E0B', '#EF4444', '#EC4899'][Math.floor(Math.random() * 5)],
-                animationDelay: `${Math.random() * 2}s`,
-                animationDuration: `${2 + Math.random() * 3}s`
+                top: `${p.top}%`,
+                left: `${p.left}%`,
+                backgroundColor: p.color,
+                animationDelay: `${p.delay}s`,
+                animationDuration: `${p.duration}s`
               }}
             />
           ))}
@@ -462,7 +522,7 @@ Gegenereerd met de FysiekFabriek Triage Tool.
               <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
               </svg>
-              Terug naar Home
+              <span>Terug naar Home</span>
             </a>
           </div>
         </div>
@@ -675,13 +735,13 @@ Gegenereerd met de FysiekFabriek Triage Tool.
                       <span className="font-extrabold text-red-400 flex items-center gap-1">
                         <span>🔴</span> Rood (Niet toegestaan)
                       </span>
-                      <p className="text-slate-300 leading-relaxed">{questions[currentQ].examples.red}</p>
+                      <p className="text-slate-300 leading-relaxed">{questions[currentQ].examples?.red}</p>
                     </div>
                     <div className="bg-emerald-950/30 border border-emerald-500/20 rounded-xl p-3 space-y-1">
                       <span className="font-extrabold text-emerald-400 flex items-center gap-1">
                         <span>🟢</span> Toegestaan (FF-Formule)
                       </span>
-                      <p className="text-slate-300 leading-relaxed">{questions[currentQ].examples.ok}</p>
+                      <p className="text-slate-300 leading-relaxed">{questions[currentQ].examples?.ok}</p>
                     </div>
                   </div>
                 </div>
@@ -717,7 +777,7 @@ Gegenereerd met de FysiekFabriek Triage Tool.
                   </div>
                 ) : (
                   <div className="flex flex-col gap-3 w-full sm:w-auto">
-                    {questions[currentQ].options.map((opt, oIdx) => (
+                    {questions[currentQ].options?.map((opt, oIdx) => (
                       <button
                         key={oIdx}
                         onClick={() => handleAnswer(opt.value)}
@@ -812,7 +872,7 @@ Gegenereerd met de FysiekFabriek Triage Tool.
                 {triage.status === 'ROOD' && (
                   <div className="space-y-4 text-sm text-slate-300">
                     <div className="bg-red-950/20 border border-red-500/30 rounded-2xl p-4 flex gap-4 items-start text-red-300/90">
-                      <span className="text-2xl">🛑</span>
+                      <span className="text-2xl animate-pulse">🛑</span>
                       <div>
                         <h4 className="font-extrabold text-white text-base">Let op: Co-creatie niet toegestaan</h4>
                         <p className="text-xs mt-1">Dit project overschrijdt de veilige grenzen voor studententeams of hobbyisten. Vanwege vitale impact, mechanische belasting, of de aanwezigheid van actieve stroom/software mag dit product niet in co-creatie gebouwd worden.</p>
@@ -1064,7 +1124,6 @@ Gegenereerd met de FysiekFabriek Triage Tool.
                       badgeColor = "bg-emerald-950/60 text-emerald-400 border-emerald-500/30";
                       badgeText = "Nee";
                     } else {
-                      // Options A/B
                       const option = q.options?.find(o => o.value === answer);
                       badgeColor = "bg-amber-950/60 text-amber-400 border-amber-500/30";
                       badgeText = option ? option.label.split(':')[0] : answer;
