@@ -3,14 +3,20 @@
   "issue_number": 1,
   "workflow_name": "refactor",
   "current_phase": "implementation",
-  "current_cycle": 2,
-  "last_cycle": 1,
+  "current_cycle": 3,
+  "last_cycle": 2,
   "cycle_history": [
     {
       "cycle_number": 2,
       "name": "Migrate Fokus Checklist to apps/project_intake_scan",
       "forced": false,
       "entered": "2026-07-09T17:30:33.184193+00:00"
+    },
+    {
+      "cycle_number": 3,
+      "name": "Migrate Triage Stoplicht to apps/maatwerk_risico_scan (TSX Conversion)",
+      "forced": false,
+      "entered": "2026-07-09T17:32:14.428875+00:00"
     }
   ],
   "required_phases": [
