@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { 
   User, 
   ChevronRight, 
@@ -33,7 +33,7 @@ interface Question {
   title: string;
   questionText: string;
   description: string;
-  icon: React.ComponentType<any>;
+  icon: React.ComponentType<{ className?: string }>;
   expectedAnswer: boolean;
   failTitle: string;
   failMessage: string;
@@ -223,6 +223,19 @@ const QUESTIONS: Question[] = [
   }
 ];
 
+interface ProjectScanResult {
+  id: number;
+  date: string;
+  project: {
+    title: string;
+    targetUser: string;
+    description: string;
+  };
+  answers: Record<number, boolean>;
+  status: 'success' | 'failed';
+  failedAtQuestion: Question | null;
+}
+
 export default function ProjectIntakeScan() {
   const [currentView, setCurrentView] = useState('dashboard');
   const [projectInfo, setProjectInfo] = useState({
@@ -232,26 +245,23 @@ export default function ProjectIntakeScan() {
   });
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [answers, setAnswers] = useState<Record<number, boolean>>({});
-  const [savedProjects, setSavedProjects] = useState<any[]>([]);
-  const [formError, setFormError] = useState("");
-
-  // Laad geschiedenis uit localStorage
-  useEffect(() => {
+  const [savedProjects, setSavedProjects] = useState<ProjectScanResult[]>(() => {
     const localData = localStorage.getItem('project_intake_scan_history');
     if (localData) {
       try {
-        setSavedProjects(JSON.parse(localData));
+        return JSON.parse(localData);
       } catch (e) {
         console.error("Fout bij laden van projecten", e);
       }
     }
-  }, []);
+    return [];
+  });
+  const [formError, setFormError] = useState("");
 
-  const saveProjectsToLocalStorage = (updatedList: any[]) => {
+  const saveProjectsToLocalStorage = (updatedList: ProjectScanResult[]) => {
     setSavedProjects(updatedList);
     localStorage.setItem('project_intake_scan_history', JSON.stringify(updatedList));
   };
-
   const handleStartNew = () => {
     setProjectInfo({ title: "", targetUser: "", description: "" });
     setAnswers({});

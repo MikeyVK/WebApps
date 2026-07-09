@@ -104,9 +104,17 @@ export default function MaatwerkRisicoScan() {
   const [projectName, setProjectName] = useState<string>('');
   const [projectDescription, setProjectDescription] = useState<string>('');
   const [challengerName, setChallengerName] = useState<string>('');
+interface ConfettiParticle {
+  id: number;
+  top: number;
+  left: number;
+  color: string;
+  delay: number;
+  duration: number;
+}
 
   const [showConfetti, setShowConfetti] = useState<boolean>(false);
-
+  const [confettiParticles, setConfettiParticles] = useState<ConfettiParticle[]>([]);
   // Logic om het resultaat realtime of aan het einde te berekenen
   const getTriageResult = (customAnswers?: Record<string, string | null> | null): TriageResult => {
     const activeAnswers = customAnswers || answers;
@@ -164,9 +172,30 @@ export default function MaatwerkRisicoScan() {
 
   useEffect(() => {
     if (step === 'result' && triage.status === 'GROEN') {
-      setShowConfetti(true);
-      const timer = setTimeout(() => setShowConfetti(false), 5000);
-      return () => clearTimeout(timer);
+      const colors = ['#10B981', '#3B82F6', '#F59E0B', '#EF4444', '#EC4899'];
+      const particles: ConfettiParticle[] = Array.from({ length: 60 }).map((_, i) => ({
+        id: i,
+        top: Math.random() * 100,
+        left: Math.random() * 100,
+        color: colors[Math.floor(Math.random() * colors.length)],
+        delay: Math.random() * 2,
+        duration: 2 + Math.random() * 3
+      }));
+      
+      const setupTimer = setTimeout(() => {
+        setConfettiParticles(particles);
+        setShowConfetti(true);
+      }, 0);
+
+      const timer = setTimeout(() => {
+        setShowConfetti(false);
+        setConfettiParticles([]);
+      }, 5000);
+
+      return () => {
+        clearTimeout(setupTimer);
+        clearTimeout(timer);
+      };
     }
   }, [step, triage.status]);
 
@@ -458,16 +487,16 @@ Gegenereerd met de FysiekFabriek Triage Tool.
       {/* Confetti Animation Layer */}
       {showConfetti && (
         <div className="absolute inset-0 pointer-events-none z-50 overflow-hidden">
-          {[...Array(60)].map((_, i) => (
+          {confettiParticles.map((p) => (
             <div
-              key={i}
+              key={p.id}
               className="absolute w-3 h-3 rounded-sm opacity-80 animate-ping"
               style={{
-                top: `${Math.random() * 100}%`,
-                left: `${Math.random() * 100}%`,
-                backgroundColor: ['#10B981', '#3B82F6', '#F59E0B', '#EF4444', '#EC4899'][Math.floor(Math.random() * 5)],
-                animationDelay: `${Math.random() * 2}s`,
-                animationDuration: `${2 + Math.random() * 3}s`
+                top: `${p.top}%`,
+                left: `${p.left}%`,
+                backgroundColor: p.color,
+                animationDelay: `${p.delay}s`,
+                animationDuration: `${p.duration}s`
               }}
             />
           ))}
