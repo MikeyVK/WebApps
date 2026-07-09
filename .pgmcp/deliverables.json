@@ -1,0 +1,19 @@
+{
+  "3": {
+    "issue_title": "Align Maatwerk Risico Scan & FF Portal styling with Neo-Brutalisme",
+    "workflow_name": "feature",
+    "execution_mode": "interactive",
+    "required_phases": [
+      "research",
+      "design",
+      "planning",
+      "implementation",
+      "validation",
+      "documentation",
+      "ready"
+    ],
+    "skip_reason": null,
+    "parent_branch": "main",
+    "created_at": "2026-07-09T19:00:44.768279+00:00"
+  }
+}
