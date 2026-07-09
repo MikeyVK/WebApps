@@ -557,12 +557,12 @@ Gegenereerd met de FysiekFabriek Scan Tool.
         
         {/* Left Column: Interactive Stoplight Visualizer */}
         <div className="lg:col-span-3 flex flex-col items-center justify-start gap-6 print:hidden">
-          <div className="bg-slate-900 text-slate-100 rounded-app-card border-width-app border-slate-850 p-6 shadow-app w-full max-w-xs flex flex-col items-center relative overflow-hidden">
+          <div className="bg-slate-50 text-slate-900 rounded-app-card border-width-app border-color-app p-6 shadow-app w-full max-w-xs flex flex-col items-center relative overflow-hidden">
             <div className="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-sky-500 via-indigo-500 to-purple-500"></div>
-            <h3 className="text-sm font-bold text-slate-350 uppercase tracking-widest mb-6 text-center">Live Stoplicht Status</h3>
+            <h3 className="text-sm font-bold text-slate-500 uppercase tracking-widest mb-6 text-center">Live Stoplicht Status</h3>
             
             {/* The actual physical stoplight case */}
-            <div className="w-32 bg-slate-950 rounded-3xl p-5 shadow-inner border border-slate-850 flex flex-col gap-6 items-center relative">
+            <div className="w-32 bg-slate-950 rounded-3xl p-5 shadow-inner border border-slate-800 flex flex-col gap-6 items-center relative">
               
               {/* Red Light */}
               <div className="relative">
@@ -602,20 +602,20 @@ Gegenereerd met de FysiekFabriek Scan Tool.
 
             {/* Live Verdict Tag */}
             <div className="mt-6 text-center w-full">
-              <span className="text-xs text-slate-400 font-bold uppercase tracking-wider block mb-1">Actueel oordeel</span>
+              <span className="text-xs text-slate-500 font-bold uppercase tracking-wider block mb-1">Actueel oordeel</span>
               <div className="inline-block py-1.5 px-4 rounded-full text-sm font-extrabold tracking-wide uppercase shadow-sm">
                 {(step === 'dashboard' || step === 'setup') && (
-                  <span className="text-slate-400 bg-slate-800 py-1 px-3 rounded-full border border-slate-700">Standby</span>
+                  <span className="text-slate-500 bg-slate-100 py-1 px-3 rounded-full border border-slate-200">Standby</span>
                 )}
                 {step === 'wizard' && (
-                  <span className="text-sky-400 bg-sky-950/85 py-1 px-3 rounded-full border border-sky-800/30 animate-pulse">Analyseren...</span>
+                  <span className="text-sky-600 bg-sky-50 py-1 px-3 rounded-full border border-sky-200 animate-pulse">Analyseren...</span>
                 )}
                 {step === 'result' && (
                   <>
-                    {triage.status === 'ROOD' && <span className="text-red-400 bg-red-950/85 py-1 px-3 rounded-full border border-red-800/30">ROOD (Professioneel)</span>}
-                    {triage.status === 'GROEN' && <span className="text-emerald-400 bg-emerald-950/85 py-1 px-3 rounded-full border border-emerald-800/30 font-bold">GROEN (Lifehack)</span>}
-                    {triage.status === 'ORANJE_MATIG' && <span className="text-amber-400 bg-amber-950/85 py-1 px-3 rounded-full border border-amber-800/30">ORANJE (Dossier + Review)</span>}
-                    {triage.status === 'ORANJE_LICHT' && <span className="text-amber-400 bg-amber-950/85 py-1 px-3 rounded-full border border-amber-800/30">ORANJE (Lichte checklist)</span>}
+                    {triage.status === 'ROOD' && <span className="text-red-600 bg-red-50 py-1 px-3 rounded-full border border-red-200">ROOD (Professioneel)</span>}
+                    {triage.status === 'GROEN' && <span className="text-emerald-600 bg-emerald-50 py-1 px-3 rounded-full border border-emerald-250 font-bold">GROEN (Lifehack)</span>}
+                    {triage.status === 'ORANJE_MATIG' && <span className="text-amber-600 bg-amber-50 py-1 px-3 rounded-full border border-amber-200">ORANJE (Dossier + Review)</span>}
+                    {triage.status === 'ORANJE_LICHT' && <span className="text-amber-600 bg-amber-50 py-1 px-3 rounded-full border border-amber-200">ORANJE (Lichte checklist)</span>}
                   </>
                 )}
               </div>

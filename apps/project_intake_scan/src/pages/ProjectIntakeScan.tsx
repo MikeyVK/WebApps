@@ -23,7 +23,8 @@ import {
   Info, 
   ArrowRight,
   Ban,
-  Eye
+  Eye,
+  Trash2
 } from 'lucide-react';
 
 interface Question {
@@ -503,9 +504,8 @@ export default function ProjectIntakeScan() {
                         className="absolute top-4 right-4 text-slate-400 hover:text-rose-600 p-1.5 rounded-lg hover:bg-slate-100 transition-colors cursor-pointer"
                         title="Verwijder dossier"
                       >
-                        <X className="w-4 h-4" />
+                        <Trash2 className="w-4 h-4" />
                       </button>
-
                       <div className="space-y-4">
                         <div className="flex items-center space-x-2 mr-8">
                           <span className="text-[10px] font-black text-slate-400 uppercase tracking-wider">{p.date}</span>
