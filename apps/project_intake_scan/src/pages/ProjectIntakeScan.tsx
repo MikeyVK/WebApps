@@ -500,14 +500,14 @@ export default function ProjectIntakeScan() {
                     >
                       <button 
                         onClick={(e) => handleDeleteProject(p.id, e)}
-                        className="absolute top-4 right-4 text-slate-400 hover:text-rose-500 p-1.5 rounded-lg hover:bg-rose-50 transition-colors cursor-pointer"
+                        className="absolute top-4 right-4 text-slate-400 hover:text-rose-600 p-1.5 rounded-lg hover:bg-slate-100 transition-colors cursor-pointer"
                         title="Verwijder dossier"
                       >
                         <X className="w-4 h-4" />
                       </button>
 
                       <div className="space-y-4">
-                        <div className="flex items-center justify-between">
+                        <div className="flex items-center space-x-2 mr-8">
                           <span className="text-[10px] font-black text-slate-400 uppercase tracking-wider">{p.date}</span>
                           {p.status === 'success' ? (
                             <span className="bg-emerald-100 border-2 border-color-app text-emerald-800 text-[10px] font-black uppercase px-3 py-1 rounded-full">Geschikt</span>
