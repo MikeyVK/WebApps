@@ -1,0 +1,351 @@
+# Architectural Principles
+
+**Status:** Binding contract for all implementation work
+**Read when:** Start of every implementation session — referenced from `.github/.copilot-instructions.md`
+**Last updated:** 2026-03-12
+
+---
+
+## 0. Primacy of This Document
+
+These principles are **laws, not suggestions**. A code change that violates these principles is **REJECTED** during code review, even if all tooling gates pass. Tooling gates (ruff, mypy, coverage) validate *form*. This document validates *architecture*.
+
+> **Agents:** read this document at the start of every implementation session. The question "may I write it this way?" is answered by this document, not by whether ruff complains.
+
+---
+
+## 1. SOLID
+
+### 1.1 SRP — Single Responsibility Principle
+
+A class has exactly one reason to change.
+
+**Binding rules:**
+- A class with more than one logical responsibility is a God Class. Always split.
+- Methods that persist state, read state, and execute business logic do not belong in the same class.
+- Test whether you can describe the class in one sentence without "and" — if not, there is an SRP violation.
+
+**Anti-patterns:**
+```python
+# ❌ WRONG — WorkEngine mixes state persistence + transition validation + hook dispatch + reconstruction
+class WorkEngine:
+    def _save_state(self): ...    # state persistence
+    def transition(self): ...     # validation + hook dispatch
+    def on_exit_phase(self): ...  # hook implementation
+    def _reconstruct(self): ...   # external-source reconstruction
+
+# ✅ CORRECT — each class has one responsibility
+class StateRepository: ...        # state persistence
+class WorkEngine: ...             # transition validation + dispatch
+class EnforcementRunner: ...      # enforcement orchestration
+class StateReconstructor: ...     # external-source reconstruction
+```
+
+### 1.2 OCP — Open/Closed Principle
+
+Code is open for extension, closed for modification.
+
+**Binding rules:**
+- If-chains on phase names, workflow names, or action types are OCP violations. Use a registry or config-driven dispatch.
+- Adding a new phase or action type must **never** require modifying an existing method. It only adds a new registration or config entry.
+
+**Anti-pattern:**
+```python
+# ❌ WRONG — every new phase requires modifying this method
+def transition(self, from_phase):
+    if from_phase == "planning":
+        self.on_exit_planning()
+    elif from_phase == "research":
+        self.on_exit_research()
+    # new phase requires a code change here
+```
+
+**Correct pattern:** Config-driven dispatch — an enforcement config file registers actions per phase; the engine reads the registry instead of an if-chain.
+
+### 1.3 LSP — Liskov Substitution Principle
+
+Subclasses must be fully interchangeable with their base class.
+
+**Binding rules:**
+- `FileStateRepository` and `InMemoryStateRepository` are interchangeable in every place that accepts `IStateRepository`.
+- A subclass may not tighten preconditions of the base class or weaken postconditions.
+- Tests using `InMemoryStateRepository` must validate the same contracts as production tests with `FileStateRepository`.
+
+### 1.4 ISP — Interface Segregation Principle
+
+Clients must not be forced to implement interfaces they do not use.
+
+**Binding rules:**
+- A read-only consumer must **never** receive an interface with write methods.
+- Split interfaces at the narrowest usable contract:
+  ```python
+  # core/interfaces.py
+  class IStateReader(Protocol):
+      def load(self, context: str) -> State: ...
+
+  class IStateRepository(IStateReader, Protocol):
+      def save(self, state: State) -> None: ...
+  ```
+- Read-only consumers → inject `IStateReader`
+- Read-write consumers → inject `IStateRepository`
+
+### 1.5 DIP — Dependency Inversion Principle
+
+High-level modules do not depend on low-level modules. Both depend on abstractions.
+
+**Binding rules:**
+- Direct instantiation (`SomeManager()`) inside `execute()` of a tool is forbidden. All dependencies via constructor injection.
+- Interfaces for external systems (file, git, external API) live in `core/interfaces/` — never in `managers/`.
+- The concrete implementation may only be instantiated at the composition root (tool layer or server startup).
+
+**Anti-pattern:**
+```python
+# ❌ WRONG — tool instantiates directly
+async def execute(self, params):
+    manager = SomeManager(workspace_root=Path.cwd())
+    engine = WorkEngine(workspace_root=Path.cwd(), manager=manager)
+
+# ✅ CORRECT — dependency injected via constructor
+class WorkTool(ITool):
+    def __init__(self, engine: IWorkEngine | None = None) -> None:
+        self._engine = engine or WorkEngine.create_default()
+
+---
+
+## 2. DRY + SSOT — Don't Repeat Yourself + Single Source of Truth
+
+**Binding rules:**
+- Every fact in the system has exactly **one authoritative location**. All other locations reference or read from it.
+- Any config file defining a list of valid values (branch types, phase names, action types) is the SSOT. Duplicating that list as a regex alternation or hardcoded set elsewhere is a violation.
+- Two classes independently reading the same config file without a shared interface is a DRY violation.
+
+---
+
+## 3. Config-First
+
+Business knowledge needed in multiple places is **always** stored in config, never hardcoded.
+
+**Binding rules:**
+- Phase names, workflow names, subphase names, commit-type mappings, branch types, deliverable gates: **always in config** (e.g., YAML), never as string literals in Python.
+- An `if phase_name == "implementation"` in production code is a Config-First violation.
+- The config loader is responsible for fail-fast validation. Code that reads config must never silently treat missing fields as "normal".
+- **SSOT for config**: one reader class per config file. No two classes independently reading the same file.
+
+**Combination validation rule:**
+Config loaders raise `ConfigError` for logically inconsistent combinations (e.g., a flag enabled while its required companion field is empty). These are detected at startup, not at runtime.
+
+---
+
+## 4. Fail-Fast
+
+Errors are detected as early as possible, as close to the source as possible.
+
+**Binding rules:**
+- Configuration errors (missing fields, inconsistent values) are detected at **startup**, not at runtime of a user action.
+- An unknown action type in an enforcement config → `ConfigError` on startup. Never a `KeyError` at execution time.
+- Missing config files → explicit `FileNotFoundError` with path, never `None` return.
+- Combination validations are checked in the Pydantic loader via `model_validator`, not in the consumer.
+
+---
+
+## 5. CQS — Command/Query Separation
+
+Methods that change state (commands) and methods that read state (queries) are strictly separated.
+
+**Binding rules:**
+- A method returns **either** a value (query) **or** mutates state (command) — never both.
+- Value objects returned as query results are **frozen**: `model_config = ConfigDict(frozen=True)`. The type system enforces that queries cannot mutate.
+- `get_state()` and similar read methods are pure queries — they **never** call `save()`.
+
+```python
+# ✅ Frozen value object as query result
+class WorkState(BaseModel):
+    model_config = ConfigDict(frozen=True)
+    context: str
+    workflow_name: str
+    current_phase: str
+    # ... all fields immutable
+```
+
+---
+
+## 6. ISP in Practice — Narrow Interfaces
+
+See also 1.4. Concrete application:
+
+| Consumer | Interface | Reason |
+|---|---|---|
+| Read-only consumer (e.g., decoder) | `IStateReader` | read-only |
+| Read-only consumer (e.g., resolver) | `IStateReader` | read-only |
+| State engine | `IStateRepository` | reads and writes |
+| Enforcement runner | `IStateRepository` | writes execution state |
+
+All `IStateReader` and `IStateRepository` interfaces live in `core/interfaces/`. Never in `managers/`.
+
+---
+
+## 7. Law of Demeter
+
+Talk to direct friends, not to their friends.
+
+**Binding rule:**
+- `tool.engine.state_repo.load(context)` is a violation. Tool talks to engine, engine talks to StateRepository.
+- Tool layer knows: the engine, config. Tool layer does **not** know: `StateRepository`, `AtomicWriter`, internal infrastructure classes.
+- Depth of dependency chain is at most 2 layers from the tool.
+
+---
+
+## 8. Explicit over Implicit
+
+No silent fallbacks, no implicit conventions that are not visible in code.
+
+**Binding rules:**
+- No `None` as a fallback for a required configuration value → `ConfigError`.
+- No silent default that hides an error. Prefer a hard error at the right moment over a silent non-value that causes an `AttributeError` three layers later.
+- Code tells the story: class variables, type annotations, and Pydantic constraints are the primary communication tools. Comments supplement; they do not tell the story.
+
+---
+
+## 9. YAGNI — You Aren't Gonna Need It
+
+Do not write code for hypothetical future needs.
+
+**Binding rules:**
+- No migration code for scenarios that do not exist now.
+- No backward-compat layer for deprecated parameters longer than one release cycle.
+- No abstraction layer for a concern that today has only one implementation (unless testability requires it).
+- No configurable flag for behavior that should always be the same.
+
+---
+
+## 10. Cohesion — Methods Belong to Their Domain
+
+**Binding rule:**
+- A method that exclusively needs domain X knowledge belongs in the class that models domain X.
+- Example: `extract_issue_number(branch)` belongs in a git-conventions config class, not in a state engine. The method answers a question about git conventions.
+- When in doubt: "Is this a question about X?" If yes, the method belongs with X.
+
+---
+
+## 11. Dependency Injection as Default
+
+**Binding rules:**
+- Constructor injection is the default. `execute()` never instantiates a dependency itself.
+- All production dependencies are injectable. Tests inject a fake/in-memory variant.
+- Composition root: only server startup and the tool layer may instantiate concrete implementations.
+- Tool constructors accept optional dependencies with `None` default, resolved via factory method:
+  ```python
+  def __init__(self, engine: IWorkEngine | None = None) -> None:
+      self._engine = engine or WorkEngine.create_default()
+  ```
+
+---
+
+## 12. No Import-Time Side Effects
+
+**Binding rule:**
+- Module-level code that reads files, makes network requests, or initializes singletons = forbidden.
+- A `config = AppConfig.load()` as a module-level statement causes `FileNotFoundError` on import in tests. **Forbidden.**
+
+**Transitional mitigation (legacy code only):**
+- The `ClassVar` lazy-init pattern (`_instance: ClassVar[...]`, `.load()` / `.from_file()` /
+  `.reset_instance()`) was prescribed as the workaround for pre-`ConfigLoader` code that could
+  not yet be refactored. It prevents import-time side effects by deferring the load to the first
+  caller.
+- **This pattern is no longer the normative solution for new code.** It is permitted only in
+  files that have not yet been migrated to `ConfigLoader` (i.e., are listed in the C_LOADER
+  migration checklist).
+
+**Normative solution (new code and post-C_LOADER code):**
+- Config classes are pure Pydantic value objects with no loader methods (`from_file`, `load`,
+  `reset_instance`, `ClassVar _instance`).
+- `ConfigLoader` (single instance, created at `server.py` composition root) owns all YAML
+  loading. It receives `config_root: Path` as a constructor parameter. It is the sole caller of
+  YAML parsing and schema construction.
+- All managers receive config objects via constructor injection from the composition root.
+- No schema class knows `ConfigLoader` exists; no schema class reads files.
+
+**Quick reference:**
+
+| Situation | Correct approach |
+|---|---|
+| New schema class | Pure Pydantic model; no `from_file()`, no `ClassVar` |
+| New consumer of a config | Accept config object via constructor injection |
+| Existing legacy schema pre-C_LOADER | `ClassVar` lazy-init permitted temporarily; must be in migration checklist |
+| Hot-reload / config refresh | `ConfigLoader(config_root)` constructs fresh instances; no `reset_instance()` |
+| MCP tool with config-driven enum/constraint | A4 pattern: override `input_schema` property on the **tool class** (not the input model); call `super().input_schema`, mutate the returned dict, return it; inject config via constructor. Never put `ClassVar` or `configure()` on the Pydantic input model. |
+
+## 13. Enforcement is Config-First
+
+**Binding rule:**
+- Behavior that "triggers at phase X" or "runs after tool Y" is configured in a YAML enforcement file, not hardcoded in Python.
+- Every new enforcement action = one registration in the enforcement runner's action registry + one entry in the enforcement config. Never an if-chain in the engine or a tool.
+- Tools declare their own enforcement event as a class variable: `enforcement_event: str | None = None`.
+
+---
+
+## 14. Test via Public API — No Private Method Access in Tests
+
+**Binding rule:**
+- Tests call **public methods only**. Private methods (`_method`) are never called directly from test code.
+- Private methods are implementation details. Testing them directly couples the test to the internal structure rather than the observable contract. Any internal refactor (rename, split, merge of private methods) would break tests that should not care.
+- If a private method contains meaningful logic, that logic is reachable and testable via the public interface. If it is not reachable via the public interface, it is dead code.
+- The corollary: private methods must be small and cohesive (SRP). If a handler is too complex to be tested through the public entry point, that is a design smell — split the method or add a narrower public accessor, do not widen the test boundary.
+
+**Anti-pattern:**
+```python
+# ❌ WRONG — bypasses public dispatch, couples test to implementation
+runner._handle_exclude_branch_local_artifacts(action, ctx, tmp_path)
+
+# ❌ WRONG — inspects internal state directly instead of observable behaviour
+assert runner._merge_readiness_context is ctx
+```
+
+**Correct pattern:**
+```python
+# ✅ CORRECT — tests the observable contract via the public entry point
+notes = runner.run(event="git_add_or_commit", timing="pre", context=ctx)
+assert any("excluded" in note for note in notes)
+
+# ✅ CORRECT — constructor injection verified by observing behaviour, not attributes
+runner = EnforcementRunner(workspace_root=tmp_path, config=config, merge_readiness_context=ctx)
+# run() behaviour proves the context was accepted
+```
+
+**When `reportPrivateUsage` appears in test code:**
+- It is a signal, not noise. Do not suppress it reflexively.
+- Re-examine whether the test can be rewritten against the public interface. The answer is almost always yes.
+- If yes → rewrite the test. Do not add the ignore.
+- Only add `# pyright: ignore[reportPrivateUsage]` when private access is an unavoidable test-infrastructure necessity (e.g., injecting a test double into an attribute that has no public setter and no factory alternative), **and** you include a rationale comment.
+
+---
+
+## 15. Presentation Boundary — Separation of Domain and User-Facing Text
+
+**Binding rules:**
+- No core domain, business logic, or adapter code may hardcode user-facing messages, text templates, emojis, or visual formatting layouts.
+- Core and domain services must produce structured data outputs (such as models, data transfer objects, error codes, or metadata event keys with raw parameter dictionaries).
+- The presentation of these outputs (including human-readable translations, formatting, iconography/emojis, and visual structures) is the exclusive responsibility of a dedicated presentation layer or external configuration/localization files.
+- This ensures the domain layer remains fully agnostic of the final display format and media (e.g., CLI, JSON-RPC responses, web UI, or logs).
+---
+
+## Quick Reference — Prohibited Patterns
+
+| Pattern | Violation | Alternative |
+|---|---|---|
+| `if phase_name == "implementation":` | Config-First, OCP | Config determines; code dispatches on type |
+| `SomeManager()` in `execute()` | DIP, SRP | Constructor injection |
+| `if sub_phase == "x": commit_type = "y"` | DRY, Config-First | `commit_type_map` in config file |
+| Two classes reading the same config file | SSOT, DRY | One reader class, singleton |
+| `module_var = Config.load()` at module level | Fail-Fast (import side effect) | Constructor injection via `ConfigLoader` (post-C_LOADER); `ClassVar` lazy-init only in legacy pre-migration code |
+| Read-only consumer injected with write interface | ISP | Use narrower read-only interface |
+| `get_state()` calls `save()` | CQS | Query returns, command mutates |
+| Mutating a frozen value object | CQS | Create new instance via command method |
+| `tool.engine.state_repo.load()` | Law of Demeter | `tool.engine.get_state(context)` |
+| Hardcoded regex/list with type or phase names | DRY, Config-First | Build from config at startup |
+| Inconsistent config combination (flag on + map empty) | Fail-Fast | `ConfigError` on startup |
+| Migration code for deprecated parameter | YAGNI | Flag-day: remove directly |
+| `runner._handle_x(...)` in test | §14 — Public API | `runner.run(event=..., timing=..., context=...)` |
+| `assert obj._internal is x` in test | §14 — Public API | Assert via observable behaviour of public method |
+| `# pyright: ignore[reportPrivateUsage]` without rationale | §14 — Public API | Rewrite test, or add rationale explaining why no public alternative exists |
+| Hardcoded user-facing text, emojis, or UI layouts in core logic | §15 — Presentation Boundary | Produce structured domain data; resolve presentation in the UI/presentation layer or via configuration |
