@@ -36,4 +36,9 @@ __pycache__/
 # Local Agent Configurations
 .agents/mcp_config.json
 
+# Phase-Gate local temp and registry files
+.pgmcp/temp/
+.pgmcp/template_registry.json
+
+
 
