@@ -8,7 +8,7 @@
   "type": "module",
   "scripts": {
     "dev": "concurrently \"vite\" \"npm run dev -w portal\" \"npm run dev -w fysiek_fabriek_portal\" \"npm run dev -w project_intake_scan\" \"npm run dev -w maatwerk_risico_scan\"",
-    "build": "vite build",
+    "build": "node build-monorepo.js",
     "lint": "eslint .",
     "preview": "vite preview"
   },
