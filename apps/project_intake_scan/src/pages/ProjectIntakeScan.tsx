@@ -500,7 +500,7 @@ export default function ProjectIntakeScan() {
                     >
                       <button 
                         onClick={(e) => handleDeleteProject(p.id, e)}
-                        className="absolute top-4 right-4 text-slate-300 hover:text-rose-500 p-1.5 rounded-lg hover:bg-rose-50 transition-colors opacity-0 group-hover:opacity-100"
+                        className="absolute top-4 right-4 text-slate-400 hover:text-rose-500 p-1.5 rounded-lg hover:bg-rose-50 transition-colors cursor-pointer"
                         title="Verwijder dossier"
                       >
                         <X className="w-4 h-4" />

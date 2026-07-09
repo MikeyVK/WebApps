@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import metadata from '../../../../apps-metadata.json';
 import { AppMetadata } from '@shared/types/metadata';
 
@@ -117,17 +117,6 @@ export default function MaatwerkRisicoScan() {
   const [projectDescription, setProjectDescription] = useState<string>('');
   const [challengerName, setChallengerName] = useState<string>('');
 
-  interface ConfettiParticle {
-    id: number;
-    top: number;
-    left: number;
-    color: string;
-    delay: number;
-    duration: number;
-  }
-
-  const [showConfetti, setShowConfetti] = useState<boolean>(false);
-  const [confettiParticles, setConfettiParticles] = useState<ConfettiParticle[]>([]);
   const getTriageResult = (customAnswers?: Record<string, string | null> | null): TriageResult => {
     const activeAnswers = customAnswers || answers;
     
@@ -182,34 +171,6 @@ export default function MaatwerkRisicoScan() {
 
   const triage = getTriageResult();
 
-  useEffect(() => {
-    if (step === 'result' && triage.status === 'GROEN') {
-      const colors = ['#10B981', '#3B82F6', '#F59E0B', '#EF4444', '#EC4899'];
-      const particles: ConfettiParticle[] = Array.from({ length: 60 }).map((_, i) => ({
-        id: i,
-        top: Math.random() * 100,
-        left: Math.random() * 100,
-        color: colors[Math.floor(Math.random() * colors.length)],
-        delay: Math.random() * 2,
-        duration: 2 + Math.random() * 3
-      }));
-      
-      const setupTimer = setTimeout(() => {
-        setConfettiParticles(particles);
-        setShowConfetti(true);
-      }, 0);
-
-      const timer = setTimeout(() => {
-        setShowConfetti(false);
-        setConfettiParticles([]);
-      }, 5000);
-
-      return () => {
-        clearTimeout(setupTimer);
-        clearTimeout(timer);
-      };
-    }
-  }, [step, triage.status]);
 
   const questions: TriageQuestion[] = [
     {
@@ -566,24 +527,6 @@ Gegenereerd met de FysiekFabriek Scan Tool.
   return (
     <div className={`min-h-screen ${appTheme} bg-bg-app text-text-app flex flex-col font-sans relative overflow-x-hidden antialiased`}>
       {/* Confetti Animation Layer */}
-      {showConfetti && (
-        <div className="absolute inset-0 pointer-events-none z-50 overflow-hidden">
-          {confettiParticles.map((p) => (
-            <div
-              key={p.id}
-              className="absolute w-3 h-3 rounded-sm opacity-80 animate-ping"
-              style={{
-                top: `${p.top}%`,
-                left: `${p.left}%`,
-                backgroundColor: p.color,
-                animationDelay: `${p.delay}s`,
-                animationDuration: `${p.duration}s`
-              }}
-            />
-          ))}
-        </div>
-      )}
-
       {/* Header */}
       <header className="bg-white border-b-app border-color-app py-5 px-6 sticky top-0 z-40 print:hidden shadow-app-small">
         <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
@@ -613,84 +556,84 @@ Gegenereerd met de FysiekFabriek Scan Tool.
       <main className="flex-grow max-w-7xl w-full mx-auto p-4 md:p-8 grid grid-cols-1 lg:grid-cols-12 gap-8 animate-fade-in">
         
         {/* Left Column: Interactive Stoplight Visualizer */}
-        {step !== 'dashboard' && step !== 'setup' && (
-          <div className="lg:col-span-3 flex flex-col items-center justify-start gap-6 print:hidden">
-            <div className="bg-white rounded-app-card border-width-app border-color-app p-6 shadow-app w-full max-w-xs flex flex-col items-center relative overflow-hidden">
-              <div className="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-sky-500 via-indigo-500 to-purple-500"></div>
-              <h3 className="text-sm font-bold text-slate-400 uppercase tracking-widest mb-6 text-center">Live Stoplicht Status</h3>
+        <div className="lg:col-span-3 flex flex-col items-center justify-start gap-6 print:hidden">
+          <div className="bg-white rounded-app-card border-width-app border-color-app p-6 shadow-app w-full max-w-xs flex flex-col items-center relative overflow-hidden">
+            <div className="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-sky-500 via-indigo-500 to-purple-500"></div>
+            <h3 className="text-sm font-bold text-slate-400 uppercase tracking-widest mb-6 text-center">Live Stoplicht Status</h3>
+            
+            {/* The actual physical stoplight case */}
+            <div className="w-32 bg-slate-950 rounded-3xl p-5 shadow-inner border border-slate-800 flex flex-col gap-6 items-center relative">
               
-              {/* The actual physical stoplight case */}
-              <div className="w-32 bg-slate-950 rounded-3xl p-5 shadow-inner border border-slate-800 flex flex-col gap-6 items-center relative">
-                
-                {/* Red Light */}
-                <div className="relative">
-                  <div className={`w-16 h-16 rounded-full border-2 border-slate-900 transition-all duration-300 ${
-                    glowClass === 'red' 
-                      ? 'bg-red-500 shadow-[0_0_35px_rgba(239,68,68,0.9)] scale-105 animate-pulse' 
-                      : 'bg-red-950/70 opacity-40'
-                  }`} />
-                  {glowClass === 'red' && <span className="absolute -inset-2 rounded-full border border-red-400/30 animate-ping pointer-events-none" />}
-                </div>
+              {/* Red Light */}
+              <div className="relative">
+                <div className={`w-16 h-16 rounded-full border-2 border-slate-900 transition-all duration-300 ${
+                  glowClass === 'red' 
+                    ? 'bg-red-500 shadow-[0_0_35px_rgba(239,68,68,0.9)] scale-105 animate-pulse' 
+                    : 'bg-red-500/10 border-red-500/20'
+                }`} />
+                {glowClass === 'red' && <span className="absolute -inset-2 rounded-full border border-red-400/30 animate-ping pointer-events-none" />}
+              </div>
 
-                {/* Orange Light */}
-                <div className="relative">
-                  <div className={`w-16 h-16 rounded-full border-2 border-slate-900 transition-all duration-300 ${
-                    glowClass === 'orange' 
-                      ? 'bg-amber-500 shadow-[0_0_35px_rgba(245,158,11,0.9)] scale-105 animate-pulse' 
-                      : 'bg-amber-950/70 opacity-40'
-                  }`} />
-                  {glowClass === 'orange' && <span className="absolute -inset-2 rounded-full border border-amber-400/30 animate-ping pointer-events-none" />}
-                </div>
+              {/* Orange Light */}
+              <div className="relative">
+                <div className={`w-16 h-16 rounded-full border-2 border-slate-900 transition-all duration-300 ${
+                  glowClass === 'orange' 
+                    ? 'bg-amber-500 shadow-[0_0_35px_rgba(245,158,11,0.9)] scale-105 animate-pulse' 
+                    : 'bg-amber-500/10 border-amber-500/20'
+                }`} />
+                {glowClass === 'orange' && <span className="absolute -inset-2 rounded-full border border-amber-400/30 animate-ping pointer-events-none" />}
+              </div>
 
-                {/* Green Light */}
-                <div className="relative">
-                  <div className={`w-16 h-16 rounded-full border-2 border-slate-900 transition-all duration-300 ${
-                    glowClass === 'green' 
-                      ? 'bg-emerald-500 shadow-[0_0_35px_rgba(16,185,129,0.9)] scale-105 animate-pulse' 
-                      : 'bg-emerald-950/70 opacity-40'
-                  }`} />
-                  {glowClass === 'green' && <span className="absolute -inset-2 rounded-full border border-emerald-400/30 animate-ping pointer-events-none" />}
-                </div>
-                
-                {/* Gentle pulse light when active but undecided */}
-                {glowClass === 'pulse' && (
-                  <div className="absolute inset-0 bg-blue-500/5 rounded-3xl animate-pulse pointer-events-none" />
+              {/* Green Light */}
+              <div className="relative">
+                <div className={`w-16 h-16 rounded-full border-2 border-slate-900 transition-all duration-300 ${
+                  glowClass === 'green' 
+                    ? 'bg-emerald-500 shadow-[0_0_35px_rgba(16,185,129,0.9)] scale-105 animate-pulse' 
+                    : 'bg-emerald-500/10 border-emerald-500/20'
+                }`} />
+                {glowClass === 'green' && <span className="absolute -inset-2 rounded-full border border-emerald-400/30 animate-ping pointer-events-none" />}
+              </div>
+              
+              {/* Gentle pulse light when active but undecided */}
+              {glowClass === 'pulse' && (
+                <div className="absolute inset-0 bg-blue-500/5 rounded-3xl animate-pulse pointer-events-none" />
+              )}
+            </div>
+
+            {/* Live Verdict Tag */}
+            <div className="mt-6 text-center w-full">
+              <span className="text-xs text-slate-500 font-bold uppercase tracking-wider block mb-1">Actueel oordeel</span>
+              <div className="inline-block py-1.5 px-4 rounded-full text-sm font-extrabold tracking-wide uppercase shadow-sm">
+                {(step === 'dashboard' || step === 'setup') && (
+                  <span className="text-slate-400 bg-slate-100 py-1 px-3 rounded-full">Standby</span>
+                )}
+                {step === 'wizard' && (
+                  <span className="text-sky-600 bg-sky-50 py-1 px-3 rounded-full animate-pulse">Analyseren...</span>
+                )}
+                {step === 'result' && (
+                  <>
+                    {triage.status === 'ROOD' && <span className="text-red-600 bg-red-50 py-1 px-3 rounded-full">ROOD (Professioneel)</span>}
+                    {triage.status === 'GROEN' && <span className="text-emerald-600 bg-emerald-50 py-1 px-3 rounded-full font-bold">GROEN (Lifehack)</span>}
+                    {triage.status === 'ORANJE_MATIG' && <span className="text-amber-600 bg-amber-50 py-1 px-3 rounded-full">ORANJE (Dossier + Review)</span>}
+                    {triage.status === 'ORANJE_LICHT' && <span className="text-amber-600 bg-amber-50 py-1 px-3 rounded-full">ORANJE (Lichte checklist)</span>}
+                  </>
                 )}
               </div>
-
-              {/* Live Verdict Tag */}
-              <div className="mt-6 text-center w-full">
-                <span className="text-xs text-slate-500 font-bold uppercase tracking-wider block mb-1">Actueel oordeel</span>
-                <div className="inline-block py-1.5 px-4 rounded-full text-sm font-extrabold tracking-wide uppercase shadow-sm">
-                  {step === 'wizard' && (
-                    <span className="text-sky-600 bg-sky-50 py-1 px-3 rounded-full animate-pulse">Analyseren...</span>
-                  )}
-                  {step === 'result' && (
-                    <>
-                      {triage.status === 'ROOD' && <span className="text-red-600 bg-red-50 py-1 px-3 rounded-full">ROOD (Professioneel)</span>}
-                      {triage.status === 'GROEN' && <span className="text-emerald-600 bg-emerald-50 py-1 px-3 rounded-full font-bold">GROEN (Lifehack)</span>}
-                      {triage.status === 'ORANJE_MATIG' && <span className="text-amber-600 bg-amber-50 py-1 px-3 rounded-full">ORANJE (Dossier + Review)</span>}
-                      {triage.status === 'ORANJE_LICHT' && <span className="text-amber-600 bg-amber-50 py-1 px-3 rounded-full">ORANJE (Lichte checklist)</span>}
-                    </>
-                  )}
-                </div>
-              </div>
-            </div>
-
-            {/* Quick Informative Info block */}
-            <div className="bg-white rounded-app-card border-2 border-color-app p-5 shadow-app-small w-full max-w-xs text-xs text-slate-600 space-y-3">
-              <h4 className="font-bold text-slate-900 uppercase tracking-wider text-[11px] border-b border-slate-100 pb-2">Actieve Software & Elektronica</h4>
-              <p><strong>Nieuwe Regelgevende Blokken:</strong> Grijpt een project in op stroomvoorziening, sensoren, printplaten, of standalone apps? Dan verschuift het risicoprofiel direct naar <strong>Rood</strong>.</p>
-              <p><strong>Waarom?</strong> Elektromagnetische storingen en softwarefouten (Rule 11) kunnen onverwacht optreden bij medisch kwetsbare gebruikers. Dit valt daarom buiten de studentenformule.</p>
             </div>
           </div>
-        )}
+
+          {/* Quick Informative Info block */}
+          <div className="bg-white rounded-app-card border-2 border-color-app p-5 shadow-app-small w-full max-w-xs text-xs text-slate-600 space-y-3">
+            <h4 className="font-bold text-slate-900 uppercase tracking-wider text-[11px] border-b border-slate-100 pb-2">Actieve Software & Elektronica</h4>
+            <p><strong>Nieuwe Regelgevende Blokken:</strong> Grijpt een project in op stroomvoorziening, sensoren, printplaten, of standalone apps? Dan verschuift het risicoprofiel direct naar <strong>Rood</strong>.</p>
+            <p><strong>Waarom?</strong> Elektromagnetische storingen en softwarefouten (Rule 11) kunnen onverwacht optreden bij medisch kwetsbare gebruikers. Dit valt daarom buiten de studentenformule.</p>
+          </div>
+        </div>
 
         {/* Middle Column: Dynamic Wizard Cards / Results Screen */}
         <div className={`${
-          step === 'dashboard' || step === 'setup' ? 'lg:col-span-12' : 'lg:col-span-6'
+          step === 'dashboard' || step === 'setup' ? 'lg:col-span-9' : 'lg:col-span-6'
         } flex flex-col justify-start`}>
-          
           {/* DASHBOARD VIEW */}
           {step === 'dashboard' && (
             <div className="space-y-8 animate-fade-in max-w-4xl mx-auto w-full">
