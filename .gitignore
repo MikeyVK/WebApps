@@ -33,3 +33,7 @@ __pycache__/
 .env
 .env.*
 
+# Local Agent Configurations
+.agents/mcp_config.json
+
+
