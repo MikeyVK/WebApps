@@ -33,8 +33,8 @@ __pycache__/
 .env
 .env.*
 
-# Local Agent Configurations
 .agents/mcp_config.json
+ftp-config.json
 
 # Phase-Gate local temp and registry files
 .pgmcp/temp/
