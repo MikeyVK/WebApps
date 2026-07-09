@@ -48,8 +48,7 @@ export default function App() {
           
           {/* Card 1: FysiekFabriek Portal */}
           <a 
-            href="/fysiek_fabriek_portal/"
-            className="group bg-[#15355e] hover:bg-[#15355e]/90 border border-slate-700/80 hover:border-[#f19d76]/60 rounded-3xl p-8 flex flex-col justify-between gap-6 shadow-2xl transition-all hover:-translate-y-1.5 hover:shadow-[#f19d76]/5 relative overflow-hidden"
+            href="fysiek_fabriek_portal/"
           >
             <div className="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-[#f19d76] to-orange-400" />
             <div className="space-y-4">
@@ -71,8 +70,7 @@ export default function App() {
 
           {/* Card 2: Project Intake Scan */}
           <a 
-            href="/project_intake_scan/"
-            className="group bg-[#15355e] hover:bg-[#15355e]/90 border border-slate-700/80 hover:border-[#f19d76]/60 rounded-3xl p-8 flex flex-col justify-between gap-6 shadow-2xl transition-all hover:-translate-y-1.5 hover:shadow-orange-500/5 relative overflow-hidden"
+            href="project_intake_scan/"
           >
             <div className="absolute top-0 left-0 w-full h-1.5 bg-[#f19d76]" />
             <div className="space-y-4">
@@ -94,8 +92,7 @@ export default function App() {
 
           {/* Card 3: Maatwerk Risico Scan */}
           <a 
-            href="/maatwerk_risico_scan/"
-            className="group bg-[#15355e] hover:bg-[#15355e]/90 border border-slate-700/80 hover:border-[#f19d76]/60 rounded-3xl p-8 flex flex-col justify-between gap-6 shadow-2xl transition-all hover:-translate-y-1.5 hover:shadow-sky-500/5 relative overflow-hidden"
+            href="maatwerk_risico_scan/"
           >
             <div className="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-orange-400 to-[#f19d76]" />
             <div className="space-y-4">

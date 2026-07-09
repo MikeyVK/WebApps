@@ -418,7 +418,7 @@ export default function ProjectIntakeScan() {
 
           <div className="flex items-center space-x-3">
             <a 
-              href="/"
+              href="../"
               className="px-4 py-2 bg-slate-100 hover:bg-slate-200 border-2 border-slate-800 rounded-xl text-xs font-bold uppercase tracking-wider transition-all shadow-[2px_2px_0px_0px_rgba(30,41,59,1)] hover:translate-y-[1px] hover:shadow-[1px_1px_0px_0px_rgba(30,41,59,1)] text-slate-800 flex items-center gap-1"
             >
               <Home className="w-3.5 h-3.5" />

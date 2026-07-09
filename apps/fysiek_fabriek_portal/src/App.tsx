@@ -20,7 +20,7 @@ export default function App() {
             </div>
           </div>
           <div className="flex items-center gap-4">
-            <a href="/" className="text-xs font-bold text-slate-300 hover:text-sky-400 transition-colors bg-slate-700/40 px-3 py-1.5 rounded-lg border border-slate-700/60 flex items-center gap-1">
+            <a href="../" className="text-xs font-bold text-slate-300 hover:text-sky-400 transition-colors bg-slate-700/40 px-3 py-1.5 rounded-lg border border-slate-700/60 flex items-center gap-1">
               <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
               </svg>
@@ -49,8 +49,7 @@ export default function App() {
           
           {/* Card 1: Maatwerk Risico Scan (Stoplicht Triage) */}
           <a 
-            href="/maatwerk_risico_scan/"
-            className="group bg-slate-800 hover:bg-slate-800/80 border border-slate-700 hover:border-sky-500/50 rounded-3xl p-8 flex flex-col justify-between gap-6 shadow-xl transition-all hover:-translate-y-1 hover:shadow-sky-500/5 relative overflow-hidden"
+            href="../maatwerk_risico_scan/"
           >
             <div className="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-sky-500 to-indigo-500" />
             <div className="space-y-4">
@@ -74,8 +73,7 @@ export default function App() {
 
           {/* Card 2: Project Intake Scan (Fokus Flowchart) */}
           <a 
-            href="/project_intake_scan/"
-            className="group bg-slate-800 hover:bg-slate-800/80 border border-slate-700 hover:border-[#F26522]/50 rounded-3xl p-8 flex flex-col justify-between gap-6 shadow-xl transition-all hover:-translate-y-1 hover:shadow-orange-500/5 relative overflow-hidden"
+            href="../project_intake_scan/"
           >
             <div className="absolute top-0 left-0 w-full h-1.5 bg-[#F26522]" />
             <div className="space-y-4">
