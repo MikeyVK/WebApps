@@ -1,1 +1,17 @@
 @import "tailwindcss";
+@import "../../../shared/styles/themes.css";
+
+@theme {
+  --color-bg-app: var(--bg-app);
+  --color-text-app: var(--text-app);
+  --color-brand-primary: var(--accent-app);
+  
+  --border-width-app: var(--border-app-width);
+  --border-color-app: var(--border-app-color);
+  
+  --shadow-app: var(--shadow-app);
+  --shadow-app-small: var(--shadow-app-small);
+  
+  --radius-app-card: var(--radius-card);
+  --radius-app-btn: var(--radius-btn);
+}
