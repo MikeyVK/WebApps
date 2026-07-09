@@ -138,13 +138,20 @@ This document is a **binding contract**. Code that violates these principles is 
 
 **Quality Gates:** Run `run_quality_gates(files=[...])` before phase transitions and before PR creation.
 
+### 🎨 UI/Frontend Styling Exemption for TDD
+For frontend-only UI/UX tasks (such as visual styling restructures, theme alignment, CSS refactoring, or portal card layout adjustments), automated unit-testing is OPTIONAL.
+Instead, verification must be performed using:
+1. **Static Analysis**: TypeScript validation (`npx tsc --noEmit`) and ESLint linting checks.
+2. **Visual Inspection**: Running the Vite dev server and manually verifying the layouts, responsiveness, and workflows in the browser.
+In these scenarios, the TDD RED/GREEN/REFACTOR phases are replaced by manual verification checkpoints, and commits may be executed directly with `git_add_or_commit(workflow_phase="implementation", sub_phase="green", cycle_number=N, message="...")` without requiring preceding RED unit tests.
+
 ---
 
 ## ⚖️ Prime Directives
 
 1. **Issue-First Development:** Never work directly on `main`. Always start with `create_issue` → `create_branch` → `initialize_project`.
 2. **Workflow Enforcement:** Always `initialize_project` before work. Use `transition_phase` for progression.
-3. **TDD is Non-Negotiable:** If you write code without a test, you are violating protocol.
+3. **TDD is Non-Negotiable:** If you write code without a test, you are violating protocol (unless the UI/Frontend Styling Exemption applies).
 4. **Tools > Manual:** Never manually create a file if `scaffold_artifact` exists. Never manually parse status if `get_work_context` exists.
 5. **English Artifacts, Dutch Chat:** Write Code/Docs/Commits in **English**. Talk to the User in **Dutch** (Nederlands).
 6. **Human-in-the-Loop:** PR merge ALWAYS requires human approval. `force_phase_transition` requires approval + reason.
