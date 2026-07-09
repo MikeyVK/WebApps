@@ -3,14 +3,20 @@
   "issue_number": 3,
   "workflow_name": "feature",
   "current_phase": "implementation",
-  "current_cycle": 2,
-  "last_cycle": 1,
+  "current_cycle": 3,
+  "last_cycle": 2,
   "cycle_history": [
     {
       "cycle_number": 2,
       "name": "Cycle 2: Refactor Project Intake Scan",
       "forced": false,
       "entered": "2026-07-09T19:52:57.565403+00:00"
+    },
+    {
+      "cycle_number": 3,
+      "name": "Cycle 3: Refactor Maatwerk Risico Scan",
+      "forced": false,
+      "entered": "2026-07-09T19:58:08.158842+00:00"
     }
   ],
   "required_phases": [

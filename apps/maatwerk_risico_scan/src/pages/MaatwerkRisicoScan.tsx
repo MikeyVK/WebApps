@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from 'react';
+import metadata from '../../../../apps-metadata.json';
+import { AppMetadata } from '@shared/types/metadata';
 
 interface PresetProject {
   name: string;
@@ -80,17 +82,27 @@ interface TriageResult {
 }
 
 export default function MaatwerkRisicoScan() {
-  const [step, setStep] = useState<'intro' | 'quiz' | 'result'>('intro');
+  const appMeta = (metadata.apps as AppMetadata[]).find(app => app.id === 'maatwerk_risico_scan');
+  const appTheme = appMeta?.defaultTheme || 'theme-brutalist';
+
+  const [step, setStep] = useState<'dashboard' | 'setup' | 'wizard' | 'result'>('dashboard');
+  const [activeScanId, setActiveScanId] = useState<number | null>(null);
+  const [savedScans, setSavedScans] = useState<any[]>(() => {
+    const localData = localStorage.getItem('maatwerk_risico_scan_history');
+    if (localData) {
+      try {
+        return JSON.parse(localData);
+      } catch (e) {
+        console.error("Fout bij laden van geschiedenis", e);
+      }
+    }
+    return [];
+  });
+  const [formError, setFormError] = useState<string>('');
+
   const [currentQ, setCurrentQ] = useState<number>(0);
   const [answers, setAnswers] = useState<Record<string, string | null>>({
-    q1: null,
-    q2: null,
-    q3: null,
-    q4: null,
-    q5: null,
-    q6: null,
-    q7: null,
-    q8: null
+    q1: null, q2: null, q3: null, q4: null, q5: null, q6: null, q7: null, q8: null
   });
   
   const [fmeaHazards, setFmeaHazards] = useState<FmeaHazard[]>([
@@ -104,18 +116,18 @@ export default function MaatwerkRisicoScan() {
   const [projectName, setProjectName] = useState<string>('');
   const [projectDescription, setProjectDescription] = useState<string>('');
   const [challengerName, setChallengerName] = useState<string>('');
-interface ConfettiParticle {
-  id: number;
-  top: number;
-  left: number;
-  color: string;
-  delay: number;
-  duration: number;
-}
+
+  interface ConfettiParticle {
+    id: number;
+    top: number;
+    left: number;
+    color: string;
+    delay: number;
+    duration: number;
+  }
 
   const [showConfetti, setShowConfetti] = useState<boolean>(false);
   const [confettiParticles, setConfettiParticles] = useState<ConfettiParticle[]>([]);
-  // Logic om het resultaat realtime of aan het einde te berekenen
   const getTriageResult = (customAnswers?: Record<string, string | null> | null): TriageResult => {
     const activeAnswers = customAnswers || answers;
     
@@ -339,9 +351,8 @@ interface ConfettiParticle {
       }
     }
   ];
-
   const getCurrentGlow = () => {
-    if (step === 'intro') return 'none';
+    if (step === 'dashboard' || step === 'setup') return 'none';
     if (step === 'result') {
       const res = getTriageResult();
       if (res.status === 'ROOD') return 'red';
@@ -365,19 +376,29 @@ interface ConfettiParticle {
     const nextAnswers = { ...answers, [questions[currentQ].id]: val };
     setAnswers(nextAnswers);
 
-    if ((currentQ === 0 || currentQ === 1 || currentQ === 2 || currentQ === 3) && val === 'yes') {
-      setStep('result');
-      return;
-    }
-    if (currentQ === 4 && val === 'yes') {
-      setStep('result');
-      return;
-    }
+    const isRood = (currentQ === 0 || currentQ === 1 || currentQ === 2 || currentQ === 3) && val === 'yes';
+    const isGroen = currentQ === 4 && val === 'yes';
+    const isLast = currentQ === questions.length - 1;
 
-    if (currentQ < questions.length - 1) {
-      setCurrentQ(currentQ + 1);
-    } else {
+    if (isRood || isGroen || isLast) {
+      const res = getTriageResult(nextAnswers);
+      const newScan = {
+        id: activeScanId || Date.now(),
+        date: new Date().toLocaleDateString('nl-NL'),
+        projectName,
+        projectDescription,
+        challengerName,
+        answers: nextAnswers,
+        status: res.status,
+        fmeaHazards
+      };
+      
+      const updatedList = [newScan, ...savedScans.filter(s => s.id !== newScan.id)];
+      setSavedScans(updatedList);
+      localStorage.setItem('maatwerk_risico_scan_history', JSON.stringify(updatedList));
       setStep('result');
+    } else {
+      setCurrentQ(currentQ + 1);
     }
   };
 
@@ -385,55 +406,115 @@ interface ConfettiParticle {
     if (currentQ > 0) {
       setCurrentQ(currentQ - 1);
     } else {
-      setStep('intro');
+      setStep('setup');
     }
   };
 
   const selectPreset = (preset: PresetProject) => {
+    const scanId = Date.now();
+    setActiveScanId(scanId);
     setProjectName(preset.name);
     setProjectDescription(preset.description);
+    setChallengerName('Preset Deelnemer');
     setAnswers(preset.answers);
+    const defaultFmea: FmeaHazard[] = [
+      { id: 1, hazard: 'Scherpe randen na 3D-printen', severity: '2', mitigation: 'Handmatig naschuren en randen afronden in CAD' },
+      { id: 2, hazard: 'Losraken door trillingen', severity: '3', mitigation: 'Gebruik van borgmoeren en periodieke controle voorschrijven' }
+    ];
+    setFmeaHazards(defaultFmea);
+
+    const res = getTriageResult(preset.answers);
+    const newScan = {
+      id: scanId,
+      date: new Date().toLocaleDateString('nl-NL'),
+      projectName: preset.name,
+      projectDescription: preset.description,
+      challengerName: 'Preset Deelnemer',
+      answers: preset.answers,
+      status: res.status,
+      fmeaHazards: defaultFmea
+    };
+
+    const updatedList = [newScan, ...savedScans.filter(s => s.id !== scanId)];
+    setSavedScans(updatedList);
+    localStorage.setItem('maatwerk_risico_scan_history', JSON.stringify(updatedList));
     setStep('result');
   };
 
-  const startTriage = () => {
+  const startScan = () => {
+    if (!projectName || !challengerName || !projectDescription) {
+      setFormError('Vul a.u.b. alle verplichte velden van het projectpaspoort in.');
+      return;
+    }
+    setFormError('');
+    const scanId = Date.now();
+    setActiveScanId(scanId);
     setAnswers({
       q1: null, q2: null, q3: null, q4: null, q5: null, q6: null, q7: null, q8: null
     });
+    setFmeaHazards([
+      { id: 1, hazard: 'Scherpe randen na 3D-printen', severity: '2', mitigation: 'Handmatig naschuren en randen afronden in CAD' },
+      { id: 2, hazard: 'Losraken door trillingen', severity: '3', mitigation: 'Gebruik van borgmoeren en periodieke controle voorschrijven' }
+    ]);
     setCurrentQ(0);
-    setStep('quiz');
+    setStep('wizard');
+  };
+
+  const deleteScan = (id: number) => {
+    const updated = savedScans.filter(s => s.id !== id);
+    setSavedScans(updated);
+    localStorage.setItem('maatwerk_risico_scan_history', JSON.stringify(updated));
+  };
+
+  const loadScan = (scan: any) => {
+    setActiveScanId(scan.id);
+    setProjectName(scan.projectName);
+    setProjectDescription(scan.projectDescription);
+    setChallengerName(scan.challengerName);
+    setAnswers(scan.answers);
+    setFmeaHazards(scan.fmeaHazards || []);
+    setStep('result');
   };
 
   const addHazard = () => {
     if (!newHazard || !newMitigation) return;
-    setFmeaHazards([
+    const updated = [
       ...fmeaHazards,
       {
         id: Date.now(),
         hazard: newHazard,
-        severity: newSeverity,
+        severity: newSeverity as any,
         mitigation: newMitigation
       }
-    ]);
+    ];
+    setFmeaHazards(updated);
     setNewHazard('');
     setNewMitigation('');
+    
+    const updatedList = savedScans.map(s => s.id === activeScanId ? { ...s, fmeaHazards: updated } : s);
+    setSavedScans(updatedList);
+    localStorage.setItem('maatwerk_risico_scan_history', JSON.stringify(updatedList));
   };
 
   const removeHazard = (id: number) => {
-    setFmeaHazards(fmeaHazards.filter(h => h.id !== id));
+    const updated = fmeaHazards.filter(h => h.id !== id);
+    setFmeaHazards(updated);
+    
+    const updatedList = savedScans.map(s => s.id === activeScanId ? { ...s, fmeaHazards: updated } : s);
+    setSavedScans(updatedList);
+    localStorage.setItem('maatwerk_risico_scan_history', JSON.stringify(updatedList));
   };
-
   const copyReportToClipboard = () => {
     const reportText = `
 =============================================
-FYSIEKFABRIEK TRIAGE-RAPPORT
+FYSIEKFABRIEK SCAN-RAPPORT
 =============================================
 Projectnaam: ${projectName || 'Niet opgegeven'}
 Uitdager: ${challengerName || 'Niet opgegeven'}
 Beschrijving: ${projectDescription || 'Niet opgegeven'}
 Datum: ${new Date().toLocaleDateString('nl-NL')}
 
-TRIAGE RESULTAAT: ${triage.status}
+SCAN RESULTAAT: ${triage.status}
 Type Classificatie: ${triage.title || 'MDR Proportioneel'}
 
 Toelichting:
@@ -463,7 +544,7 @@ ${triage.status === 'GROEN' ? `
 FMEA-Lite Risicomatrix (voor Oranje projecten):
 ${fmeaHazards.map(h => `- Risico: ${h.hazard} (Ernst: ${h.severity}/5) -> Oplossing: ${h.mitigation}`).join('\n')}
 
-Gegenereerd met de FysiekFabriek Triage Tool.
+Gegenereerd met de FysiekFabriek Scan Tool.
 =============================================
     `;
 
@@ -483,7 +564,7 @@ Gegenereerd met de FysiekFabriek Triage Tool.
   const glowClass = getCurrentGlow();
 
   return (
-    <div className="min-h-screen bg-slate-900 text-slate-100 flex flex-col font-sans relative overflow-x-hidden antialiased">
+    <div className={`min-h-screen ${appTheme} bg-bg-app text-text-app flex flex-col font-sans relative overflow-x-hidden antialiased`}>
       {/* Confetti Animation Layer */}
       {showConfetti && (
         <div className="absolute inset-0 pointer-events-none z-50 overflow-hidden">
@@ -504,21 +585,21 @@ Gegenereerd met de FysiekFabriek Triage Tool.
       )}
 
       {/* Header */}
-      <header className="bg-slate-800 border-b border-slate-700 py-5 px-6 sticky top-0 z-40 shadow-md">
+      <header className="bg-white border-b-app border-color-app py-5 px-6 sticky top-0 z-40 print:hidden shadow-app-small">
         <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-gradient-to-tr from-sky-500 to-indigo-600 rounded-xl flex items-center justify-center shadow-lg shadow-sky-500/20">
+            <div className="bg-slate-900 text-white p-3 border-2 border-slate-900 rounded-2xl flex items-center justify-center transform rotate-[-2deg] shadow-[2px_2px_0px_0px_rgba(242,101,34,1)]">
               <svg className="w-6 h-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z" />
               </svg>
             </div>
             <div>
-              <h1 className="text-xl font-bold tracking-tight bg-gradient-to-r from-sky-400 to-indigo-400 bg-clip-text text-transparent">FysiekFabriek</h1>
-              <p className="text-xs text-slate-400 font-semibold uppercase tracking-wider">MDR Triage & Stoplicht Tool</p>
+              <h1 className="text-xl font-bold tracking-tight text-slate-900">FysiekFabriek</h1>
+              <p className="text-xs text-slate-400 font-semibold uppercase tracking-wider">MDR Risico Scan & Stoplicht Tool</p>
             </div>
           </div>
           <div className="flex items-center gap-4">
-            <a href="../" className="text-xs font-bold text-slate-300 hover:text-sky-400 transition-colors flex items-center gap-1.5 bg-slate-700/40 px-3 py-1.5 rounded-lg border border-slate-700/60">
+            <a href="../" className="text-xs font-bold text-slate-600 hover:text-slate-900 transition-colors flex items-center gap-1.5 bg-slate-100 hover:bg-slate-200 px-3 py-1.5 rounded-app-btn border-2 border-color-app">
               <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
               </svg>
@@ -528,233 +609,348 @@ Gegenereerd met de FysiekFabriek Triage Tool.
         </div>
       </header>
 
-      {/* Main Content Dashboard */}
+      {/* Main Content */}
       <main className="flex-grow max-w-7xl w-full mx-auto p-4 md:p-8 grid grid-cols-1 lg:grid-cols-12 gap-8 animate-fade-in">
         
         {/* Left Column: Interactive Stoplight Visualizer */}
-        <div className="lg:col-span-3 flex flex-col items-center justify-start gap-6">
-          <div className="bg-slate-800 rounded-3xl border border-slate-700 p-6 shadow-xl w-full max-w-xs flex flex-col items-center relative overflow-hidden">
-            <div className="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-sky-500 via-indigo-500 to-purple-500"></div>
-            <h3 className="text-sm font-bold text-slate-400 uppercase tracking-widest mb-6 text-center">Live Stoplicht Status</h3>
-            
-            {/* The actual physical stoplight case */}
-            <div className="w-32 bg-slate-950 rounded-3xl p-5 shadow-inner border border-slate-800 flex flex-col gap-6 items-center relative">
+        {step !== 'dashboard' && step !== 'setup' && (
+          <div className="lg:col-span-3 flex flex-col items-center justify-start gap-6 print:hidden">
+            <div className="bg-white rounded-app-card border-width-app border-color-app p-6 shadow-app w-full max-w-xs flex flex-col items-center relative overflow-hidden">
+              <div className="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-sky-500 via-indigo-500 to-purple-500"></div>
+              <h3 className="text-sm font-bold text-slate-400 uppercase tracking-widest mb-6 text-center">Live Stoplicht Status</h3>
               
-              {/* Red Light */}
-              <div className="relative">
-                <div className={`w-16 h-16 rounded-full border-2 border-slate-900 transition-all duration-300 ${
-                  glowClass === 'red' 
-                    ? 'bg-red-500 shadow-[0_0_35px_rgba(239,68,68,0.9)] scale-105 animate-pulse' 
-                    : 'bg-red-950/70 opacity-40'
-                }`} />
-                {glowClass === 'red' && <span className="absolute -inset-2 rounded-full border border-red-400/30 animate-ping pointer-events-none" />}
-              </div>
+              {/* The actual physical stoplight case */}
+              <div className="w-32 bg-slate-950 rounded-3xl p-5 shadow-inner border border-slate-800 flex flex-col gap-6 items-center relative">
+                
+                {/* Red Light */}
+                <div className="relative">
+                  <div className={`w-16 h-16 rounded-full border-2 border-slate-900 transition-all duration-300 ${
+                    glowClass === 'red' 
+                      ? 'bg-red-500 shadow-[0_0_35px_rgba(239,68,68,0.9)] scale-105 animate-pulse' 
+                      : 'bg-red-950/70 opacity-40'
+                  }`} />
+                  {glowClass === 'red' && <span className="absolute -inset-2 rounded-full border border-red-400/30 animate-ping pointer-events-none" />}
+                </div>
 
-              {/* Orange Light */}
-              <div className="relative">
-                <div className={`w-16 h-16 rounded-full border-2 border-slate-900 transition-all duration-300 ${
-                  glowClass === 'orange' 
-                    ? 'bg-amber-500 shadow-[0_0_35px_rgba(245,158,11,0.9)] scale-105 animate-pulse' 
-                    : 'bg-amber-950/70 opacity-40'
-                }`} />
-                {glowClass === 'orange' && <span className="absolute -inset-2 rounded-full border border-amber-400/30 animate-ping pointer-events-none" />}
-              </div>
+                {/* Orange Light */}
+                <div className="relative">
+                  <div className={`w-16 h-16 rounded-full border-2 border-slate-900 transition-all duration-300 ${
+                    glowClass === 'orange' 
+                      ? 'bg-amber-500 shadow-[0_0_35px_rgba(245,158,11,0.9)] scale-105 animate-pulse' 
+                      : 'bg-amber-950/70 opacity-40'
+                  }`} />
+                  {glowClass === 'orange' && <span className="absolute -inset-2 rounded-full border border-amber-400/30 animate-ping pointer-events-none" />}
+                </div>
 
-              {/* Green Light */}
-              <div className="relative">
-                <div className={`w-16 h-16 rounded-full border-2 border-slate-900 transition-all duration-300 ${
-                  glowClass === 'green' 
-                    ? 'bg-emerald-500 shadow-[0_0_35px_rgba(16,185,129,0.9)] scale-105 animate-pulse' 
-                    : 'bg-emerald-950/70 opacity-40'
-                }`} />
-                {glowClass === 'green' && <span className="absolute -inset-2 rounded-full border border-emerald-400/30 animate-ping pointer-events-none" />}
-              </div>
-              
-              {/* Gentle pulse light when active but undecided */}
-              {glowClass === 'pulse' && (
-                <div className="absolute inset-0 bg-blue-500/5 rounded-3xl animate-pulse pointer-events-none" />
-              )}
-            </div>
-
-            {/* Live Verdict Tag */}
-            <div className="mt-6 text-center w-full">
-              <span className="text-xs text-slate-500 font-bold uppercase tracking-wider block mb-1">Actueel oordeel</span>
-              <div className="inline-block py-1.5 px-4 rounded-full text-sm font-extrabold tracking-wide uppercase shadow-sm">
-                {step === 'intro' && <span className="text-slate-400 bg-slate-700/40 py-1 px-3 rounded-full">Standby</span>}
-                {step === 'quiz' && (
-                  <span className="text-sky-400 bg-sky-950/40 py-1 px-3 rounded-full animate-pulse">Analyseren...</span>
-                )}
-                {step === 'result' && (
-                  <>
-                    {triage.status === 'ROOD' && <span className="text-red-400 bg-red-950/40 py-1 px-3 rounded-full">ROOD (Professioneel)</span>}
-                    {triage.status === 'GROEN' && <span className="text-emerald-400 bg-emerald-950/40 py-1 px-3 rounded-full font-bold">GROEN (Lifehack)</span>}
-                    {triage.status === 'ORANJE_MATIG' && <span className="text-amber-400 bg-amber-950/40 py-1 px-3 rounded-full">ORANJE (Dossier + Review)</span>}
-                    {triage.status === 'ORANJE_LICHT' && <span className="text-amber-400 bg-amber-950/40 py-1 px-3 rounded-full">ORANJE (Lichte checklist)</span>}
-                  </>
+                {/* Green Light */}
+                <div className="relative">
+                  <div className={`w-16 h-16 rounded-full border-2 border-slate-900 transition-all duration-300 ${
+                    glowClass === 'green' 
+                      ? 'bg-emerald-500 shadow-[0_0_35px_rgba(16,185,129,0.9)] scale-105 animate-pulse' 
+                      : 'bg-emerald-950/70 opacity-40'
+                  }`} />
+                  {glowClass === 'green' && <span className="absolute -inset-2 rounded-full border border-emerald-400/30 animate-ping pointer-events-none" />}
+                </div>
+                
+                {/* Gentle pulse light when active but undecided */}
+                {glowClass === 'pulse' && (
+                  <div className="absolute inset-0 bg-blue-500/5 rounded-3xl animate-pulse pointer-events-none" />
                 )}
               </div>
+
+              {/* Live Verdict Tag */}
+              <div className="mt-6 text-center w-full">
+                <span className="text-xs text-slate-500 font-bold uppercase tracking-wider block mb-1">Actueel oordeel</span>
+                <div className="inline-block py-1.5 px-4 rounded-full text-sm font-extrabold tracking-wide uppercase shadow-sm">
+                  {step === 'wizard' && (
+                    <span className="text-sky-600 bg-sky-50 py-1 px-3 rounded-full animate-pulse">Analyseren...</span>
+                  )}
+                  {step === 'result' && (
+                    <>
+                      {triage.status === 'ROOD' && <span className="text-red-600 bg-red-50 py-1 px-3 rounded-full">ROOD (Professioneel)</span>}
+                      {triage.status === 'GROEN' && <span className="text-emerald-600 bg-emerald-50 py-1 px-3 rounded-full font-bold">GROEN (Lifehack)</span>}
+                      {triage.status === 'ORANJE_MATIG' && <span className="text-amber-600 bg-amber-50 py-1 px-3 rounded-full">ORANJE (Dossier + Review)</span>}
+                      {triage.status === 'ORANJE_LICHT' && <span className="text-amber-600 bg-amber-50 py-1 px-3 rounded-full">ORANJE (Lichte checklist)</span>}
+                    </>
+                  )}
+                </div>
+              </div>
+            </div>
+
+            {/* Quick Informative Info block */}
+            <div className="bg-white rounded-app-card border-2 border-color-app p-5 shadow-app-small w-full max-w-xs text-xs text-slate-600 space-y-3">
+              <h4 className="font-bold text-slate-900 uppercase tracking-wider text-[11px] border-b border-slate-100 pb-2">Actieve Software & Elektronica</h4>
+              <p><strong>Nieuwe Regelgevende Blokken:</strong> Grijpt een project in op stroomvoorziening, sensoren, printplaten, of standalone apps? Dan verschuift het risicoprofiel direct naar <strong>Rood</strong>.</p>
+              <p><strong>Waarom?</strong> Elektromagnetische storingen en softwarefouten (Rule 11) kunnen onverwacht optreden bij medisch kwetsbare gebruikers. Dit valt daarom buiten de studentenformule.</p>
             </div>
           </div>
-
-          {/* Quick Informative Info block */}
-          <div className="bg-slate-800/60 rounded-2xl border border-slate-700/60 p-5 shadow-lg w-full max-w-xs text-xs text-slate-400 space-y-3">
-            <h4 className="font-bold text-slate-300 uppercase tracking-wider text-[11px] border-b border-slate-700/60 pb-2">Actieve Software & Elektronica</h4>
-            <p><strong>Nieuwe Regelgevende Blokken:</strong> Grijpt een project in op stroomvoorziening, sensoren, printplaten, of standalone apps? Dan verschuift het risicoprofiel direct naar <strong>Rood</strong>.</p>
-            <p><strong>Waarom?</strong> Elektromagnetische storingen en softwarefouten (Rule 11) kunnen onverwacht optreden bij medisch kwetsbare gebruikers. Dit valt daarom buiten de studentenformule.</p>
-          </div>
-        </div>
+        )}
 
         {/* Middle Column: Dynamic Wizard Cards / Results Screen */}
         <div className={`${
-          step === 'intro' ? 'lg:col-span-9' : 'lg:col-span-6'
+          step === 'dashboard' || step === 'setup' ? 'lg:col-span-12' : 'lg:col-span-6'
         } flex flex-col justify-start`}>
           
-          {/* INTRO STEP */}
-          {step === 'intro' && (
-            <div className="bg-slate-800 border border-slate-700 rounded-3xl p-6 md:p-8 shadow-xl space-y-6 animate-fade-in">
-              <div className="space-y-3">
-                <span className="text-xs font-bold text-sky-400 uppercase tracking-widest bg-sky-950/50 px-3 py-1.5 rounded-md">Fase 1: Project Classificatie</span>
-                <h2 className="text-2xl md:text-3xl font-extrabold text-white">Welkom bij de FysiekFabriek Triage Tool</h2>
-                <p className="text-slate-300 text-sm md:text-base leading-relaxed">
-                  Deze interactieve tool helpt studenten, makers en uitdagers om direct te classificeren of een projectveiligheidsrisico past binnen de informele FysiekFabriek formule, of dat het overgedragen moet worden aan een professioneel adaptatietechnicus.
-                </p>
-              </div>
-
-              {/* Project Context Form */}
-              <div className="bg-slate-900/60 border border-slate-700/60 rounded-2xl p-5 space-y-4">
-                <h3 className="text-sm font-bold text-slate-300 uppercase tracking-wider">Projectgegevens (Optioneel)</h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-xs font-bold text-slate-400 uppercase mb-1">Naam van het Project</label>
-                    <input 
-                      type="text" 
-                      placeholder="bijv. Bekerhouder voor Rolstoel" 
-                      value={projectName}
-                      onChange={(e) => setProjectName(e.target.value)}
-                      className="w-full bg-slate-800 border border-slate-700 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:ring-2 focus:ring-sky-500/50"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-xs font-bold text-slate-400 uppercase mb-1">Naam Uitdager / Cliënt</label>
-                    <input 
-                      type="text" 
-                      placeholder="Naam van de eindgebruiker" 
-                      value={challengerName}
-                      onChange={(e) => setChallengerName(e.target.value)}
-                      className="w-full bg-slate-800 border border-slate-700 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:ring-2 focus:ring-sky-500/50"
-                    />
-                  </div>
-                  <div className="md:col-span-2">
-                    <label className="block text-xs font-bold text-slate-400 uppercase mb-1">Beschrijving Uitdaging</label>
-                    <textarea 
-                      placeholder="Wat is het probleem en wat willen jullie gaan maken?" 
-                      rows={2}
-                      value={projectDescription}
-                      onChange={(e) => setProjectDescription(e.target.value)}
-                      className="w-full bg-slate-800 border border-slate-700 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:ring-2 focus:ring-sky-500/50"
-                    />
+          {/* DASHBOARD VIEW */}
+          {step === 'dashboard' && (
+            <div className="space-y-8 animate-fade-in max-w-4xl mx-auto w-full">
+              {/* Welkomst hero card */}
+              <div className="border-width-app border-color-app bg-white p-8 sm:p-12 text-slate-900 rounded-app-card shadow-app space-y-6 relative overflow-hidden mb-8">
+                <div className="absolute right-[-20px] top-[-20px] w-40 h-40 bg-amber-100/50 rounded-full blur-3xl pointer-events-none" />
+                <div className="border-b-app border-color-app pb-6">
+                  <span className="text-xs font-black uppercase tracking-widest text-[#F26522]">FysiekFabriek Maatwerk</span>
+                  <h1 className="text-4xl sm:text-5xl font-black tracking-tight uppercase mt-1 leading-none text-slate-900">
+                    Maatwerk Risico Scan
+                  </h1>
+                  <p className="text-lg font-bold text-slate-500 mt-2">MDR Risico Scan & Stoplichtanalyse voor patiëntspecifieke hulpmiddelen.</p>
+                </div>
+                
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-8 pt-2">
+                  <p className="text-slate-700 text-sm leading-relaxed font-semibold">
+                    Dit interactieve controlepaneel helpt studenten, makers en uitdagers om direct te classificeren of een projectveiligheidsrisico past binnen de kaders van de FysiekFabriek co-creatie formule, of dat het moet worden overgedragen aan een adaptatietechnicus.
+                  </p>
+                  <div className="bg-[#C4BDF3]/20 border-2 border-dashed border-[#C4BDF3] rounded-2xl p-4 flex flex-col justify-between">
+                    <div className="space-y-1">
+                      <h4 className="text-xs font-black uppercase text-[#4C4973]">Snelle Richtlijn:</h4>
+                      <p className="text-xs text-slate-600 font-medium">We bouwen uitsluitend mechanische lifehacks die ergonomisch comfort bieden en geen vitale functies beïnvloeden.</p>
+                    </div>
+                    <button 
+                      onClick={() => setStep('setup')}
+                      className="mt-4 bg-slate-900 hover:bg-slate-800 border-2 border-slate-900 text-white font-bold uppercase tracking-wider text-xs py-3.5 px-6 rounded-app-btn transition-all shadow-[3px_3px_0px_0px_rgba(242,101,34,1)] flex items-center justify-center space-x-2 cursor-pointer"
+                    >
+                      <span>Start Nieuwe Scan</span>
+                      <svg className="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                      </svg>
+                    </button>
                   </div>
                 </div>
               </div>
 
-              {/* Trigger */}
-              <div className="flex flex-col sm:flex-row gap-4 pt-2">
-                <button 
-                  onClick={startTriage}
-                  className="bg-gradient-to-r from-sky-500 to-indigo-600 hover:from-sky-400 hover:to-indigo-500 text-white font-bold px-6 py-3.5 rounded-xl shadow-lg shadow-sky-500/10 flex items-center justify-center gap-2 transition-all transform hover:-translate-y-0.5"
-                >
-                  <span>Start Nieuwe Triage</span>
-                  <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M14 5l7 7m0 0l-7 7m7-7H3" />
-                  </svg>
-                </button>
-              </div>
-
               {/* Presets Grid */}
-              <div className="space-y-3 pt-4 border-t border-slate-700/60">
-                <h4 className="text-xs font-bold text-slate-400 uppercase tracking-widest">Snel testen met voorbeeld-projecten</h4>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+              <div className="space-y-4">
+                <h2 className="text-lg font-black uppercase tracking-widest text-slate-700">Voorbeeld-projecten laden</h2>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                   {PRESET_PROJECTS.map((p, idx) => (
                     <button
                       key={idx}
                       onClick={() => selectPreset(p)}
-                      className="text-left bg-slate-900/40 hover:bg-slate-900/80 border border-slate-700/50 rounded-xl p-3.5 transition-all hover:border-slate-600 flex flex-col justify-between group"
+                      className="text-left bg-white hover:bg-slate-50 border-2 border-color-app rounded-app-btn p-4 transition-all shadow-app-small flex flex-col justify-between group cursor-pointer"
                     >
                       <div>
-                        <h5 className="font-bold text-xs text-slate-200 group-hover:text-sky-400 transition-colors">{p.name}</h5>
-                        <p className="text-[11px] text-slate-400 mt-1 line-clamp-2">{p.description}</p>
+                        <h3 className="font-extrabold text-sm text-slate-900 group-hover:text-[#F26522] transition-colors">{p.name}</h3>
+                        <p className="text-xs text-slate-500 mt-2 line-clamp-2 leading-relaxed">{p.description}</p>
                       </div>
-                      <span className="text-[10px] font-bold text-slate-500 mt-3.5 flex items-center gap-1 self-start">
+                      <span className="text-[10px] font-black uppercase tracking-wider text-[#F26522] mt-4 flex items-center gap-1">
                         Laad test-case
                         <svg className="w-3 h-3 transform group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7" />
                         </svg>
                       </span>
                     </button>
                   ))}
                 </div>
               </div>
+
+              {/* Saved Scans List */}
+              <div className="space-y-4">
+                <h2 className="text-lg font-black uppercase tracking-widest text-slate-700">Eerdere Risico Scans</h2>
+                {savedScans.length === 0 ? (
+                  <div className="bg-white border-2 border-dashed border-slate-300 rounded-app-card p-12 text-center text-slate-500 font-bold">
+                    Geen eerdere scans gevonden. Start een nieuwe scan of laad een preset.
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {savedScans.map((scan) => (
+                      <div 
+                        key={scan.id}
+                        onClick={() => loadScan(scan)}
+                        className="bg-white border-width-app border-color-app rounded-app-card p-6 shadow-app-small hover:shadow-app transition-all flex flex-col justify-between group relative cursor-pointer"
+                      >
+                        <button 
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            deleteScan(scan.id);
+                          }}
+                          className="absolute top-4 right-4 text-slate-400 hover:text-red-500 transition-colors cursor-pointer"
+                          title="Verwijder scan"
+                        >
+                          <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                          </svg>
+                        </button>
+
+                        <div className="space-y-4">
+                          <div className="flex items-center space-x-2">
+                            <span className="text-[10px] font-black text-slate-400 uppercase tracking-wider">{scan.date}</span>
+                            {scan.status === 'ROOD' && <span className="bg-red-100 border-2 border-color-app text-red-800 text-[10px] font-black uppercase px-3 py-0.5 rounded-full">Uitsluiting</span>}
+                            {scan.status === 'GROEN' && <span className="bg-emerald-100 border-2 border-color-app text-emerald-800 text-[10px] font-black uppercase px-3 py-0.5 rounded-full">Geschikt</span>}
+                            {(scan.status === 'ORANJE_MATIG' || scan.status === 'ORANJE_LICHT') && <span className="bg-amber-100 border-2 border-color-app text-amber-800 text-[10px] font-black uppercase px-3 py-0.5 rounded-full">MDR Licht</span>}
+                          </div>
+
+                          <div>
+                            <h3 className="font-extrabold text-lg uppercase tracking-tight text-slate-900 group-hover:text-[#F26522] transition-colors">{scan.projectName}</h3>
+                            <p className="text-xs text-slate-500 font-bold mt-0.5">Uitdager: {scan.challengerName}</p>
+                            <p className="text-xs text-slate-600 mt-2 line-clamp-2 font-semibold leading-relaxed">{scan.projectDescription}</p>
+                          </div>
+                        </div>
+
+                        <div className="pt-4 mt-4 border-t-2 border-slate-100 flex items-center justify-between text-[10px] text-slate-400 font-bold">
+                          <span>Scan voltooid</span>
+                          <span className="text-slate-900 font-black uppercase hover:underline flex items-center space-x-1">
+                            <span>Inzien</span>
+                            <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7" />
+                            </svg>
+                          </span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
             </div>
           )}
 
-          {/* ACTIVE QUIZ WIZARD */}
-          {step === 'quiz' && (
-            <div className="bg-slate-800 border border-slate-700 rounded-3xl p-6 md:p-8 shadow-xl space-y-6 relative transition-all duration-300">
+          {/* SETUP VIEW */}
+          {step === 'setup' && (
+            <div className="max-w-xl mx-auto w-full bg-white border-width-app border-color-app rounded-app-card p-8 sm:p-10 space-y-6 shadow-app animate-fadeIn">
+              <div className="border-b-app border-color-app pb-4">
+                <span className="text-xs font-black uppercase tracking-widest text-[#F26522]">Dossieraanmaak</span>
+                <h2 className="text-2xl font-black uppercase tracking-tight text-slate-900 mt-1">Projectpaspoort</h2>
+                <p className="text-xs text-slate-500 font-bold mt-1">Leg de basisgegevens vast om de risico scan te starten.</p>
+              </div>
+
+              {formError && (
+                <div className="border-2 border-rose-800 bg-rose-50 text-rose-900 p-4 text-xs font-bold flex items-start space-x-2 rounded-app-btn">
+                  <svg className="w-4 h-4 shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                  </svg>
+                  <span>{formError}</span>
+                </div>
+              )}
+
+              <div className="space-y-6">
+                <div className="space-y-1">
+                  <label className="block text-xs font-black uppercase tracking-wider text-slate-600">
+                    Titel van de uitdaging
+                  </label>
+                  <input 
+                    type="text"
+                    placeholder="Bijv. Rolstoel-bekerhouder of Klembare schildersezel"
+                    value={projectName}
+                    onChange={(e) => setProjectName(e.target.value)}
+                    className="w-full px-4 py-3 border-2 border-color-app rounded-app-btn focus:border-brand-primary outline-none text-sm transition-colors shadow-app-small"
+                  />
+                </div>
+
+                <div className="space-y-1">
+                  <label className="block text-xs font-black uppercase tracking-wider text-slate-600">
+                    Wie is de uitdager?
+                  </label>
+                  <input 
+                    type="text"
+                    placeholder="Bijv. Mijzelf of Sophie"
+                    value={challengerName}
+                    onChange={(e) => setChallengerName(e.target.value)}
+                    className="w-full px-4 py-3 border-2 border-color-app rounded-app-btn focus:border-brand-primary outline-none text-sm transition-colors shadow-app-small"
+                  />
+                </div>
+
+                <div className="space-y-1">
+                  <label className="block text-xs font-black uppercase tracking-wider text-slate-600">
+                    Omschrijving van het vraagstuk
+                  </label>
+                  <textarea 
+                    rows={3}
+                    placeholder="Wat is er precies nodig en welke handeling moet hiermee worden vergemakkelijkt?"
+                    value={projectDescription}
+                    onChange={(e) => setProjectDescription(e.target.value)}
+                    className="w-full px-4 py-3 border-2 border-color-app rounded-app-btn focus:border-brand-primary outline-none text-sm transition-colors shadow-app-small"
+                  />
+                </div>
+
+                <div className="pt-4 border-t-2 border-slate-100 flex justify-between items-center">
+                  <button 
+                    type="button"
+                    onClick={() => setStep('dashboard')}
+                    className="text-slate-500 hover:text-slate-900 text-xs font-black uppercase tracking-wider py-2 px-4 rounded-app-btn cursor-pointer"
+                  >
+                    Annuleren
+                  </button>
+                  <button 
+                    type="button"
+                    onClick={startScan}
+                    className="bg-slate-900 hover:bg-slate-800 border-2 border-slate-900 text-white px-5 py-3 rounded-app-btn text-xs font-black uppercase tracking-wider transition-all shadow-app-small flex items-center space-x-1.5 cursor-pointer"
+                  >
+                    <span>Start de Scan</span>
+                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7" />
+                    </svg>
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* WIZARD VIEW */}
+          {step === 'wizard' && (
+            <div className="bg-white border-width-app border-color-app rounded-app-card p-6 md:p-8 space-y-6 shadow-app animate-fadeIn relative">
               
               {/* Progress Indicator */}
-              <div className="flex items-center justify-between text-xs text-slate-400 font-bold uppercase tracking-wider">
+              <div className="flex items-center justify-between text-xs text-slate-500 font-bold uppercase tracking-wider">
                 <span>Vraag {currentQ + 1} van {questions.length}</span>
-                <span className="text-sky-400 bg-sky-950/50 px-2 py-1 rounded-md">{questions[currentQ].title}</span>
+                <span className="text-[#F26522] bg-orange-50 border border-orange-200 px-2.5 py-1 rounded-md font-black">{questions[currentQ].title}</span>
               </div>
-              <div className="w-full bg-slate-900 h-2 rounded-full overflow-hidden">
+              <div className="w-full bg-slate-100 h-2 rounded-full overflow-hidden border border-slate-200">
                 <div 
-                  className="bg-gradient-to-r from-sky-500 to-indigo-500 h-full transition-all duration-500"
+                  className="bg-[#F26522] h-full transition-all duration-500"
                   style={{ width: `${((currentQ + 1) / questions.length) * 100}%` }}
                 />
               </div>
 
               {/* Question card */}
-              <div className="bg-slate-900/50 border border-slate-700/60 rounded-2xl p-6 flex flex-col md:flex-row gap-5 items-start">
-                <div className="bg-slate-800 p-4 rounded-xl shadow-md border border-slate-700 shrink-0">
+              <div className="bg-slate-50 border-2 border-color-app rounded-app-btn p-6 flex flex-col md:flex-row gap-5 items-start">
+                <div className="bg-white p-4 rounded-xl shadow-md border-2 border-color-app shrink-0">
                   {questions[currentQ].icon}
                 </div>
                 <div className="space-y-2">
-                  <h3 className="text-lg md:text-xl font-bold text-white leading-snug">{questions[currentQ].text}</h3>
-                  <p className="text-slate-300 text-sm md:text-base leading-relaxed">{questions[currentQ].description}</p>
+                  <h3 className="text-lg md:text-xl font-black text-slate-900 leading-snug">{questions[currentQ].text}</h3>
+                  <p className="text-slate-600 text-sm md:text-base font-semibold leading-relaxed">{questions[currentQ].description}</p>
                 </div>
               </div>
 
               {/* Specific Question Examples (Sub-panel) */}
               {questions[currentQ].examples && (
-                <div className="bg-slate-900/40 border border-slate-700/40 rounded-2xl p-4 space-y-3">
-                  <div className="flex items-center gap-1.5 text-xs font-bold text-slate-300 uppercase tracking-wider">
-                    <span>💡 Praktijkvoorbeelden ter vergelijking:</span>
+                <div className="bg-slate-50 border-2 border-color-app rounded-app-btn p-4 space-y-3">
+                  <div className="flex items-center gap-1.5 text-xs font-black text-slate-700 uppercase tracking-wider">
+                    <span>💡 Praktijkvoorbeelden:</span>
                   </div>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
-                    <div className="bg-red-950/30 border border-red-500/20 rounded-xl p-3 space-y-1">
-                      <span className="font-extrabold text-red-400 flex items-center gap-1">
-                        <span>🔴</span> Rood (Niet toegestaan)
+                    <div className="bg-rose-50 border-2 border-rose-250 rounded-xl p-3 space-y-1">
+                      <span className="font-black text-rose-800 flex items-center gap-1">
+                        <span>🔴</span> Rood (Uitsluiting)
                       </span>
-                      <p className="text-slate-300 leading-relaxed">{questions[currentQ].examples?.red}</p>
+                      <p className="text-rose-700 font-semibold leading-relaxed">{questions[currentQ].examples?.red}</p>
                     </div>
-                    <div className="bg-emerald-950/30 border border-emerald-500/20 rounded-xl p-3 space-y-1">
-                      <span className="font-extrabold text-emerald-400 flex items-center gap-1">
-                        <span>🟢</span> Toegestaan (FF-Formule)
+                    <div className="bg-emerald-50 border-2 border-emerald-250 rounded-xl p-3 space-y-1">
+                      <span className="font-black text-emerald-800 flex items-center gap-1">
+                        <span>🟢</span> Geschikt (FF-Kader)
                       </span>
-                      <p className="text-slate-300 leading-relaxed">{questions[currentQ].examples?.ok}</p>
+                      <p className="text-emerald-700 font-semibold leading-relaxed">{questions[currentQ].examples?.ok}</p>
                     </div>
                   </div>
                 </div>
               )}
 
               {/* Controls */}
-              <div className="flex flex-col sm:flex-row justify-between gap-4 pt-4 border-t border-slate-700/60">
+              <div className="flex flex-col sm:flex-row justify-between gap-4 pt-4 border-t border-slate-200">
                 <button
                   onClick={handleBack}
-                  className="px-5 py-3 rounded-xl border border-slate-700 text-slate-300 hover:text-white hover:bg-slate-700/50 font-bold transition-all flex items-center justify-center gap-2"
+                  className="px-5 py-3 rounded-app-btn border-2 border-color-app hover:bg-slate-50 text-slate-900 font-bold transition-all flex items-center justify-center gap-2 cursor-pointer"
                 >
-                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                  <svg className="w-4 h-4 text-slate-950" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
                   </svg>
                   <span>Terug</span>
                 </button>
@@ -764,13 +960,13 @@ Gegenereerd met de FysiekFabriek Triage Tool.
                   <div className="flex gap-4">
                     <button
                       onClick={() => handleAnswer('no')}
-                      className="px-8 py-3.5 bg-slate-700 hover:bg-slate-600 text-slate-100 hover:text-white font-extrabold rounded-xl transition-all shadow-md active:scale-95"
+                      className="px-8 py-3.5 bg-slate-950 hover:bg-slate-800 border-2 border-slate-955 text-white font-extrabold rounded-app-btn transition-all shadow-app-small cursor-pointer"
                     >
                       Nee
                     </button>
                     <button
                       onClick={() => handleAnswer('yes')}
-                      className="px-8 py-3.5 bg-red-600 hover:bg-red-500 text-white font-extrabold rounded-xl transition-all shadow-lg shadow-red-500/10 active:scale-95"
+                      className="px-8 py-3.5 bg-red-600 hover:bg-red-500 border-2 border-red-650 text-white font-extrabold rounded-app-btn transition-all shadow-app-small cursor-pointer"
                     >
                       Ja
                     </button>
@@ -781,10 +977,10 @@ Gegenereerd met de FysiekFabriek Triage Tool.
                       <button
                         key={oIdx}
                         onClick={() => handleAnswer(opt.value)}
-                        className="text-left px-5 py-3.5 bg-slate-700/80 hover:bg-slate-700 border border-slate-600 hover:border-slate-500 text-slate-100 hover:text-white font-bold rounded-xl transition-all shadow-md active:scale-95 flex flex-col"
+                        className="text-left px-5 py-3.5 bg-white hover:bg-slate-50 border-2 border-color-app text-slate-900 font-bold rounded-app-btn transition-all shadow-app-small flex flex-col cursor-pointer"
                       >
                         <span className="text-sm font-extrabold">{opt.label}</span>
-                        <span className="text-xs text-slate-300 font-normal mt-0.5">{opt.desc}</span>
+                        <span className="text-xs text-slate-650 font-normal mt-0.5">{opt.desc}</span>
                       </button>
                     ))}
                   </div>
@@ -793,18 +989,17 @@ Gegenereerd met de FysiekFabriek Triage Tool.
             </div>
           )}
 
-          {/* RESULTS SCREEN */}
+          {/* RESULT VIEW */}
           {step === 'result' && (
-            <div className="space-y-6 animate-fade-in">
+            <div className="space-y-6 animate-fadeIn">
               
               {/* Main result badge */}
-              <div className={`border rounded-3xl p-6 md:p-8 shadow-xl space-y-4 relative overflow-hidden ${
-                triage.status === 'ROOD' ? 'bg-red-950/40 border-red-500/50 text-red-100' :
-                triage.status === 'GROEN' ? 'bg-emerald-950/40 border-emerald-500/50 text-emerald-100' :
-                'bg-amber-950/40 border-amber-500/50 text-amber-100'
+              <div className={`border-width-app border-color-app rounded-app-card p-6 md:p-8 shadow-app space-y-4 relative overflow-hidden ${
+                triage.status === 'ROOD' ? 'bg-rose-50 text-rose-900' :
+                triage.status === 'GROEN' ? 'bg-emerald-50 text-emerald-900' :
+                'bg-amber-50 text-amber-900'
               }`}>
                 
-                {/* Visual Glow Header */}
                 <div className={`absolute top-0 left-0 w-full h-1.5 ${
                   triage.status === 'ROOD' ? 'bg-red-500' :
                   triage.status === 'GROEN' ? 'bg-emerald-500' :
@@ -812,284 +1007,312 @@ Gegenereerd met de FysiekFabriek Triage Tool.
                 }`}></div>
 
                 <div className="flex items-center gap-3">
-                  <div className={`p-3 rounded-xl shadow-md ${
-                    triage.status === 'ROOD' ? 'bg-red-900/50 border border-red-500' :
-                    triage.status === 'GROEN' ? 'bg-emerald-900/50 border border-emerald-500' :
-                    'bg-amber-900/50 border border-amber-500'
+                  <div className={`p-3 rounded-xl border-2 ${
+                    triage.status === 'ROOD' ? 'bg-white border-red-500 text-red-500' :
+                    triage.status === 'GROEN' ? 'bg-white border-emerald-500 text-emerald-500' :
+                    'bg-white border-amber-500 text-amber-500'
                   }`}>
                     {triage.status === 'ROOD' && (
-                      <svg className="w-8 h-8 text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <svg className="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636" />
                       </svg>
                     )}
                     {triage.status === 'GROEN' && (
-                      <svg className="w-8 h-8 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <svg className="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
                       </svg>
                     )}
                     {(triage.status === 'ORANJE_MATIG' || triage.status === 'ORANJE_LICHT') && (
-                      <svg className="w-8 h-8 text-amber-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <svg className="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
                       </svg>
                     )}
                   </div>
                   <div>
-                    <span className="text-[10px] font-bold uppercase tracking-widest opacity-60">Resultaat Triage</span>
-                    <h2 className="text-xl md:text-2xl font-black tracking-tight">{triage.title || 'MDR Proportioneel'}</h2>
+                    <span className="text-[10px] font-black uppercase tracking-widest text-slate-400">Resultaat Scan</span>
+                    <h2 className="text-xl md:text-2xl font-black tracking-tight text-slate-900">{triage.title || 'MDR Proportioneel'}</h2>
                   </div>
                 </div>
 
-                <p className="text-slate-200 text-sm md:text-base leading-relaxed bg-slate-900/40 p-4 rounded-xl border border-slate-700/40">
+                <p className="text-slate-700 text-sm md:text-base font-semibold leading-relaxed bg-white/70 p-4 rounded-xl border border-slate-200">
                   {triage.message}
                 </p>
 
-                {/* If orange, display reasons */}
                 {triage.reasons && triage.reasons.length > 0 && (
                   <div className="space-y-2 pt-2">
-                    <span className="text-xs font-bold text-slate-400 uppercase tracking-wider block">Gedetecteerde Risicofactoren:</span>
+                    <span className="text-xs font-black text-slate-500 uppercase tracking-wider block">Gedetecteerde Risicofactoren:</span>
                     <ul className="space-y-1.5">
                       {triage.reasons.map((reason, idx) => (
-                        <li key={idx} className="text-xs text-amber-300 flex items-start gap-2">
-                          <span className="text-amber-400 shrink-0">⚠️</span>
+                        <li key={idx} className="text-xs text-amber-900 font-bold flex items-start gap-2">
+                          <span className="text-amber-500 shrink-0">⚠️</span>
                           <span>{reason}</span>
                         </li>
                       ))}
                     </ul>
                   </div>
                 )}
+                
+                <div className="pt-2 print:hidden">
+                  <button
+                    onClick={() => setStep('wizard')}
+                    className="inline-flex items-center space-x-1.5 bg-[#F26522] border-2 border-slate-800 hover:bg-orange-600 text-white px-5 py-2.5 rounded-app-btn text-xs font-black uppercase tracking-wider shadow-app-small transition-all cursor-pointer"
+                  >
+                    <svg className="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                    </svg>
+                    <span>Pas antwoord aan</span>
+                  </button>
+                </div>
               </div>
 
-              {/* ACTION PLAN SECTION */}
-              <div className="bg-slate-800 border border-slate-700 rounded-3xl p-6 md:p-8 shadow-xl space-y-6">
-                <h3 className="text-lg font-bold text-white flex items-center gap-2">
-                  <svg className="w-5 h-5 text-sky-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
-                  </svg>
-                  <span>Geadviseerd Actieplan & Procesborging</span>
-                </h3>
+              {/* Official Report Container */}
+              <div className="bg-white border-width-app border-color-app rounded-app-card shadow-app overflow-hidden print-full-layout mt-6">
+                
+                {/* Scan Sheet Header */}
+                <div className="p-8 sm:p-10 border-b-app border-color-app flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-slate-50 print-full-layout">
+                  <div>
+                    <span className="text-[10px] font-black tracking-widest text-slate-400 uppercase">Fokus FysiekFabriek Dossier</span>
+                    <h3 className="text-2xl font-black uppercase tracking-tight mt-1 text-slate-900">Scan Uitdagingen</h3>
+                  </div>
+                  <div className="flex items-center space-x-2 print:hidden">
+                    <button 
+                      onClick={() => window.print()}
+                      className="border-2 border-color-app bg-white hover:bg-slate-50 px-4 py-2.5 rounded-app-btn text-xs font-bold uppercase tracking-wider transition-all shadow-app-small cursor-pointer text-slate-800 animate-pulse"
+                    >
+                      <span>Opslaan als PDF</span>
+                    </button>
+                    <button 
+                      onClick={() => setStep('dashboard')}
+                      className="bg-slate-900 border-2 border-slate-900 hover:bg-slate-800 text-white px-4 py-2.5 rounded-app-btn text-xs font-bold uppercase tracking-wider transition-all shadow-app-small cursor-pointer"
+                    >
+                      <span>Nieuwe Scan</span>
+                    </button>
+                  </div>
+                </div>
 
-                {/* ROOD ROUTE PLAN */}
-                {triage.status === 'ROOD' && (
-                  <div className="space-y-4 text-sm text-slate-300">
-                    <div className="bg-red-950/20 border border-red-500/30 rounded-2xl p-4 flex gap-4 items-start text-red-300/90">
-                      <span className="text-2xl animate-pulse">🛑</span>
+                {/* Dossier Report Body */}
+                <div className="p-8 sm:p-10 space-y-8 print-full-layout text-slate-900">
+                  
+                  {/* Section A: Passport Data */}
+                  <div className="space-y-3">
+                    <h4 className="text-[10px] font-black uppercase tracking-widest text-slate-400 border-b-2 border-slate-100 pb-1.5 font-mono">Projectpaspoort</h4>
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-xs">
                       <div>
-                        <h4 className="font-extrabold text-white text-base">Let op: Co-creatie niet toegestaan</h4>
-                        <p className="text-xs mt-1">Dit project overschrijdt de veilige grenzen voor studententeams of hobbyisten. Vanwege vitale impact, mechanische belasting, of de aanwezigheid van actieve stroom/software mag dit product niet in co-creatie gebouwd worden.</p>
+                        <span className="text-slate-400 font-bold block">PROJECTNAAM:</span>
+                        <span className="font-extrabold text-sm text-slate-900">{projectName || 'Niet opgegeven'}</span>
+                      </div>
+                      <div>
+                        <span className="text-slate-400 font-bold block">UITDAGER:</span>
+                        <span className="font-extrabold text-sm text-slate-900">{challengerName || 'Niet opgegeven'}</span>
+                      </div>
+                      <div>
+                        <span className="text-slate-400 font-bold block">DATUM TOETSING:</span>
+                        <span className="font-extrabold text-sm text-slate-900">{new Date().toLocaleDateString('nl-NL')}</span>
                       </div>
                     </div>
-                    
-                    <div className="space-y-3">
-                      <h4 className="font-bold text-white text-sm">Vervolgstappen:</h4>
-                      <ol className="list-decimal pl-5 space-y-2 text-xs">
-                        <li><strong>Wijs het project af voor co-creatie:</strong> Leg de uitdaging niet neer bij studenten of hobbyisten.</li>
-                        <li><strong>Professionele overdracht:</strong> Geef de uitdaging rechtstreeks door aan een gecertificeerd professioneel adaptatietechnicus (zoals Michel Verkaik) of de revalidatiewerkplaats van Rijndam Revalidatie.</li>
-                        <li><strong>Dossierarchivering:</strong> Sla dit triagerapport op in de database van FysiekFabriek als bewijs van actieve risicobeheersing en conformiteit.</li>
-                      </ol>
+                    <div className="pt-2 text-xs">
+                      <span className="text-slate-400 font-bold block">OMSCHRIJVING:</span>
+                      <p className="text-slate-700 leading-relaxed font-semibold mt-1">{projectDescription || 'Niet opgegeven'}</p>
                     </div>
                   </div>
-                )}
 
-                {/* ORANJE - MATIG PLAN */}
-                {triage.status === 'ORANJE_MATIG' && (
-                  <div className="space-y-5 text-sm text-slate-300">
-                    <div className="bg-amber-950/20 border border-amber-500/30 rounded-2xl p-4 flex gap-4 items-start text-amber-300/90">
-                      <span className="text-2xl">📋</span>
+                  {/* Section B: Triage result */}
+                  <div className="space-y-3">
+                    <h4 className="text-[10px] font-black uppercase tracking-widest text-slate-400 border-b-2 border-slate-100 pb-1.5 font-mono">Risicobeoordeling</h4>
+                    <div className="text-xs space-y-2">
                       <div>
-                        <h4 className="font-extrabold text-white text-base">Zwaardere Oranje Route: Dossier & Expert-Check</h4>
-                        <p className="text-xs mt-1">Samenwerking is mogelijk, maar we moeten aan de strenge traceerbaarheids- en kwaliteitswensen van het Nederlandse VWS/IGJ kabinet voldoen.</p>
+                        <span className="text-slate-400 font-bold block">STATUS VERDICT:</span>
+                        <span className="font-extrabold text-sm text-slate-900">{triage.status}</span>
+                      </div>
+                      <div>
+                        <span className="text-slate-400 font-bold block">TOELICHTING VERDICT:</span>
+                        <p className="text-slate-700 leading-relaxed font-semibold mt-1">{triage.message}</p>
                       </div>
                     </div>
+                  </div>
 
-                    {/* Checklists and wizards */}
-                    <div className="space-y-4">
-                      <h4 className="font-bold text-white text-sm">Vereiste Processtappen:</h4>
+                  {/* FMEA Matrix Section (for orange status) */}
+                  {(triage.status === 'ORANJE_MATIG' || triage.status === 'ORANJE_LICHT') && (
+                    <div className="space-y-4 pt-4 border-t border-slate-100">
+                      <h4 className="text-[10px] font-black uppercase tracking-widest text-slate-400 border-b-2 border-slate-100 pb-1.5 font-mono">FMEA-Lite Risicomatrix (MDR-Licht)</h4>
                       
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div className="bg-slate-900/60 p-4 rounded-xl border border-slate-700/60 space-y-2">
-                          <h5 className="font-bold text-xs text-sky-400 uppercase">1. Digitaal Mini-Technisch Dossier</h5>
-                          <p className="text-[11px] text-slate-400">Studenten moeten bij oplevering een online dossier vullen met de materiaalspecificaties (filamenten, coatings) en de risicoanalyse. Dit dossier is digitaal opvraagbaar voor de cliënt.</p>
-                        </div>
-                        <div className="bg-slate-900/60 p-4 rounded-xl border border-slate-700/60 space-y-2">
-                          <h5 className="font-bold text-xs text-amber-400 uppercase">2. Expert Peer-Review (Michel Verkaik)</h5>
-                          <p className="text-[11px] text-slate-400">Voor de overdracht moet een gecertificeerd expert het 3D-ontwerp of fysieke prototype keuren. Zonder zijn digitale accreditatie mag het product niet geleverd worden.</p>
-                        </div>
-                      </div>
-
-                      {/* FMEA Wizard integration */}
-                      <div className="border-t border-slate-700/60 pt-4 space-y-3">
-                        <h4 className="font-bold text-white text-sm">Risicoanalyse & Beheersing (FMEA-lite Wizard)</h4>
-                        <p className="text-xs text-slate-400">Breng samen met de studenten de gevaren van dit specifieke ontwerp in kaart en koppel direct maatregelen om het risico beheersbaar te maken.</p>
-                        
-                        {/* Hazard List */}
-                        <div className="bg-slate-900/50 rounded-xl overflow-hidden border border-slate-700/60 text-xs">
-                          <table className="w-full text-left">
-                            <thead className="bg-slate-800 text-slate-400 font-bold uppercase tracking-wider text-[10px]">
-                              <tr>
-                                <th className="p-3">Gevaar / Risico</th>
-                                <th className="p-3 text-center">Ernst (1-5)</th>
-                                <th className="p-3">Beheersmaatregel</th>
-                                <th className="p-3 text-right">Actie</th>
-                              </tr>
-                            </thead>
-                            <tbody className="divide-y divide-slate-700/60">
-                              {fmeaHazards.map((h) => (
-                                <tr key={h.id} className="hover:bg-slate-800/40">
-                                  <td className="p-3 font-semibold text-slate-200">{h.hazard}</td>
-                                  <td className="p-3 text-center">
-                                    <span className={`px-2 py-0.5 rounded font-extrabold ${
-                                      parseInt(h.severity) >= 4 ? 'bg-red-950 text-red-400 border border-red-500/30' :
-                                      parseInt(h.severity) === 3 ? 'bg-amber-950 text-amber-400 border border-amber-500/30' :
-                                      'bg-sky-950 text-sky-400 border border-sky-500/30'
-                                    }`}>
+                      <div className="overflow-x-auto">
+                        <table className="w-full text-left text-xs border-collapse">
+                          <thead>
+                            <tr className="border-b-2 border-slate-800 text-slate-500 font-bold">
+                              <th className="py-2.5 pr-4 uppercase">Risico / Gevaar</th>
+                              <th className="py-2.5 px-4 uppercase text-center w-24">Ernst (1-5)</th>
+                              <th className="py-2.5 px-4 uppercase">Mitigerende Maatregel</th>
+                              <th className="py-2.5 pl-4 uppercase text-right print:hidden w-16">Actie</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {fmeaHazards.map((h) => {
+                              const sevNum = parseInt(h.severity);
+                              const sevClass = sevNum <= 2 ? 'bg-emerald-100 text-emerald-800 border-emerald-300' :
+                                               sevNum === 3 ? 'bg-amber-100 text-amber-800 border-amber-300' :
+                                               'bg-rose-100 text-rose-800 border-rose-300';
+                              return (
+                                <tr key={h.id} className="border-b border-slate-100 font-semibold text-slate-850 hover:bg-slate-50/50">
+                                  <td className="py-3 pr-4 leading-normal">{h.hazard}</td>
+                                  <td className="py-3 px-4 text-center">
+                                    <span className={`inline-block px-2.5 py-0.5 rounded-full border text-[10px] font-black ${sevClass}`}>
                                       {h.severity}/5
                                     </span>
                                   </td>
-                                  <td className="p-3 text-slate-300">{h.mitigation}</td>
-                                  <td className="p-3 text-right">
+                                  <td className="py-3 px-4 leading-normal">{h.mitigation}</td>
+                                  <td className="py-3 pl-4 text-right print:hidden">
                                     <button 
-                                      onClick={() => removeHazard(h.id)} 
-                                      className="text-red-400 hover:text-red-300 transition-colors"
-                                      title="Verwijder risico"
+                                      onClick={() => removeHazard(h.id)}
+                                      className="text-slate-400 hover:text-red-500 cursor-pointer font-bold uppercase text-[9px] hover:underline"
                                     >
-                                      🗑️
+                                      Wis
                                     </button>
                                   </td>
                                 </tr>
-                              ))}
-                            </tbody>
-                          </table>
-                        </div>
+                              );
+                            })}
+                          </tbody>
+                        </table>
+                      </div>
 
-                        {/* Add hazard form */}
-                        <div className="bg-slate-900/40 p-3 rounded-xl border border-slate-700/50 grid grid-cols-1 sm:grid-cols-12 gap-3 items-end">
-                          <div className="sm:col-span-5">
-                            <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1">Gevaar</label>
+                      {/* Add Hazard Form (hidden on print) */}
+                      <div className="bg-slate-50 border-2 border-dashed border-slate-200 rounded-xl p-4 space-y-4 print:hidden">
+                        <span className="text-[10px] font-black uppercase text-slate-500 block">Nieuw Risico Toevoegen:</span>
+                        <div className="grid grid-cols-1 sm:grid-cols-12 gap-3 items-end">
+                          <div className="sm:col-span-5 space-y-1">
+                            <label className="block text-[9px] font-black uppercase text-slate-400">Risico / Gevaar</label>
                             <input 
-                              type="text" 
-                              placeholder="bijv. Kunststof adapter breekt onder druk" 
+                              type="text"
+                              placeholder="Bijv. Klemgevaar bij inklappen"
                               value={newHazard}
                               onChange={(e) => setNewHazard(e.target.value)}
-                              className="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-1.5 text-xs text-white focus:outline-none"
+                              className="w-full px-3 py-2 bg-white border border-slate-300 rounded-md text-xs focus:outline-none focus:ring-1 focus:ring-slate-400"
                             />
                           </div>
-                          <div className="sm:col-span-2">
-                            <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1">Ernst (1-5)</label>
+                          <div className="sm:col-span-2 space-y-1">
+                            <label className="block text-[9px] font-black uppercase text-slate-400">Ernst</label>
                             <select 
                               value={newSeverity}
                               onChange={(e) => setNewSeverity(e.target.value)}
-                              className="w-full bg-slate-800 border border-slate-700 rounded-lg px-2 py-1.5 text-xs text-white focus:outline-none"
+                              className="w-full px-2 py-2 bg-white border border-slate-300 rounded-md text-xs focus:outline-none"
                             >
-                              <option value="1">1 (Verwaarloosbaar)</option>
-                              <option value="2">2 (Licht)</option>
+                              <option value="1">1 (Licht)</option>
+                              <option value="2">2 (Laag)</option>
                               <option value="3">3 (Matig)</option>
-                              <option value="4">4 (Ernst)</option>
-                              <option value="5">5 (Katastrofaal)</option>
+                              <option value="4">4 (Hoog)</option>
+                              <option value="5">5 (Kritiek)</option>
                             </select>
                           </div>
-                          <div className="sm:col-span-4">
-                            <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1">Beheersmaatregel</label>
+                          <div className="sm:col-span-4 space-y-1">
+                            <label className="block text-[9px] font-black uppercase text-slate-400">Mitigatie (Oplossing)</label>
                             <input 
-                              type="text" 
-                              placeholder="bijv. Minimale wanddikte 4mm en PETG" 
+                              type="text"
+                              placeholder="Bijv. Afronden hoeken, waarschuwing"
                               value={newMitigation}
                               onChange={(e) => setNewMitigation(e.target.value)}
-                              className="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-1.5 text-xs text-white focus:outline-none"
+                              className="w-full px-3 py-2 bg-white border border-slate-300 rounded-md text-xs focus:outline-none focus:ring-1 focus:ring-slate-400"
                             />
                           </div>
-                          <div className="sm:col-span-1 text-right">
+                          <div className="sm:col-span-1">
                             <button
                               onClick={addHazard}
-                              className="w-full bg-sky-600 hover:bg-sky-500 text-white font-extrabold py-1.5 px-3 rounded-lg transition-colors text-xs"
+                              className="w-full py-2 bg-slate-900 hover:bg-slate-800 text-white rounded-md text-xs font-black uppercase cursor-pointer"
                             >
-                              Voeg
+                              +
                             </button>
                           </div>
                         </div>
                       </div>
                     </div>
+                  )}
+
+                  {/* Section C: Complete scan visualization */}
+                  <div className="space-y-3">
+                    <h4 className="text-[10px] font-black uppercase tracking-widest text-slate-400 border-b-2 border-slate-100 pb-1.5 font-mono">Gezamenlijke Scan Toetsing</h4>
+                    
+                    <div className="space-y-2">
+                      {questions.map((q, i) => {
+                        const wasAnswered = answers[q.id] !== null;
+                        const answer = answers[q.id];
+                        let statusText = "Niet bereikt";
+                        let indicator = <div className="w-1.5 h-1.5 bg-slate-200 rounded-full" />;
+
+                        if (wasAnswered) {
+                          if (answer === 'yes') {
+                            if (q.id === 'q1' || q.id === 'q2' || q.id === 'q3' || q.id === 'q4') {
+                              indicator = <span className="text-red-500">✗</span>;
+                              statusText = "Uitsluiting";
+                            } else {
+                              indicator = <span className="text-emerald-500">✓</span>;
+                              statusText = "Voldoet";
+                            }
+                          } else if (answer === 'no') {
+                            if (q.id === 'q1' || q.id === 'q2' || q.id === 'q3' || q.id === 'q4') {
+                              indicator = <span className="text-emerald-500">✓</span>;
+                              statusText = "Voldoet";
+                            } else {
+                              indicator = <span className="text-red-500">✗</span>;
+                              statusText = "Uitsluiting";
+                            }
+                          } else {
+                            indicator = <span className="text-amber-500">✓</span>;
+                            statusText = "Voldoet";
+                          }
+                        }
+
+                        return (
+                          <div 
+                            key={q.id} 
+                            className={`flex items-center justify-between p-3.5 border rounded-xl text-xs font-bold transition-all ${
+                              wasAnswered 
+                                ? 'border-color-app text-slate-900 bg-white shadow-app-small' 
+                                : 'border-slate-200 text-slate-400 bg-slate-50/50'
+                            }`}
+                          >
+                            <div className="flex items-center space-x-3">
+                              <span className="text-[10px] text-slate-400 w-4">{i + 1}.</span>
+                              <span className="uppercase tracking-tight">{q.title}</span>
+                            </div>
+                            <div className="flex items-center space-x-2">
+                              <span className="text-[9px] font-black uppercase tracking-wider">{statusText}</span>
+                              <div className="w-5 h-5 border-2 border-slate-200 bg-white rounded flex items-center justify-center font-bold text-[10px]">
+                                {indicator}
+                              </div>
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
                   </div>
-                )}
 
-                {/* ORANJE - LICHT PLAN */}
-                {triage.status === 'ORANJE_LICHT' && (
-                  <div className="space-y-4 text-sm text-slate-300">
-                    <div className="bg-amber-950/20 border border-amber-500/30 rounded-2xl p-4 flex gap-4 items-start text-amber-300/90">
-                      <span className="text-2xl">⚡</span>
-                      <div>
-                        <h4 className="font-extrabold text-white text-base">Lichte Oranje Route: Zelfcontrole</h4>
-                        <p className="text-xs mt-1">Dit project compenseert weliswaar een beperking (dus formeel MDR), maar heeft een minimaal risicoprofiel.</p>
-                      </div>
-                    </div>
+                </div>
 
-                    <div className="space-y-3">
-                      <h4 className="font-bold text-white text-sm">Af te vinken kwaliteitschecklist voor studenten:</h4>
-                      <div className="space-y-2 bg-slate-900/50 p-4 rounded-xl border border-slate-700/60 text-xs">
-                        <label className="flex items-center gap-2 cursor-pointer py-1 hover:text-white">
-                          <input type="checkbox" className="rounded bg-slate-800 border-slate-700 text-sky-500 focus:ring-sky-500/40" defaultChecked />
-                          <span>Het product heeft geen scherpe hoeken, splinters of randen.</span>
-                        </label>
-                        <label className="flex items-center gap-2 cursor-pointer py-1 hover:text-white">
-                          <input type="checkbox" className="rounded bg-slate-800 border-slate-700 text-sky-500 focus:ring-sky-500/40" defaultChecked />
-                          <span>Gebruikte materialen zijn gecertificeerd huidvriendelijk (non-toxic biocompatibel PLA/PETG).</span>
-                        </label>
-                        <label className="flex items-center gap-2 cursor-pointer py-1 hover:text-white">
-                          <input type="checkbox" className="rounded bg-slate-800 border-slate-700 text-sky-500 focus:ring-sky-500/40" />
-                          <span>Het product is eenvoudig te reinigen met een milde zeep of milde alcoholoplossing.</span>
-                        </label>
-                        <label className="flex items-center gap-2 cursor-pointer py-1 hover:text-white">
-                          <input type="checkbox" className="rounded bg-slate-800 border-slate-700 text-sky-500 focus:ring-sky-500/40" />
-                          <span>Het product bevat geen kleine, loszittende onderdelen die per ongeluk ingeslikt kunnen worden.</span>
-                        </label>
-                      </div>
-                    </div>
-                  </div>
-                )}
+                {/* Official print timestamp footer */}
+                <div className="hidden print:block text-center text-[9px] text-slate-400 p-8 border-t border-slate-100">
+                  Gegenereerd door Fokus FysiekFabriek Scantoets op {new Date().toLocaleDateString('nl-NL')}
+                </div>
 
-                {/* GROEN ROUTE PLAN */}
-                {triage.status === 'GROEN' && (
-                  <div className="space-y-4 text-sm text-slate-300">
-                    <div className="bg-emerald-950/20 border border-emerald-500/30 rounded-2xl p-4 flex gap-4 items-start text-emerald-300/90">
-                      <span className="text-2xl">🎉</span>
-                      <div>
-                        <h4 className="font-extrabold text-white text-base">Vrije co-creatie toegestaan!</h4>
-                        <p className="text-xs mt-1">Geen zware medische procedures of certificering nodig. Studenten kunnen vrij ontwerpen, brainstormen en bouwen binnen de creatieve kaders van FysiekFabriek.</p>
-                      </div>
-                    </div>
-
-                    <div className="space-y-3">
-                      <h4 className="font-bold text-white text-sm">Aandachtspunten:</h4>
-                      <ul className="list-disc pl-5 space-y-1.5 text-xs">
-                        <li><strong>Gebruikershandleiding:</strong> Lever het product op met een simpele en visuele instructiekaart voor de uitdager (hoe te gebruiken, wassen of opbergen).</li>
-                        <li><strong>Disclaimer:</strong> Voeg de standaard FysiekFabriek disclaimer toe waarin staat dat dit geen medisch hulpmiddel is maar een ergonomische 'lifehack'.</li>
-                        <li><strong>Open Source:</strong> Deel je 3D-ontwerpbestanden (STL/STEP) en instructies op de FysiekFabriek website, zodat andere uitdagers hier in de toekomst ook profijt van kunnen hebben!</li>
-                      </ul>
-                    </div>
-                  </div>
-                )}
               </div>
 
               {/* REPORT ACTIONS & EXPORTS */}
-              <div className="flex flex-col sm:flex-row gap-4 justify-between items-center bg-slate-800 border border-slate-700 rounded-2xl p-4">
+              <div className="flex flex-col sm:flex-row gap-4 justify-between items-center bg-white border-2 border-color-app rounded-2xl p-4 print:hidden shadow-app-small">
                 <button
-                  onClick={() => setStep('intro')}
-                  className="w-full sm:w-auto px-5 py-2.5 rounded-xl border border-slate-700 text-slate-300 hover:text-white hover:bg-slate-700/50 font-bold transition-all text-xs flex items-center justify-center gap-2"
+                  onClick={() => setStep('dashboard')}
+                  className="w-full sm:w-auto px-5 py-2.5 rounded-app-btn border-2 border-color-app text-slate-600 hover:text-slate-900 hover:bg-slate-50 font-bold transition-all text-xs flex items-center justify-center gap-2 cursor-pointer"
                 >
                   <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 1121.21 15H19" />
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
                   </svg>
-                  <span>Nieuwe Triage</span>
+                  <span>Terug naar dashboard</span>
                 </button>
 
                 <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
                   <button
                     onClick={copyReportToClipboard}
-                    className="w-full sm:w-auto px-5 py-2.5 bg-gradient-to-r from-sky-500 to-indigo-600 hover:from-sky-400 hover:to-indigo-500 text-white font-extrabold rounded-xl transition-all shadow-md text-xs flex items-center justify-center gap-2"
+                    className="w-full sm:w-auto px-5 py-2.5 bg-slate-900 hover:bg-slate-800 text-white font-extrabold rounded-app-btn transition-all shadow-app-small text-xs flex items-center justify-center gap-2 cursor-pointer"
                   >
-                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3" />
-                    </svg>
-                    <span>Kopieer Triage-rapport</span>
+                    <span>Kopieer Scan-rapport</span>
                   </button>
                 </div>
               </div>
@@ -1100,36 +1323,36 @@ Gegenereerd met de FysiekFabriek Triage Tool.
         </div>
 
         {/* Right Column: Live Answers & Progress Tracker */}
-        {step !== 'intro' && (
-          <div className="lg:col-span-3 flex flex-col gap-6 animate-fade-in">
-            <div className="bg-slate-800 rounded-3xl border border-slate-700 p-5 shadow-xl w-full space-y-4">
-              <div className="border-b border-slate-700 pb-3">
-                <h3 className="text-sm font-bold text-slate-200 uppercase tracking-wider">Triage Voortgang</h3>
-                <p className="text-[10px] text-slate-400 mt-0.5">Klik op een beantwoord blok om terug te gaan</p>
+        {step === 'wizard' && (
+          <div className="lg:col-span-3 flex flex-col gap-6 animate-fade-in print:hidden">
+            <div className="bg-white rounded-app-card border-width-app border-color-app p-5 shadow-app w-full space-y-4">
+              <div className="border-b border-slate-200 pb-3">
+                <h3 className="text-sm font-bold text-slate-950 uppercase tracking-wider">Scan Voortgang</h3>
+                <p className="text-[10px] text-slate-400 mt-0.5 font-bold">Klik op een beantwoord blok om terug te gaan</p>
               </div>
               <div className="space-y-3">
                 {questions.map((q, idx) => {
                   const answer = answers[q.id];
                   const isAnswered = answer !== null;
-                  const isCurrent = currentQ === idx && step === 'quiz';
+                  const isCurrent = currentQ === idx && step === 'wizard';
                   
-                  let badgeColor = "bg-slate-900 text-slate-500 border-slate-800";
+                  let badgeColor = "bg-slate-100 text-slate-500 border-slate-200";
                   let badgeText = "Openstaand";
                   
                   if (isAnswered) {
                     if (answer === 'yes') {
-                      badgeColor = "bg-red-950/60 text-red-400 border-red-500/30";
+                      badgeColor = "bg-rose-50 text-rose-800 border-rose-200";
                       badgeText = "Ja";
                     } else if (answer === 'no') {
-                      badgeColor = "bg-emerald-950/60 text-emerald-400 border-emerald-500/30";
+                      badgeColor = "bg-emerald-50 text-emerald-800 border-emerald-200";
                       badgeText = "Nee";
                     } else {
                       const option = q.options?.find(o => o.value === answer);
-                      badgeColor = "bg-amber-950/60 text-amber-400 border-amber-500/30";
+                      badgeColor = "bg-amber-50 text-amber-800 border-amber-200";
                       badgeText = option ? option.label.split(':')[0] : answer;
                     }
                   } else if (isCurrent) {
-                    badgeColor = "bg-sky-950 text-sky-400 border-sky-500/50 animate-pulse";
+                    badgeColor = "bg-sky-50 text-sky-800 border-sky-200 animate-pulse";
                     badgeText = "Actief...";
                   }
 
@@ -1137,27 +1360,27 @@ Gegenereerd met de FysiekFabriek Triage Tool.
                     <div 
                       key={q.id} 
                       onClick={() => {
-                        if (step === 'quiz' && isAnswered) {
+                        if (isAnswered) {
                           setCurrentQ(idx);
                         }
                       }}
-                      className={`p-2.5 rounded-xl border text-xs transition-all ${
+                      className={`p-2.5 rounded-app-btn border-2 text-xs transition-all ${
                         isCurrent 
-                          ? 'bg-slate-700/50 border-sky-500/40 ring-1 ring-sky-500/20 shadow-md shadow-sky-500/5' 
-                          : isAnswered && step === 'quiz' 
-                          ? 'bg-slate-900/40 border-slate-700/60 hover:bg-slate-700/20 cursor-pointer hover:border-slate-500/40' 
-                          : 'bg-slate-900/10 border-slate-800/40 opacity-55'
+                          ? 'bg-slate-50 border-sky-500/50 shadow-app-small' 
+                          : isAnswered 
+                          ? 'bg-white border-color-app hover:bg-slate-50 cursor-pointer shadow-app-small' 
+                          : 'bg-slate-50 border-slate-200 opacity-60'
                       }`}
                     >
                       <div className="flex items-center justify-between gap-2">
-                        <span className={`font-semibold ${isCurrent ? 'text-sky-400' : isAnswered ? 'text-slate-200' : 'text-slate-500'}`}>
+                        <span className={`font-semibold ${isCurrent ? 'text-sky-800' : isAnswered ? 'text-slate-900' : 'text-slate-400'}`}>
                           Vraag {idx + 1}
                         </span>
-                        <span className={`text-[9px] px-1.5 py-0.5 rounded-md font-bold border ${badgeColor}`}>
+                        <span className={`text-[9px] px-1.5 py-0.5 rounded-md font-black border ${badgeColor}`}>
                           {badgeText}
                         </span>
                       </div>
-                      <p className="text-[11px] text-slate-400 truncate mt-1">{q.text}</p>
+                      <p className="text-[11px] text-slate-500 truncate mt-1 font-semibold">{q.text}</p>
                     </div>
                   );
                 })}
@@ -1169,11 +1392,11 @@ Gegenereerd met de FysiekFabriek Triage Tool.
       </main>
 
       {/* Footer */}
-      <footer className="bg-slate-950 border-t border-slate-800/80 py-6 px-6 text-center text-slate-500 text-xs">
+      <footer className="bg-white border-t-app border-color-app py-6 px-6 text-center text-slate-500 text-xs mt-auto print:hidden">
         <div className="max-w-7xl mx-auto space-y-2">
-          <p>© 2026 FysiekFabriek & Michel Verkaik Adaptatietechniek. Alle rechten voorbehouden.</p>
-          <p className="opacity-60 text-[10px]">
-            Deze tool is gebaseerd op de EU MDR 2017/745 verordeningen, de BNC Kamerbrief (december 2025 / februari 2026) en de risico-evaluatiemethodiek van Michel Verkaik.
+          <p className="font-bold">© 2026 FysiekFabriek & Michel Verkaik Adaptatietechniek. Alle rechten voorbehouden.</p>
+          <p className="opacity-60 text-[10px] font-semibold">
+            Deze scan is gebaseerd op de EU MDR 2017/745 verordeningen en de risico-evaluatiemethodiek van Michel Verkaik.
           </p>
         </div>
       </footer>
