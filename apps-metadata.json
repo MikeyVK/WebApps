@@ -1,0 +1,34 @@
+{
+  "apps": [
+    {
+      "id": "project_intake_scan",
+      "name": "Project Intake Scan",
+      "subtitle": "Scan uitdagingen",
+      "description": "Doorloop de 11 criteria voor uitdagers en uitdagingen om te bepalen of een project past binnen de Fokus-formule.",
+      "path": "/project_intake_scan/",
+      "icon": "ClipboardList",
+      "defaultTheme": "theme-brutalist",
+      "order": 1
+    },
+    {
+      "id": "maatwerk_risico_scan",
+      "name": "Maatwerk Risico Scan",
+      "subtitle": "MDR Stoplicht Risico Scan",
+      "description": "Evalueer snel projecten aan de hand van het stoplichtmedisch model (Rood, Oranje, Groen). Inclusief interactieve FMEA-lite risicoanalyse.",
+      "path": "/maatwerk_risico_scan/",
+      "icon": "ShieldCheck",
+      "defaultTheme": "theme-brutalist",
+      "order": 2
+    },
+    {
+      "id": "fysiek_fabriek_portal",
+      "name": "FysiekFabriek Portal",
+      "subtitle": "Hulpmiddelen & Risicobeoordeling",
+      "description": "De overkoepelende startpagina specifiek voor alle FysiekFabriek hulpmiddelen en scans.",
+      "path": "/fysiek_fabriek_portal/",
+      "icon": "Layers",
+      "defaultTheme": "theme-brutalist",
+      "order": 0
+    }
+  ]
+}

@@ -1,0 +1,50 @@
+.theme-brutalist {
+  --bg-app: #fffdf9;
+  --text-app: #1e293b;
+  --accent-app: #f26522; /* Fokus orange */
+  --border-app-width: 4px;
+  --border-app-color: #1e293b;
+  --shadow-app: 6px 6px 0px 0px rgba(30, 41, 59, 1);
+  --shadow-app-small: 3px 3px 0px 0px rgba(30, 41, 59, 1);
+  --radius-card: 24px;
+  --radius-btn: 12px;
+}
+
+.theme-dark {
+  --bg-app: #0f172a;
+  --text-app: #f1f5f9;
+  --accent-app: #f19d76; /* Peach orange */
+  --border-app-width: 2px;
+  --border-app-color: rgba(51, 65, 85, 0.6);
+  --shadow-app: 0px 10px 15px -3px rgba(0, 0, 0, 0.4);
+  --shadow-app-small: 0px 4px 6px -2px rgba(0, 0, 0, 0.3);
+  --radius-card: 32px;
+  --radius-btn: 16px;
+}
+
+/* Print utility classes shared by scans */
+@media print {
+  body {
+    background-color: #ffffff !important;
+    color: #000000 !important;
+  }
+  .print-hidden,
+  header,
+  footer,
+  button,
+  .print-hide {
+    display: none !important;
+  }
+  .print-full-layout {
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    border: none !important;
+    box-shadow: none !important;
+  }
+  /* Remove shadow offset on paper */
+  .shadow-app, .shadow-app-small {
+    box-shadow: none !important;
+  }
+}
