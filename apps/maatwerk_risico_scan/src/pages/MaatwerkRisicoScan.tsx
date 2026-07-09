@@ -569,7 +569,7 @@ Gegenereerd met de FysiekFabriek Scan Tool.
                 <div className={`w-16 h-16 rounded-full border-2 border-slate-900 transition-all duration-300 ${
                   glowClass === 'red' 
                     ? 'bg-red-500 shadow-[0_0_35px_rgba(239,68,68,0.9)] scale-105 animate-pulse' 
-                    : 'bg-red-500/10 border-red-500/20'
+                    : 'bg-red-500/25 border-red-500/35'
                 }`} />
                 {glowClass === 'red' && <span className="absolute -inset-2 rounded-full border border-red-400/30 animate-ping pointer-events-none" />}
               </div>
@@ -579,7 +579,7 @@ Gegenereerd met de FysiekFabriek Scan Tool.
                 <div className={`w-16 h-16 rounded-full border-2 border-slate-900 transition-all duration-300 ${
                   glowClass === 'orange' 
                     ? 'bg-amber-500 shadow-[0_0_35px_rgba(245,158,11,0.9)] scale-105 animate-pulse' 
-                    : 'bg-amber-500/10 border-amber-500/20'
+                    : 'bg-amber-500/25 border-amber-500/35'
                 }`} />
                 {glowClass === 'orange' && <span className="absolute -inset-2 rounded-full border border-amber-400/30 animate-ping pointer-events-none" />}
               </div>
@@ -589,7 +589,7 @@ Gegenereerd met de FysiekFabriek Scan Tool.
                 <div className={`w-16 h-16 rounded-full border-2 border-slate-900 transition-all duration-300 ${
                   glowClass === 'green' 
                     ? 'bg-emerald-500 shadow-[0_0_35px_rgba(16,185,129,0.9)] scale-105 animate-pulse' 
-                    : 'bg-emerald-500/10 border-emerald-500/20'
+                    : 'bg-emerald-500/25 border-emerald-500/35'
                 }`} />
                 {glowClass === 'green' && <span className="absolute -inset-2 rounded-full border border-emerald-400/30 animate-ping pointer-events-none" />}
               </div>
