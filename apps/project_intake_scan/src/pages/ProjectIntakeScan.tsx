@@ -298,7 +298,7 @@ export default function ProjectIntakeScan() {
     const isFailed = answerValue !== currentQuestion.expectedAnswer;
 
     if (isFailed) {
-      const newResult = {
+      const newResult: ProjectScanResult = {
         id: Date.now(),
         date: new Date().toLocaleDateString('nl-NL'),
         project: projectInfo,
@@ -311,7 +311,7 @@ export default function ProjectIntakeScan() {
       setCurrentView('result');
     } else {
       if (currentQuestionIndex === QUESTIONS.length - 1) {
-        const newResult = {
+        const newResult: ProjectScanResult = {
           id: Date.now(),
           date: new Date().toLocaleDateString('nl-NL'),
           project: projectInfo,
@@ -956,7 +956,7 @@ export default function ProjectIntakeScan() {
                 <p className="text-slate-500 text-xs font-semibold">De hulpvraag conflicteert met één of meerdere richtlijnen. Pas de details aan of bekijk de toelichtende adviezen hieronder.</p>
                 <div className="pt-2">
                   <button
-                    onClick={() => handleGoBackToQuestion(currentResult.failedAtQuestion?.id)}
+                    onClick={() => currentResult.failedAtQuestion && handleGoBackToQuestion(currentResult.failedAtQuestion.id)}
                     className="inline-flex items-center space-x-1.5 bg-[#F26522] border-2 border-slate-800 hover:bg-orange-600 text-white px-5 py-2.5 rounded-xl text-xs font-black uppercase tracking-wider shadow-[2px_2px_0px_0px_rgba(30,41,59,1)] transition-all cursor-pointer"
                   >
                     <ChevronLeft className="w-4 h-4" />
