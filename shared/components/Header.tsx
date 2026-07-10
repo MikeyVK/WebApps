@@ -24,7 +24,7 @@ export const Header: React.FC<HeaderProps> = ({
   subtitle,
   actions = [],
   className = '',
-  innerClassName = 'max-w-7xl'
+  innerClassName = 'w-full max-w-7xl'
 }) => {
   return (
     <header className={`bg-white border-b-app border-color-app py-4 px-6 sticky top-0 z-40 print:hidden shadow-app-small ${className}`}>
@@ -39,7 +39,7 @@ export const Header: React.FC<HeaderProps> = ({
           ) : null}
           
           {subtitle && (
-            <div className="hidden sm:block border-l-2 border-slate-200 pl-4 py-1">
+            <div className="hidden sm:block border-l-2 border-slate-200 pl-4 py-1 shrink-0">
               <p className="text-xs text-slate-400 font-bold uppercase tracking-wider">{subtitle}</p>
             </div>
           )}

@@ -3,6 +3,7 @@ import metadata from '../../../../apps-metadata.json';
 import { AppMetadata } from '@shared/types/metadata';
 import { Header } from '@shared/components/Header';
 import { FFLogo } from '@shared/components/FFLogo';
+import { Footer } from '@shared/components/Footer';
 import {
   User,
   ChevronRight,
@@ -1117,17 +1118,11 @@ export default function ProjectIntakeScan() {
 
       </main>
 
-      {/* Footer block */}
-      <footer className="bg-white border-t-app border-color-app py-6 text-center text-[10px] font-black uppercase tracking-wider text-slate-400 mt-auto print:hidden">
-        <div className="max-w-7xl mx-auto px-4">
-          <p>© 2026 Fokus FysiekFabriek. Alle rechten voorbehouden.</p>
-        </div>
-      </footer>
-      <footer className="bg-white border-t-4 border-slate-800 py-6 text-center text-[10px] font-black uppercase tracking-wider text-slate-400 mt-auto print:hidden">
-        <div className="max-w-7xl mx-auto px-4">
-          <p>© 2026 Fokus FysiekFabriek. Alle rechten voorbehouden.</p>
-        </div>
-      </footer>
+      {/* Footer */}
+      <Footer 
+        copyright="© 2026 Fokus FysiekFabriek. Alle rechten voorbehouden." 
+        notes={['Deze scan is gebaseerd op de Fokus-formule voor co-creatie van hulpmiddelen.']} 
+      />
 
     </div>
   );

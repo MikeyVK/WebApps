@@ -3,7 +3,7 @@ import metadata from '../../../apps-metadata.json';
 import { AppMetadata } from '@shared/types/metadata';
 import { Header } from '@shared/components/Header';
 import { FFLogo } from '@shared/components/FFLogo';
-
+import { Footer } from '@shared/components/Footer';
 export default function App() {
   const portalMeta = (metadata.apps as AppMetadata[]).find(app => app.id === 'fysiek_fabriek_portal');
   const appTheme = portalMeta?.defaultTheme || 'theme-brutalist';
@@ -92,9 +92,7 @@ export default function App() {
       </main>
 
       {/* Footer */}
-      <footer className="bg-white border-t-app border-color-app py-6 px-6 text-center text-slate-500 text-xs mt-auto">
-        <p className="font-bold">© 2026 FysiekFabriek & Fokus. Alle rechten voorbehouden.</p>
-      </footer>
+      <Footer copyright="© 2026 FysiekFabriek & Fokus. Alle rechten voorbehouden." />
     </div>
   );
 }

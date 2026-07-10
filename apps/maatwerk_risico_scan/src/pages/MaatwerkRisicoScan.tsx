@@ -4,6 +4,7 @@ import metadata from '../../../../apps-metadata.json';
 import { AppMetadata } from '@shared/types/metadata';
 import { Header } from '@shared/components/Header';
 import { FFLogo } from '@shared/components/FFLogo';
+import { Footer } from '@shared/components/Footer';
 interface PresetProject {
   name: string;
   description: string;
@@ -1352,14 +1353,10 @@ Gegenereerd met de FysiekFabriek Scan Tool.
       </main>
 
       {/* Footer */}
-      <footer className="bg-white border-t-app border-color-app py-6 px-6 text-center text-slate-500 text-xs mt-auto print:hidden">
-        <div className="max-w-7xl mx-auto space-y-2">
-          <p className="font-bold">© 2026 FysiekFabriek & Michel Verkaik Adaptatietechniek. Alle rechten voorbehouden.</p>
-          <p className="opacity-60 text-[10px] font-semibold">
-            Deze scan is gebaseerd op de EU MDR 2017/745 verordeningen en de risico-evaluatiemethodiek van Michel Verkaik.
-          </p>
-        </div>
-      </footer>
+      <Footer 
+        copyright="© 2026 FysiekFabriek & Michel Verkaik Adaptatietechniek. Alle rechten voorbehouden." 
+        notes={['Deze scan is gebaseerd op de EU MDR 2017/745 verordeningen en de risico-evaluatiemethodiek van Michel Verkaik.']} 
+      />
     </div>
   );
 }
