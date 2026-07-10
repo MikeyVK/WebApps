@@ -1,6 +1,7 @@
 @import "tailwindcss";
 @import "../../../shared/styles/themes.css";
 
+@source "../../../shared/components/**/*.tsx";
 @theme {
   --color-bg-app: var(--bg-app);
   --color-text-app: var(--text-app);
