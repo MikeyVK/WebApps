@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
 import metadata from '../../../../apps-metadata.json';
 import { AppMetadata } from '@shared/types/metadata';
-import { 
-  User, 
-  ChevronRight, 
+import { Header } from '@shared/components/Header';
+import { FFLogo } from '@shared/components/FFLogo';
+import {
+  User,
+  ChevronRight,
   ChevronLeft, 
   Check, 
   X, 
@@ -387,45 +389,30 @@ export default function ProjectIntakeScan() {
   return (
     <div className={`min-h-screen ${appTheme} bg-bg-app text-text-app font-sans flex flex-col selection:bg-orange-100 print:bg-white print:text-black`}>
 
-      {/* Brand Header */}
-      <header className="bg-white border-b-app border-color-app sticky top-0 z-40 print:hidden shadow-app-small">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
-          <div className="flex items-center space-x-3 cursor-pointer" onClick={() => setCurrentView('dashboard')}>
-            <div className="bg-slate-900 text-white p-3 border-2 border-slate-900 rounded-2xl flex items-center justify-center transform rotate-[-2deg] shadow-[2px_2px_0px_0px_rgba(242,101,34,1)]">
-              <span className="font-extrabold text-lg tracking-wider">FF</span>
-            </div>
-            <div className="flex flex-col">
-              <span className="text-xs font-black uppercase tracking-widest text-slate-400">Fokus</span>
-              <span className="font-black text-2xl tracking-tight text-slate-900 uppercase">
-                Fysiek<span className="text-[#F26522]">Fabriek</span>
-              </span>
-            </div>
-          </div>
-
-          <div className="flex items-center space-x-3">
-            <a 
-              href="../"
-              className="px-4 py-2 bg-slate-100 hover:bg-slate-200 border-2 border-slate-800 rounded-xl text-xs font-bold uppercase tracking-wider transition-all shadow-[2px_2px_0px_0px_rgba(30,41,59,1)] hover:translate-y-[1px] hover:shadow-[1px_1px_0px_0px_rgba(30,41,59,1)] text-slate-800 flex items-center gap-1"
-            >
-              <Home className="w-3.5 h-3.5" />
-              <span>Naar Home Portal</span>
-            </a>
-            <button 
-              onClick={() => setCurrentView('dashboard')}
-              className={`px-4 py-2 border-2 border-slate-800 rounded-xl text-xs font-bold uppercase tracking-wider transition-all shadow-[2px_2px_0px_0px_rgba(30,41,59,1)] hover:translate-y-[1px] hover:shadow-[1px_1px_0px_0px_rgba(30,41,59,1)] ${currentView === 'dashboard' ? 'text-white bg-slate-900' : 'text-slate-800 bg-white'}`}
-            >
-              Geschiedenis
-            </button>
-            <button 
-              onClick={handleStartNew}
-              className="bg-[#F26522] hover:bg-orange-600 border-2 border-slate-800 text-white px-5 py-2.5 rounded-xl text-xs font-bold uppercase tracking-wider transition-all shadow-[3px_3px_0px_0px_rgba(30,41,59,1)] hover:translate-y-[2px] hover:shadow-[1px_1px_0px_0px_rgba(30,41,59,1)] flex items-center space-x-1.5"
-            >
-              <Plus className="w-4 h-4" />
-              <span>Nieuwe Intake</span>
-            </button>
-          </div>
-        </div>
-      </header>
+      <Header 
+        logo={<FFLogo onClick={() => setCurrentView('dashboard')} />}
+        subtitle="Project Intake Scan"
+        actions={[
+          {
+            label: 'Home',
+            icon: <Home className="w-3.5 h-3.5" />,
+            href: '../fysiek_fabriek_portal/',
+            variant: 'secondary'
+          },
+          {
+            label: 'Geschiedenis',
+            onClick: () => setCurrentView('dashboard'),
+            isActive: currentView === 'dashboard',
+            variant: 'secondary'
+          },
+          {
+            label: 'Nieuwe Scan',
+            icon: <Plus className="w-4 h-4" />,
+            onClick: handleStartNew,
+            variant: 'primary'
+          }
+        ]}
+      />
 
       {/* Main Content */}
       <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 flex flex-col justify-start">
