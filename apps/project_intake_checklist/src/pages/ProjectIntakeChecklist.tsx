@@ -20,7 +20,6 @@ interface ChecklistBlock {
   title: string;
   headerBg: string;
   borderClass: string;
-  bullets: string[];
   explanation: {
     title: string;
     text: string;
@@ -38,11 +37,6 @@ const CHECKLIST_BLOCKS: ChecklistBlock[] = [
     title: 'De uitdager',
     headerBg: 'bg-[#F9D448]', // Yellow
     borderClass: 'border-[#F9D448]',
-    bullets: [
-      'heeft een fysieke beperking',
-      'is meerderjarig',
-      'en handelingsbekwaam: kan eigen regie voeren, keuzes maken.'
-    ],
     explanation: {
       title: 'Toelichting: De uitdager',
       text: 'FysiekFabriek is voor mensen met een fysieke beperking om met eigen regie over het eigen leven een oplossing te vinden. De uitdager moet in staat zijn eigen keuzes te maken en daarvoor verantwoordelijkheid te kunnen dragen.'
@@ -50,7 +44,7 @@ const CHECKLIST_BLOCKS: ChecklistBlock[] = [
     checkboxes: [
       { id: 'beperking', label: 'Heeft een fysieke beperking' },
       { id: 'meerderjarig', label: 'Is meerderjarig' },
-      { id: 'regie', label: 'Is handelingsbekwaam (eigen regie)' }
+      { id: 'regie', label: 'Is handelingsbekwaam: kan eigen regie voeren en keuzes maken' }
     ]
   },
   {
@@ -58,16 +52,13 @@ const CHECKLIST_BLOCKS: ChecklistBlock[] = [
     title: 'De uitdaging',
     headerBg: 'bg-[#CBD5E1]', // Grey
     borderClass: 'border-[#CBD5E1]',
-    bullets: [
-      'gaat over het eigen leven',
-      'om een gewone dagelijkse activiteit mogelijk of makkelijker te maken.'
-    ],
     explanation: {
       title: 'Toelichting: De uitdaging',
       text: 'Er worden bij FysiekFabriek alleen oplossingen gezocht voor één specifieke persoon: de uitdager. De oplossing is altijd maatwerk: Design-for-one. Daarnaast worden er alleen voorwerpen gemaakt die uitsluitend een ergonomisch, recreatief of huishoudelijk comfortdoel dienen en geen medische of compenserende claim hebben.'
     },
     checkboxes: [
-      { id: 'eigen_leven', label: 'Gaat over het eigen leven' },
+      { id: 'eigen_leven', label: 'Gaat over het eigen leven van de uitdager' },
+      { id: 'activiteit', label: 'Dient om een gewone dagelijkse activiteit mogelijk of makkelijker te maken' },
       { id: 'comfortdoel', label: 'Dient uitsluitend een comfortdoel (geen medische claim)' }
     ]
   },
@@ -76,17 +67,13 @@ const CHECKLIST_BLOCKS: ChecklistBlock[] = [
     title: 'De uitdager (Lichaam & Advies)',
     headerBg: 'bg-[#FDCF9E]', // Peach
     borderClass: 'border-[#FDCF9E]',
-    bullets: [
-      'weet wat diens lichaam kan en aankan.',
-      'heeft bestaande oplossingen geprobeerd en hierbij hulp/advies gehad. (bijv. van een ergotherapeut)'
-    ],
     explanation: {
       title: 'Toelichting: Lichaam & Advies',
       text: 'Het is belangrijk dat er sprake is van een stabiele situatie. En het is noodzakelijk dat de uitdager zelf goed weet wat die wel en niet kan en wat goed is voor diens lijf. FysiekFabriek kan hierin niet adviseren. FysiekFabriek is geen zorg.'
     },
     checkboxes: [
-      { id: 'lichaam_kennis', label: 'Weet wat diens lichaam kan/aankan' },
-      { id: 'advies_gehad', label: 'Heeft bestaande oplossingen/advies geprobeerd (bijv. ergotherapeut)' }
+      { id: 'lichaam_kennis', label: 'Weet wat diens lichaam kan en aankan' },
+      { id: 'advies_gehad', label: 'Heeft bestaande oplossingen geprobeerd en hierbij hulp/advies gehad (bijv. ergotherapeut)' }
     ]
   },
   {
@@ -94,11 +81,6 @@ const CHECKLIST_BLOCKS: ChecklistBlock[] = [
     title: 'Wat kan niet',
     headerBg: 'bg-[#F8C1C1]', // Pink
     borderClass: 'border-[#F8C1C1]',
-    bullets: [
-      'oplossingen voor problemen met vitale functies.',
-      'oplossingen die het volledige lichaamsgewicht dragen.',
-      'oplossing met software, apps of actieve elektronische componenten.'
-    ],
     explanation: {
       title: 'Toelichting: Uitsluitingscriteria',
       text: 'Bepaalde categorieën hulpmiddelen zijn om veiligheidsredenen strikt uitgesloten van ontwikkeling binnen de FysiekFabriek.',
@@ -116,9 +98,9 @@ const CHECKLIST_BLOCKS: ChecklistBlock[] = [
       }
     },
     checkboxes: [
-      { id: 'geen_vitale', label: 'Geen oplossing voor vitale functies' },
-      { id: 'geen_gewicht', label: 'Draagt NIET het volledige lichaamsgewicht' },
-      { id: 'geen_software', label: 'Bevat GEEN software, apps of actieve elektronica' }
+      { id: 'geen_vitale', label: 'Geen oplossing voor problemen met vitale functies' },
+      { id: 'geen_gewicht', label: 'Geen oplossing die het volledige lichaamsgewicht draagt' },
+      { id: 'geen_software', label: 'Geen software, apps of actieve elektronische componenten' }
     ]
   },
   {
@@ -126,16 +108,13 @@ const CHECKLIST_BLOCKS: ChecklistBlock[] = [
     title: 'Let op: bestaande hulpmiddelen worden niet aangepast',
     headerBg: 'bg-[#E2C6A9]', // Brown
     borderClass: 'border-[#E2C6A9]',
-    bullets: [
-      '❌ NOOIT: Boren, zagen, lassen etc. aan/in een rolstoel of ander hulpmiddel.',
-      '🟢 MAAR: Bijv. een voorwerp met een schroefloze klemverbinding bevestigen.'
-    ],
     explanation: {
       title: 'Toelichting: Geen aanpassing van bestaande hulpmiddelen',
       text: 'Bestaande, gecertificeerde hulpmiddelen (zoals een rolstoel) mogen nooit constructief worden gewijzigd door boren, zagen of lassen, omdat hiermee de fabrieksgarantie en veiligheidscertificering (CE-markering) vervallen. Bevestigingen mogen uitsluitend via schroefloze, demontabele klemverbindingen plaatsvinden.'
     },
     checkboxes: [
-      { id: 'geen_constructieve_wijziging', label: 'Geen constructieve wijziging (lassen, boren, zagen)' }
+      { id: 'geen_constructieve_wijziging', label: 'Geen constructieve wijzigingen (nooit boren, zagen of lassen aan/in een rolstoel)' },
+      { id: 'klemverbinding', label: 'Bevestigingen uitsluitend via schroefloze, demontabele klemverbindingen' }
     ]
   },
   {
@@ -143,16 +122,12 @@ const CHECKLIST_BLOCKS: ChecklistBlock[] = [
     title: '...??',
     headerBg: 'bg-[#D1C4E9]', // Purple
     borderClass: 'border-[#D1C4E9]',
-    bullets: [
-      'Zijn er nog andere dingen die we moeten checken?',
-      '...? (Gebruik het opmerkingenveld bij twijfel)'
-    ],
     explanation: {
       title: 'Toelichting: Overige checks',
       text: 'Gebruik uw gezond verstand om te beoordelen of er nog andere risico\'s of belemmeringen zijn die de geschiktheid van de uitdaging in de weg staan.'
     },
     checkboxes: [
-      { id: 'geen_overige_risicos', label: 'Geen overige risico\'s of twijfels geïdentificeerd' }
+      { id: 'geen_overige_risicos', label: 'Geen overige risico\'s of twijfels geïdentificeerd (gebruik het opmerkingenveld bij twijfel)' }
     ]
   }
 ];
@@ -201,6 +176,19 @@ export default function ProjectIntakeChecklist() {
       ...prev,
       [id]: !prev[id]
     }));
+  };
+
+  const handleToggleBlockAll = (block: ChecklistBlock, e: React.MouseEvent) => {
+    e.stopPropagation();
+    const allCheckboxIds = block.checkboxes.map(c => c.id);
+    const allChecked = allCheckboxIds.every(id => checks[id] === true);
+    setChecks(prev => {
+      const nextChecks = { ...prev };
+      allCheckboxIds.forEach(id => {
+        nextChecks[id] = !allChecked;
+      });
+      return nextChecks;
+    });
   };
 
   const getSuitabilityStatus = (): 'Geschikt' | 'Niet Geschikt' => {
@@ -469,44 +457,35 @@ export default function ProjectIntakeChecklist() {
                         {/* Header bar of the block */}
                         <div className={`py-2.5 px-4 flex items-center justify-between border-b-2 border-slate-800 print:border-slate-300 ${block.headerBg}`}>
                           <h3 className="font-black text-sm uppercase tracking-wider text-slate-900">{block.title}</h3>
-                          <div className="w-5 h-5 bg-white border-2 border-slate-800 rounded flex items-center justify-center print:border-slate-300">
+                          <button 
+                            type="button"
+                            onClick={(e) => handleToggleBlockAll(block, e)}
+                            className="w-5 h-5 bg-white border-2 border-slate-800 rounded flex items-center justify-center hover:bg-slate-100 transition-colors cursor-pointer print:border-slate-300 print:bg-white shrink-0"
+                            title={blockChecked ? "Deselecteer alle criteria" : "Selecteer alle criteria"}
+                          >
                             {blockChecked && <Check className="w-4 h-4 text-emerald-600 stroke-[3.5]" />}
-                          </div>
+                          </button>
                         </div>
 
-                        {/* Bullets & checkboxes */}
-                        <div className="p-4 bg-white flex flex-col md:flex-row md:items-start justify-between gap-4">
-                          <div className="flex items-start gap-4 flex-[3]">
-                            {renderBlockIcon(block.id)}
-                            <ul className="list-disc pl-4 text-xs font-semibold text-slate-700 space-y-1.5 flex-1 pt-0.5">
-                              {block.bullets.map((bullet, idx) => (
-                                <li key={idx}>{bullet}</li>
-                              ))}
-                            </ul>
-                          </div>
-                          
-                          {/* Inner Checkbox Controls (hidden in print, replaced by visual checks) */}
-                          <div className="border-t md:border-t-0 md:border-l border-slate-200 pt-3 md:pt-0 md:pl-4 space-y-2.5 flex-[2] print:hidden">
+                        {/* Integrated clickable bullet checklist */}
+                        <div className="p-4 bg-white flex items-start gap-4">
+                          {renderBlockIcon(block.id)}
+                          <div className="space-y-2 flex-1">
                             {block.checkboxes.map(cb => (
                               <label key={cb.id} className="flex items-start gap-3 cursor-pointer group text-xs font-semibold text-slate-700 py-1 leading-normal">
+                                {/* Screen Checkbox Input */}
                                 <input 
                                   type="checkbox"
                                   checked={!!checks[cb.id]}
                                   onChange={() => handleCheckboxChange(cb.id)}
-                                  className="shrink-0 mt-0.5"
+                                  className="shrink-0 mt-0.5 print:hidden"
                                 />
+                                {/* Print Checkbox visual representation on paper */}
+                                <span className="hidden print:flex items-center justify-center font-mono text-[9px] text-slate-800 shrink-0 mt-0.5 border border-slate-400 w-[14px] h-[14px] font-bold bg-white rounded">
+                                  {checks[cb.id] ? '✓' : ' '}
+                                </span>
                                 <span className="group-hover:text-slate-900 transition-colors">{cb.label}</span>
                               </label>
-                            ))}
-                          </div>
-
-                          {/* Print Checkbox details */}
-                          <div className="hidden print:block text-[10px] text-slate-500 font-bold border-l-2 border-slate-200 pl-3 space-y-1">
-                            {block.checkboxes.map(cb => (
-                              <div key={cb.id} className="flex items-center gap-1.5">
-                                <span className="font-mono text-slate-800">[{checks[cb.id] ? 'X' : ' '}]</span>
-                                <span>{cb.label}</span>
-                              </div>
                             ))}
                           </div>
                         </div>
