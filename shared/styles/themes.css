@@ -46,6 +46,24 @@
 .theme-dark .border-\[\#E2C6A9\] { border-color: #5c432b !important; }
 .theme-dark .border-\[\#D1C4E9\] { border-color: #44336c !important; }
 
+/* targeted block icon box background overrides (w-14) in dark theme */
+.theme-dark .w-14.bg-amber-100 { background-color: rgba(245, 158, 11, 0.2) !important; }
+.theme-dark .w-14.bg-slate-100 { background-color: rgba(148, 163, 184, 0.2) !important; }
+.theme-dark .w-14.bg-orange-100 { background-color: rgba(249, 115, 22, 0.2) !important; }
+.theme-dark .w-14.bg-red-100 { background-color: rgba(239, 68, 68, 0.2) !important; }
+.theme-dark .w-14.bg-amber-50 { background-color: rgba(217, 119, 6, 0.2) !important; }
+.theme-dark .w-14.bg-purple-100 { background-color: rgba(168, 85, 247, 0.2) !important; }
+
+/* status badges in dark theme */
+.theme-dark .bg-emerald-100 {
+  background-color: rgba(16, 185, 129, 0.2) !important;
+  color: #34d399 !important;
+}
+.theme-dark .bg-amber-50 {
+  background-color: rgba(245, 158, 11, 0.2) !important;
+  color: #fbbf24 !important;
+}
+
 /* Subtle print/action button colors in dark theme */
 .theme-dark .bg-slate-100,
 .theme-dark .bg-slate-200 {
