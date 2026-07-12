@@ -79,7 +79,7 @@
 /* Theme dark overrides for standard slate text and backgrounds */
 .theme-dark .text-slate-900,
 .theme-dark .text-slate-800 {
-  color: #f1f5f9 !important; /* Prominent soft white headers */
+  color: #e2e8f0 !important; /* Softer white slate-200 headers */
 }
 
 .theme-dark .text-slate-700,
@@ -95,7 +95,7 @@
 
 /* Hover checks text fix inside blocks in dark theme */
 .theme-dark .group:hover .group-hover\:text-slate-900 {
-  color: #f1f5f9 !important; /* High contrast soft white on hover */
+  color: #e2e8f0 !important; /* High contrast soft slate-200 on hover */
 }
 
 .theme-dark .bg-white {
@@ -132,6 +132,52 @@
 /* History dashboard row hover fix in dark theme */
 .theme-dark .hover\:bg-slate-50:hover {
   background-color: var(--bg-app) !important;
+}
+
+/* Custom Scrollbar Styles */
+* {
+  scrollbar-width: thin;
+}
+
+.theme-brutalist {
+  scrollbar-color: #1e293b #fffdf9;
+}
+
+.theme-dark {
+  scrollbar-color: #475569 #0f172a;
+}
+
+/* Webkit custom scrollbars (Chrome, Edge, Safari) */
+.theme-brutalist::-webkit-scrollbar,
+.theme-brutalist *::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+.theme-brutalist::-webkit-scrollbar-track,
+.theme-brutalist *::-webkit-scrollbar-track {
+  background: #fffdf9;
+}
+.theme-brutalist::-webkit-scrollbar-thumb,
+.theme-brutalist *::-webkit-scrollbar-thumb {
+  background-color: #1e293b;
+  border-radius: 4px;
+  border: 2px solid #fffdf9;
+}
+
+.theme-dark::-webkit-scrollbar,
+.theme-dark *::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+.theme-dark::-webkit-scrollbar-track,
+.theme-dark *::-webkit-scrollbar-track {
+  background: #0f172a;
+}
+.theme-dark::-webkit-scrollbar-thumb,
+.theme-dark *::-webkit-scrollbar-thumb {
+  background-color: #475569;
+  border-radius: 4px;
+  border: 2px solid #0f172a;
 }
 
 /* Print utility classes shared by scans */
