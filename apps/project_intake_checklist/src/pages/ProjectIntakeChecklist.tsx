@@ -653,22 +653,13 @@ export default function ProjectIntakeChecklist() {
         ) : (
           /* History / Dashboard View */
           <div className="bg-white border-width-app border-color-app p-8 rounded-app-card shadow-app space-y-6">
-            <div className="flex items-center justify-between border-b-2 border-slate-200 pb-4">
-              <div>
-                <h2 className="text-2xl font-black uppercase tracking-tight text-slate-900">
-                  Intake Dossier Geschiedenis
-                </h2>
-                <p className="text-xs text-slate-400 font-bold uppercase tracking-wider mt-1">
-                  Overzicht van opgeslagen intakes via dit werkstation
-                </p>
-              </div>
-              <button 
-                onClick={handleStartNew}
-                className="bg-[#F26522] hover:bg-orange-600 border-2 border-slate-800 text-white px-5 py-2.5 rounded-xl text-xs font-bold uppercase tracking-wider transition-all shadow-[2px_2px_0px_0px_rgba(30,41,59,1)] hover:translate-y-[1px] hover:shadow-[1px_1px_0px_0px_rgba(30,41,59,1)] flex items-center space-x-1.5 cursor-pointer"
-              >
-                <Plus className="w-4 h-4" />
-                <span>Nieuwe Intake</span>
-              </button>
+            <div className="border-b-2 border-slate-200 pb-4">
+              <h2 className="text-2xl font-black uppercase tracking-tight text-slate-900">
+                Intake Dossier Geschiedenis
+              </h2>
+              <p className="text-xs text-slate-400 font-bold uppercase tracking-wider mt-1">
+                Overzicht van opgeslagen intakes via dit werkstation
+              </p>
             </div>
 
             {savedChecklists.length === 0 ? (
@@ -678,31 +669,81 @@ export default function ProjectIntakeChecklist() {
                 <p className="text-slate-400 text-xs mt-1">Start een nieuwe intake en klik op 'Opslaan'.</p>
               </div>
             ) : (
-              <div className="overflow-x-auto">
-                <table className="w-full text-left border-collapse">
-                  <thead>
-                    <tr className="border-b-2 border-slate-800">
-                      <th className="py-3 px-4 text-xs font-black uppercase tracking-wider text-slate-500">Datum</th>
-                      <th className="py-3 px-4 text-xs font-black uppercase tracking-wider text-slate-500">Projectnaam</th>
-                      <th className="py-3 px-4 text-xs font-black uppercase tracking-wider text-slate-500">Uitdager</th>
-                      <th className="py-3 px-4 text-xs font-black uppercase tracking-wider text-slate-500">Status</th>
-                      <th className="py-3 px-4 text-xs font-black uppercase tracking-wider text-slate-500 text-right">Acties</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {savedChecklists.map(item => (
-                      <tr key={item.id} className="border-b border-slate-200 hover:bg-slate-50">
-                        <td className="py-3.5 px-4 text-xs font-bold text-slate-700">{item.date}</td>
-                        <td className="py-3.5 px-4 text-sm font-black text-slate-900">{item.projectName}</td>
-                        <td className="py-3.5 px-4 text-xs font-bold text-slate-700">{item.challengerName || 'N.v.t.'}</td>
-                        <td className="py-3.5 px-4">
-                          <span className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase border border-slate-800 ${
-                            item.status === 'Geschikt' ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-50 text-amber-800'
-                          }`}>
-                            {item.status}
-                          </span>
-                        </td>
-                        <td className="py-3.5 px-4 text-right space-x-2">
+              <div className="space-y-4">
+                {/* Desktop View Table */}
+                <div className="hidden md:block overflow-x-auto">
+                  <table className="w-full text-left border-collapse">
+                    <thead>
+                      <tr className="border-b-2 border-slate-800">
+                        <th className="py-3 px-4 text-xs font-black uppercase tracking-wider text-slate-500">Datum</th>
+                        <th className="py-3 px-4 text-xs font-black uppercase tracking-wider text-slate-500">Projectnaam</th>
+                        <th className="py-3 px-4 text-xs font-black uppercase tracking-wider text-slate-500">Uitdager</th>
+                        <th className="py-3 px-4 text-xs font-black uppercase tracking-wider text-slate-500">Status</th>
+                        <th className="py-3 px-4 text-xs font-black uppercase tracking-wider text-slate-500 text-right">Acties</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {savedChecklists.map(item => (
+                        <tr key={item.id} className="border-b border-slate-200 hover:bg-slate-50">
+                          <td className="py-3.5 px-4 text-xs font-bold text-slate-700">{item.date}</td>
+                          <td className="py-3.5 px-4 text-sm font-black text-slate-900">{item.projectName}</td>
+                          <td className="py-3.5 px-4 text-xs font-bold text-slate-700">{item.challengerName || 'N.v.t.'}</td>
+                          <td className="py-3.5 px-4">
+                            <span className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase border border-slate-800 ${
+                              item.status === 'Geschikt' ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-50 text-amber-800'
+                            }`}>
+                              {item.status}
+                            </span>
+                          </td>
+                          <td className="py-3.5 px-4 text-right space-x-2">
+                            <button 
+                              onClick={() => loadChecklist(item)}
+                              className="bg-white hover:bg-slate-100 border border-slate-800 px-3 py-1.5 rounded-lg text-xs font-bold uppercase transition-colors cursor-pointer"
+                            >
+                              Openen
+                            </button>
+                            <button 
+                              onClick={() => handlePrintItem(item)}
+                              className="bg-slate-100 hover:bg-slate-200 border border-slate-800 px-3 py-1.5 rounded-lg text-xs font-bold uppercase transition-colors cursor-pointer inline-flex items-center gap-1"
+                            >
+                              <Printer className="w-3.5 h-3.5" />
+                              <span>Print</span>
+                            </button>
+                            <button 
+                              onClick={() => handleDelete(item.id)}
+                              className="bg-red-50 hover:bg-red-100 text-red-600 border border-red-200 px-3 py-1.5 rounded-lg text-xs font-bold uppercase transition-colors cursor-pointer"
+                            >
+                              <Trash2 className="w-3.5 h-3.5 inline" />
+                            </button>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+
+                {/* Mobile View Cards */}
+                <div className="block md:hidden space-y-4">
+                  {savedChecklists.map(item => (
+                    <div key={item.id} className="border border-slate-200 rounded-xl p-4 space-y-3 bg-white hover:bg-slate-50/50 transition-colors">
+                      <div className="flex items-center justify-between text-xs text-slate-500">
+                        <span className="font-bold">{item.date}</span>
+                        <span className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase border border-slate-800 ${
+                          item.status === 'Geschikt' ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-50 text-amber-800'
+                        }`}>
+                          {item.status}
+                        </span>
+                      </div>
+                      
+                      <div>
+                        <h4 className="text-base font-black text-slate-900">{item.projectName}</h4>
+                        <p className="text-xs text-slate-500 font-medium mt-0.5">
+                          Uitdager: <span className="font-bold text-slate-700">{item.challengerName || 'N.v.t.'}</span>
+                        </p>
+                      </div>
+                      
+                      <div className="flex items-center justify-between gap-2 pt-2 border-t border-slate-100">
+                        <div className="flex gap-2">
                           <button 
                             onClick={() => loadChecklist(item)}
                             className="bg-white hover:bg-slate-100 border border-slate-800 px-3 py-1.5 rounded-lg text-xs font-bold uppercase transition-colors cursor-pointer"
@@ -716,17 +757,17 @@ export default function ProjectIntakeChecklist() {
                             <Printer className="w-3.5 h-3.5" />
                             <span>Print</span>
                           </button>
-                          <button 
-                            onClick={() => handleDelete(item.id)}
-                            className="bg-red-50 hover:bg-red-100 text-red-600 border border-red-200 px-3 py-1.5 rounded-lg text-xs font-bold uppercase transition-colors cursor-pointer"
-                          >
-                            <Trash2 className="w-3.5 h-3.5 inline" />
-                          </button>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
+                        </div>
+                        <button 
+                          onClick={() => handleDelete(item.id)}
+                          className="bg-red-50 hover:bg-red-100 text-red-600 border border-red-200 px-3 py-1.5 rounded-lg text-xs font-bold uppercase transition-colors cursor-pointer"
+                        >
+                          <Trash2 className="w-3.5 h-3.5 inline" />
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
               </div>
             )}
           </div>
