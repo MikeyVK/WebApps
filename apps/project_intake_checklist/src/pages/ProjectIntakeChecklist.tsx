@@ -457,14 +457,14 @@ export default function ProjectIntakeChecklist() {
                         {/* Header bar of the block */}
                         <div className={`py-2.5 px-4 flex items-center justify-between border-b-2 border-slate-800 print:border-slate-300 ${block.headerBg}`}>
                           <h3 className="font-black text-sm uppercase tracking-wider text-slate-900">{block.title}</h3>
-                          <button 
-                            type="button"
+                          <div 
+                            role="button"
                             onClick={(e) => handleToggleBlockAll(block, e)}
                             className="w-5 h-5 bg-white border-2 border-slate-800 rounded flex items-center justify-center hover:bg-slate-100 transition-colors cursor-pointer print:border-slate-300 print:bg-white shrink-0"
                             title={blockChecked ? "Deselecteer alle criteria" : "Selecteer alle criteria"}
                           >
                             {blockChecked && <Check className="w-4 h-4 text-emerald-600 stroke-[3.5]" />}
-                          </button>
+                          </div>
                         </div>
 
                         {/* Integrated clickable bullet checklist */}

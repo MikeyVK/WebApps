@@ -240,6 +240,7 @@ input[type="checkbox"]:checked::after {
   header,
   footer,
   button,
+  input[type="checkbox"],
   .print-hide {
     display: none !important;
   }
