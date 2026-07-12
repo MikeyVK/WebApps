@@ -8,6 +8,16 @@
       "path": "/project_intake_scan/",
       "icon": "ClipboardList",
       "defaultTheme": "theme-brutalist",
+      "order": 3
+    },
+    {
+      "id": "project_intake_checklist",
+      "name": "Project Intake Checklist",
+      "subtitle": "Digitale A4 Checklist",
+      "description": "Een eenvoudige, digitale versie van de originele A4 Instroom FysiekFabriek checklist met interactieve toelichtingen.",
+      "path": "/project_intake_checklist/",
+      "icon": "FileText",
+      "defaultTheme": "theme-brutalist",
       "order": 1
     },
     {

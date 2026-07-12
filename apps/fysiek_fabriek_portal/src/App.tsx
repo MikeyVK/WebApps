@@ -1,31 +1,38 @@
-import { Home } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { Home, FileText, ShieldCheck, ClipboardList } from 'lucide-react';
 import metadata from '../../../apps-metadata.json';
 import { AppMetadata } from '@shared/types/metadata';
 import { Header } from '@shared/components/Header';
 import { FFLogo } from '@shared/components/FFLogo';
 import { Footer } from '@shared/components/Footer';
+
 export default function App() {
-  const portalMeta = (metadata.apps as AppMetadata[]).find(app => app.id === 'fysiek_fabriek_portal');
-  const appTheme = portalMeta?.defaultTheme || 'theme-brutalist';
+  const [theme, setTheme] = useState<'theme-brutalist' | 'theme-dark'>(
+    (localStorage.getItem('app-theme') as 'theme-brutalist' | 'theme-dark') || 'theme-brutalist'
+  );
+
+  const handleChangeTheme = (newTheme: 'theme-brutalist' | 'theme-dark') => {
+    setTheme(newTheme);
+    localStorage.setItem('app-theme', newTheme);
+  };
+
+  useEffect(() => {
+    document.documentElement.className = theme;
+  }, [theme]);
 
   const scans = (metadata.apps as AppMetadata[])
-    .filter(app => app.id !== 'fysiek_fabriek_portal')
+    .filter(app => app.id !== 'fysiek_fabriek_portal' && app.id !== 'project_intake_scan')
     .sort((a, b) => a.order - b.order);
 
   const renderIcon = (iconName: string) => {
-    if (iconName === 'ClipboardList') {
-      return (
-        <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
-        </svg>
-      );
+    if (iconName === 'FileText') {
+      return <FileText className="w-6 h-6" />;
     }
     if (iconName === 'ShieldCheck') {
-      return (
-        <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-        </svg>
-      );
+      return <ShieldCheck className="w-6 h-6" />;
+    }
+    if (iconName === 'ClipboardList') {
+      return <ClipboardList className="w-6 h-6" />;
     }
     return null;
   };
@@ -40,7 +47,7 @@ export default function App() {
   ];
 
   return (
-    <div className={`min-h-screen ${appTheme} bg-bg-app text-text-app flex flex-col font-sans relative overflow-x-hidden antialiased`}>
+    <div className={`min-h-screen ${theme} bg-bg-app text-text-app flex flex-col font-sans relative overflow-x-hidden antialiased`}>
       <Header 
         logo={<FFLogo />}
         subtitle="Hulpmiddelen & Risicobeoordeling"
@@ -92,7 +99,7 @@ export default function App() {
       </main>
 
       {/* Footer */}
-      <Footer copyright="© 2026 FysiekFabriek & Fokus. Alle rechten voorbehouden." />
+      <Footer copyright="© 2026 FysiekFabriek & Fokus. Alle rechten voorbehouden." theme={theme} onChangeTheme={handleChangeTheme} />
     </div>
   );
 }

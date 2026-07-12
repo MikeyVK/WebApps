@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 
 export interface HeaderAction {
   label: string;
@@ -26,27 +26,48 @@ export const Header: React.FC<HeaderProps> = ({
   className = '',
   innerClassName = 'w-full max-w-7xl'
 }) => {
+  const [isOpen, setIsOpen] = useState(false);
+
   return (
     <header className={`bg-white border-b-app border-color-app py-4 px-6 sticky top-0 z-40 print:hidden shadow-app-small ${className}`}>
-      <div className={`mx-auto flex items-center justify-between ${innerClassName}`}>
+      <div className={`mx-auto flex flex-col md:flex-row md:items-center justify-between ${innerClassName}`}>
         
-        {/* Left Slot: Logo / Title / Subtitle */}
-        <div className="flex items-center gap-4">
-          {logo ? (
-            logo
-          ) : title ? (
-            <h1 className="text-xl font-bold text-slate-900">{title}</h1>
-          ) : null}
-          
-          {subtitle && (
-            <div className="hidden sm:block border-l-2 border-slate-200 pl-4 py-1 shrink-0">
-              <p className="text-xs text-slate-400 font-bold uppercase tracking-wider">{subtitle}</p>
-            </div>
+        <div className="flex items-center justify-between w-full md:w-auto">
+          {/* Left Slot: Logo / Title / Subtitle */}
+          <div className="flex items-center gap-4">
+            {logo ? (
+              logo
+            ) : title ? (
+              <h1 className="text-xl font-bold text-slate-900">{title}</h1>
+            ) : null}
+            
+            {subtitle && (
+              <div className="hidden sm:block border-l-2 border-slate-200 pl-4 py-1 shrink-0">
+                <p className="text-xs text-slate-400 font-bold uppercase tracking-wider">{subtitle}</p>
+              </div>
+            )}
+          </div>
+
+          {/* Mobile Hamburger Button */}
+          {actions.length > 0 && (
+            <button 
+              onClick={() => setIsOpen(!isOpen)}
+              className="md:hidden p-2 border-2 border-slate-800 rounded-xl bg-white text-slate-800 hover:bg-slate-50 cursor-pointer shadow-[2px_2px_0px_0px_rgba(30,41,59,1)] focus:outline-none"
+              aria-label="Toggle Menu"
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2.5">
+                {isOpen ? (
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                ) : (
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h16" />
+                )}
+              </svg>
+            </button>
           )}
         </div>
 
-        {/* Right Slot: Dynamic Actions */}
-        <div className="flex items-center gap-3">
+        {/* Right Slot: Dynamic Actions (Desktop only) */}
+        <div className="hidden md:flex items-center gap-3">
           {actions.map((action, idx) => {
             const btnClass = `px-4 py-2 border-2 border-slate-800 rounded-xl text-xs font-bold uppercase tracking-wider transition-all shadow-[2px_2px_0px_0px_rgba(30,41,59,1)] hover:translate-y-[1px] hover:shadow-[1px_1px_0px_0px_rgba(30,41,59,1)] cursor-pointer flex items-center gap-1.5 ${
               action.variant === 'primary' 
@@ -73,6 +94,44 @@ export const Header: React.FC<HeaderProps> = ({
             );
           })}
         </div>
+
+        {/* Mobile Dropdown Actions (Mobile only) */}
+        {isOpen && actions.length > 0 && (
+          <div className="md:hidden border-t border-slate-200 py-3.5 mt-3.5 flex flex-col gap-3 w-full">
+            {actions.map((action, idx) => {
+              const btnClass = `w-full px-4 py-3 border-2 border-slate-800 rounded-xl text-xs font-black uppercase tracking-wider transition-all shadow-[2px_2px_0px_0px_rgba(30,41,59,1)] active:translate-y-[1px] cursor-pointer flex items-center justify-center gap-1.5 ${
+                action.variant === 'primary' 
+                  ? 'bg-[#F26522] text-white border-slate-800' 
+                  : action.isActive 
+                    ? 'text-white bg-slate-900' 
+                    : 'text-slate-800 bg-white hover:bg-slate-50'
+              }`;
+
+              const handleActionClick = () => {
+                setIsOpen(false);
+                if (action.onClick) {
+                  action.onClick();
+                }
+              };
+
+              if (action.href) {
+                return (
+                  <a key={idx} href={action.href} onClick={() => setIsOpen(false)} className={btnClass}>
+                    {action.icon}
+                    <span>{action.label}</span>
+                  </a>
+                );
+              }
+
+              return (
+                <button key={idx} onClick={handleActionClick} className={btnClass}>
+                  {action.icon}
+                  <span>{action.label}</span>
+                </button>
+              );
+            })}
+          </div>
+        )}
 
       </div>
     </header>
