@@ -16,10 +16,10 @@
 
 .theme-dark {
   --bg-app: #0f172a;
-  --text-app: #f1f5f9;
+  --text-app: #cbd5e1; /* Softer slate-300 normal text */
   --accent-app: #f19d76; /* Peach orange */
   --bg-card: #1e293b;
-  --text-card: #f8fafc;
+  --text-card: #cbd5e1; /* Softer slate-300 card text */
   --border-app-width: 2px;
   --border-app-color: rgba(71, 85, 105, 0.8);
   --shadow-app: 0px 10px 15px -3px rgba(0, 0, 0, 0.4);
@@ -78,16 +78,24 @@
 
 /* Theme dark overrides for standard slate text and backgrounds */
 .theme-dark .text-slate-900,
-.theme-dark .text-slate-800,
+.theme-dark .text-slate-800 {
+  color: #f1f5f9 !important; /* Prominent soft white headers */
+}
+
 .theme-dark .text-slate-700,
 .theme-dark .text-slate-650,
 .theme-dark .text-slate-600 {
-  color: var(--text-app) !important;
+  color: #94a3b8 !important; /* Softer slate-400 body text to avoid glare */
 }
 
 .theme-dark .text-slate-500,
 .theme-dark .text-slate-400 {
-  color: #94a3b8 !important;
+  color: #64748b !important; /* Muted slate-500 secondary details */
+}
+
+/* Hover checks text fix inside blocks in dark theme */
+.theme-dark .group:hover .group-hover\:text-slate-900 {
+  color: #f1f5f9 !important; /* High contrast soft white on hover */
 }
 
 .theme-dark .bg-white {
