@@ -155,6 +155,46 @@ export default function ProjectIntakeChecklist() {
     localStorage.setItem('app-theme', newTheme);
   };
 
+  const migrateChecks = (oldChecks: Record<string, boolean>): Record<string, boolean> => {
+    if (!oldChecks) return {};
+    const newChecks: Record<string, boolean> = { ...oldChecks };
+    
+    // Map uitdager_1 -> beperking, meerderjarig, regie
+    if (oldChecks.uitdager_1) {
+      newChecks.beperking = true;
+      newChecks.meerderjarig = true;
+      newChecks.regie = true;
+    }
+    // Map uitdaging -> eigen_leven, activiteit, comfortdoel
+    if (oldChecks.uitdaging) {
+      newChecks.eigen_leven = true;
+      newChecks.activiteit = true;
+      newChecks.comfortdoel = true;
+    }
+    // Map uitdager_2 -> lichaam_kennis, advies_gehad
+    if (oldChecks.uitdager_2) {
+      newChecks.lichaam_kennis = true;
+      newChecks.advies_gehad = true;
+    }
+    // Map wat_kan_niet -> geen_vitale, geen_gewicht, geen_software
+    if (oldChecks.wat_kan_niet) {
+      newChecks.geen_vitale = true;
+      newChecks.geen_gewicht = true;
+      newChecks.geen_software = true;
+    }
+    // Map aanpassing -> geen_constructieve_wijziging, klemverbinding
+    if (oldChecks.aanpassing) {
+      newChecks.geen_constructieve_wijziging = true;
+      newChecks.klemverbinding = true;
+    }
+    // Map overig -> geen_overige_risicos
+    if (oldChecks.overig) {
+      newChecks.geen_overige_risicos = true;
+    }
+
+    return newChecks;
+  };
+
   useEffect(() => {
     document.documentElement.className = theme;
   }, [theme]);
@@ -164,7 +204,12 @@ export default function ProjectIntakeChecklist() {
     const history = localStorage.getItem('project_intake_checklist_history');
     if (history) {
       try {
-        setSavedChecklists(JSON.parse(history));
+        const parsed: SavedChecklist[] = JSON.parse(history);
+        const migrated = parsed.map(item => ({
+          ...item,
+          checks: migrateChecks(item.checks)
+        }));
+        setSavedChecklists(migrated);
       } catch (e) {
         console.error('Error parsing checklist history:', e);
       }
@@ -198,6 +243,8 @@ export default function ProjectIntakeChecklist() {
   };
 
   const handleSave = () => {
+    if (showSuccessModal) return;
+
     if (!projectName.trim()) {
       setValidationError('Vul a.u.b. een projectnaam in.');
       return;
@@ -236,7 +283,7 @@ export default function ProjectIntakeChecklist() {
     setProjectDescription(item.projectDescription);
     setChallengerName(item.challengerName);
     setDate(item.date);
-    setChecks(item.checks);
+    setChecks(migrateChecks(item.checks));
     setNotes(item.notes);
     setValidationError('');
     setShowSuccessModal(false);
@@ -339,7 +386,7 @@ export default function ProjectIntakeChecklist() {
   const suitability = getSuitabilityStatus();
 
   return (
-    <div className={`min-h-screen ${theme} bg-bg-app text-text-app flex flex-col font-sans relative overflow-x-clip antialiased`}>
+    <div className={`min-h-screen print:min-h-0 print:h-auto ${theme} bg-bg-app text-text-app flex flex-col font-sans relative overflow-x-clip antialiased`}>
       <Header 
         logo={<FFLogo onClick={handleStartNew} />}
         subtitle="Project Intake Checklist"
@@ -366,12 +413,12 @@ export default function ProjectIntakeChecklist() {
       />
 
       {/* Main Content Area */}
-      <main className="flex-1 max-w-7xl w-full mx-auto p-4 md:p-8 flex flex-col justify-start">
+      <main className="flex-1 max-w-7xl w-full mx-auto p-4 md:p-8 flex flex-col justify-start print:flex-none print:p-0">
         {currentView === 'form' ? (
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start print:block print:w-full">
             
             {/* Left Column: Form & Checklist Grid (A4 view) */}
-            <div className="lg:col-span-8 space-y-6 print:w-full print:border-none print:shadow-none">
+            <div className="lg:col-span-8 space-y-6 print:block print:w-full print:space-y-0">
               
               {/* Projectpaspoort Block */}
               <div className="bg-white border-width-app border-color-app p-6 rounded-app-card shadow-app print:hidden">
@@ -418,17 +465,23 @@ export default function ProjectIntakeChecklist() {
                       onChange={e => setProjectDescription(e.target.value)}
                       placeholder="Beschrijf kort de uitdaging en de beoogde oplossing..."
                       rows={2}
+                      maxLength={250}
                       className="w-full bg-slate-50 border-2 border-slate-800 rounded-xl px-4 py-2 text-sm font-semibold focus:outline-none focus:bg-white print:border-slate-300"
                     />
+                    <div className="flex justify-between items-center mt-1 print:hidden">
+                      <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Projectomschrijving</span>
+                      <span className="text-[10px] font-bold text-slate-400">
+                        {250 - projectDescription.length} tekens resterend
+                      </span>
+                    </div>
                   </div>
                 </div>
               </div>
 
               {/* Digital A4 Checklist Grid */}
               <div className="bg-white border-width-app border-color-app p-8 rounded-app-card shadow-app relative print:border-none print:p-0 print:shadow-none">
-                
-                {/* Print Title Block */}
-                <div className="hidden print:flex items-center justify-between border-b-2 border-slate-800 pb-3 mb-5">
+                               {/* Print Title Block */}
+                <div className="hidden print:flex items-center justify-between border-b-2 border-slate-800 pb-3 mb-4">
                   <div>
                     <h1 className="text-2xl font-black uppercase text-slate-900">Checklist uitdagingen</h1>
                     <p className="text-xs text-slate-500 font-bold uppercase tracking-widest mt-0.5">Fokus FysiekFabriek</p>
@@ -437,15 +490,18 @@ export default function ProjectIntakeChecklist() {
                     <p>Project: <span className="font-black text-slate-900">{projectName || 'N.v.t.'}</span></p>
                     <p>Uitdager: <span className="font-black text-slate-900">{challengerName || 'N.v.t.'}</span></p>
                     <p>Datum: <span className="font-black text-slate-900">{date}</span></p>
-                    {projectDescription && (
-                      <p className="text-[10px] text-slate-500 italic font-medium mt-1 leading-tight text-right break-words max-w-[240px]">
-                        Omschrijving: {projectDescription}
-                      </p>
-                    )}
                   </div>
-                </div>
+                </div>                 {/* Dedicated Print Project Description Block */}
+                {projectDescription && (
+                  <div className="hidden print:block border-b border-slate-200 pb-3 mb-5 text-xs text-slate-700">
+                    <span className="font-black block uppercase tracking-wider text-[10px] text-slate-400 mb-1">Projectomschrijving</span>
+                    <p className="leading-relaxed italic print:max-h-[5em] print:overflow-hidden print:text-ellipsis break-words">
+                      {projectDescription.slice(0, 250) + (projectDescription.length > 250 ? '...' : '')}
+                    </p>
+                  </div>
+                )}
 
-                <div className="space-y-6 print:space-y-0 print:grid print:grid-cols-2 print:gap-4">
+                <div className="space-y-6 print:space-y-0 print:grid print:grid-cols-2 print:gap-3">
                   {CHECKLIST_BLOCKS.map(block => {
                     const blockChecked = block.checkboxes.every(c => checks[c.id] === true);
                     return (
@@ -460,7 +516,7 @@ export default function ProjectIntakeChecklist() {
                         }`}
                       >
                         {/* Header bar of the block */}
-                        <div className={`py-2.5 px-4 flex items-center justify-between border-b-2 border-slate-800 print:border-slate-300 ${block.headerBg}`}>
+                        <div className={`py-2.5 px-4 print:py-1.5 print:px-3 flex items-center justify-between border-b-2 border-slate-800 print:border-slate-300 ${block.headerBg}`}>
                           <h3 className="font-black text-sm uppercase tracking-wider text-slate-900">{block.title}</h3>
                           <div 
                             role="button"
@@ -473,11 +529,11 @@ export default function ProjectIntakeChecklist() {
                         </div>
 
                         {/* Integrated clickable bullet checklist */}
-                        <div className="p-4 bg-white flex items-start gap-4">
+                        <div className="p-4 print:p-3 bg-white flex items-start gap-4">
                           {renderBlockIcon(block.id)}
-                          <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-2 flex-1">
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-2 print:gap-y-1 flex-1">
                             {block.checkboxes.map(cb => (
-                              <label key={cb.id} className="flex items-start gap-3 cursor-pointer group text-xs font-semibold text-slate-700 py-1 leading-normal">
+                              <label key={cb.id} className="flex items-start gap-3 print:gap-2.5 cursor-pointer group text-xs font-semibold text-slate-700 py-1 print:py-0.75 leading-normal">
                                 {/* Screen Checkbox Input */}
                                 <input 
                                   type="checkbox"
@@ -501,19 +557,21 @@ export default function ProjectIntakeChecklist() {
 
                 {/* Opmerkingenveld voor afdrukken */}
                 {notes && (
-                  <div className="hidden print:block mt-6 border-t-2 border-slate-300 pt-4">
+                  <div className="hidden print:block mt-4 border-t-2 border-slate-300 pt-3">
                     <h3 className="text-xs font-black uppercase text-slate-900 mb-1">Opmerkingen / Notities:</h3>
-                    <p className="text-xs text-slate-700 leading-relaxed italic">{notes}</p>
+                    <p className="text-xs text-slate-700 leading-relaxed italic print:max-h-[5em] print:overflow-hidden print:text-ellipsis break-words">
+                      {notes.slice(0, 250) + (notes.length > 250 ? '...' : '')}
+                    </p>
                   </div>
                 )}
 
                 {/* Handtekeningen voor afdrukken */}
-                <div className="hidden print:grid grid-cols-2 gap-8 mt-6 pt-4 border-t-2 border-slate-800">
-                  <div className="space-y-10">
+                <div className="hidden print:grid grid-cols-2 gap-8 mt-4 pt-3 border-t-2 border-slate-800">
+                  <div className="space-y-6">
                     <p className="text-xs font-bold text-slate-500">Handtekening Uitdager:</p>
                     <div className="border-b border-slate-400 w-48"></div>
                   </div>
-                  <div className="space-y-10">
+                  <div className="space-y-6">
                     <p className="text-xs font-bold text-slate-500">Handtekening FysiekFabriek Coach:</p>
                     <div className="border-b border-slate-400 w-48"></div>
                   </div>
@@ -563,8 +621,15 @@ export default function ProjectIntakeChecklist() {
                     onChange={e => setNotes(e.target.value)}
                     placeholder="Opmerkingen, specifieke twijfels of toelichtingen bij de intake..."
                     rows={3}
+                    maxLength={250}
                     className="w-full bg-slate-50 border-2 border-slate-800 rounded-xl px-4 py-2 text-xs font-semibold focus:outline-none focus:bg-white"
                   />
+                  <div className="flex justify-between items-center mt-1">
+                    <span className="text-[9px] font-bold uppercase tracking-wider text-slate-400">Opmerkingen</span>
+                    <span className="text-[9px] font-bold text-slate-400">
+                      {250 - notes.length} tekens resterend
+                    </span>
+                  </div>
                 </div>
 
                 {/* Actions */}
@@ -774,6 +839,7 @@ export default function ProjectIntakeChecklist() {
             </div>
             <button 
               onClick={() => setShowSuccessModal(false)}
+              autoFocus
               className="w-full bg-[#F26522] hover:bg-orange-600 border-2 border-slate-800 text-white font-bold text-xs uppercase py-3 rounded-xl tracking-wider shadow-[3px_3px_0px_0px_rgba(30,41,59,1)] hover:translate-y-[1px] hover:shadow-[1px_1px_0px_0px_rgba(30,41,59,1)] transition-all cursor-pointer"
             >
               Sluiten

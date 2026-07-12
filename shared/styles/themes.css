@@ -231,7 +231,7 @@ input[type="checkbox"]:checked::after {
 /* Print utility classes shared by scans */
 @media print {
   @page {
-    margin: 1.2cm 1cm;
+    margin: 0.8cm 1cm;
   }
   body, html,
   .theme-dark body, .theme-dark html,
