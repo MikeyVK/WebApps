@@ -90,3 +90,4 @@ Nieuwe lichtgewicht applicatie met:
 |---------|------|--------|---------|
 | 1.0.0 | 2026-07-12 | Antigravity | Initial definitive walkthrough |
 | 1.1.0 | 2026-07-12 | Antigravity | Refactored criteria list to unified clickable bullets, added block-header toggle checks, and responsive desktop layout |
+| 1.1.1 | 2026-07-12 | Antigravity | Fixed specificity conflict causing double checkboxes on print layout |
