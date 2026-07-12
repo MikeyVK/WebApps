@@ -30,21 +30,21 @@
   color: var(--text-app) !important;
 }
 
-/* Dark desaturated header backgrounds for neo-brutalist blocks */
-.theme-dark .bg-\[\#F9D448\] { background-color: #7a6308 !important; color: #f1f5f9 !important; }
-.theme-dark .bg-\[\#CBD5E1\] { background-color: #334155 !important; color: #f1f5f9 !important; }
-.theme-dark .bg-\[\#FDCF9E\] { background-color: #7c4e1a !important; color: #f1f5f9 !important; }
-.theme-dark .bg-\[\#F8C1C1\] { background-color: #7f2d2d !important; color: #f1f5f9 !important; }
-.theme-dark .bg-\[\#E2C6A9\] { background-color: #5c432b !important; color: #f1f5f9 !important; }
-.theme-dark .bg-\[\#D1C4E9\] { background-color: #44336c !important; color: #f1f5f9 !important; }
+/* Dark glowing header backgrounds for neo-brutalist blocks (transparent to blend with card bg) */
+.theme-dark .bg-\[\#F9D448\] { background-color: rgba(234, 179, 8, 0.25) !important; color: #e2e8f0 !important; }
+.theme-dark .bg-\[\#CBD5E1\] { background-color: rgba(148, 163, 184, 0.25) !important; color: #e2e8f0 !important; }
+.theme-dark .bg-\[\#FDCF9E\] { background-color: rgba(249, 115, 22, 0.25) !important; color: #e2e8f0 !important; }
+.theme-dark .bg-\[\#F8C1C1\] { background-color: rgba(239, 68, 68, 0.25) !important; color: #e2e8f0 !important; }
+.theme-dark .bg-\[\#E2C6A9\] { background-color: rgba(217, 119, 6, 0.25) !important; color: #e2e8f0 !important; }
+.theme-dark .bg-\[\#D1C4E9\] { background-color: rgba(168, 85, 247, 0.25) !important; color: #e2e8f0 !important; }
 
-/* Border overrides to match desaturated header colors */
-.theme-dark .border-\[\#F9D448\] { border-color: #7a6308 !important; }
-.theme-dark .border-\[\#CBD5E1\] { border-color: #334155 !important; }
-.theme-dark .border-\[\#FDCF9E\] { border-color: #7c4e1a !important; }
-.theme-dark .border-\[\#F8C1C1\] { border-color: #7f2d2d !important; }
-.theme-dark .border-\[\#E2C6A9\] { border-color: #5c432b !important; }
-.theme-dark .border-\[\#D1C4E9\] { border-color: #44336c !important; }
+/* Border overrides to match glowing header colors */
+.theme-dark .border-\[\#F9D448\] { border-color: rgba(234, 179, 8, 0.4) !important; }
+.theme-dark .border-\[\#CBD5E1\] { border-color: rgba(148, 163, 184, 0.4) !important; }
+.theme-dark .border-\[\#FDCF9E\] { border-color: rgba(249, 115, 22, 0.4) !important; }
+.theme-dark .border-\[\#F8C1C1\] { border-color: rgba(239, 68, 68, 0.4) !important; }
+.theme-dark .border-\[\#E2C6A9\] { border-color: rgba(217, 119, 6, 0.4) !important; }
+.theme-dark .border-\[\#D1C4E9\] { border-color: rgba(168, 85, 247, 0.4) !important; }
 
 /* targeted block icon box background overrides (w-14) in dark theme */
 .theme-dark .w-14.bg-amber-100 { background-color: rgba(245, 158, 11, 0.2) !important; }

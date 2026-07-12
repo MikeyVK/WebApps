@@ -460,10 +460,10 @@ export default function ProjectIntakeChecklist() {
                         key={block.id}
                         onClick={() => setActiveBlock(block)}
                         onMouseEnter={() => setActiveBlock(block)}
-                        className={`border-2 rounded-2xl transition-all duration-200 overflow-hidden cursor-pointer shadow-[3px_3px_0px_0px_rgba(30,41,59,1)] print:shadow-none print:border-slate-300 print:break-inside-avoid ${
+                        className={`border-2 rounded-2xl transition-all duration-200 overflow-hidden cursor-pointer shadow-[3px_3px_0px_0px_rgba(30,41,59,1)] print:shadow-none print:border-slate-300 print:break-inside-avoid ${block.borderClass} ${
                           activeBlock.id === block.id 
-                            ? 'border-slate-900 ring-2 ring-slate-800/10 scale-[1.01] translate-y-[-2px]' 
-                            : 'border-slate-800 hover:border-slate-900 hover:translate-y-[-1px]'
+                            ? 'ring-2 ring-slate-800/10 scale-[1.01] translate-y-[-2px] border-slate-900' 
+                            : 'hover:translate-y-[-1px] hover:border-slate-900'
                         }`}
                       >
                         {/* Header bar of the block */}
