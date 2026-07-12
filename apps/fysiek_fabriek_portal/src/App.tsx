@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Home, FileText, ShieldCheck, ClipboardList } from 'lucide-react';
 import metadata from '../../../apps-metadata.json';
 import { AppMetadata } from '@shared/types/metadata';
@@ -15,6 +15,10 @@ export default function App() {
     setTheme(newTheme);
     localStorage.setItem('app-theme', newTheme);
   };
+
+  useEffect(() => {
+    document.documentElement.className = theme;
+  }, [theme]);
 
   const scans = (metadata.apps as AppMetadata[])
     .filter(app => app.id !== 'fysiek_fabriek_portal' && app.id !== 'project_intake_scan')

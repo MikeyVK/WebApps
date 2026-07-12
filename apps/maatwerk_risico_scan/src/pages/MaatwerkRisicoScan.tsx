@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Home, Plus } from 'lucide-react';
 import { Header } from '@shared/components/Header';
 import { FFLogo } from '@shared/components/FFLogo';
@@ -91,6 +91,10 @@ export default function MaatwerkRisicoScan() {
     setTheme(newTheme);
     localStorage.setItem('app-theme', newTheme);
   };
+
+  useEffect(() => {
+    document.documentElement.className = theme;
+  }, [theme]);
 
   const [step, setStep] = useState<'dashboard' | 'setup' | 'wizard' | 'result'>('dashboard');
   const [activeScanId, setActiveScanId] = useState<number | null>(null);

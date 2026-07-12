@@ -180,6 +180,10 @@ export default function ProjectIntakeChecklist() {
     localStorage.setItem('app-theme', newTheme);
   };
 
+  useEffect(() => {
+    document.documentElement.className = theme;
+  }, [theme]);
+
   // Load history from localStorage
   useEffect(() => {
     const history = localStorage.getItem('project_intake_checklist_history');

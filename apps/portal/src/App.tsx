@@ -1,10 +1,21 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import * as Icons from 'lucide-react';
 import metadata from '../../../apps-metadata.json';
 import { AppMetadata } from '@shared/types/metadata';
 
 export default function App() {
-  const [theme, setTheme] = useState<'theme-dark' | 'theme-brutalist'>('theme-dark');
+  const [theme, setTheme] = useState<'theme-brutalist' | 'theme-dark'>(
+    (localStorage.getItem('app-theme') as 'theme-brutalist' | 'theme-dark') || 'theme-dark'
+  );
+
+  const handleChangeTheme = (newTheme: 'theme-brutalist' | 'theme-dark') => {
+    setTheme(newTheme);
+    localStorage.setItem('app-theme', newTheme);
+  };
+
+  useEffect(() => {
+    document.documentElement.className = theme;
+  }, [theme]);
 
   const sortedApps = (metadata.apps as AppMetadata[]).sort((a, b) => a.order - b.order);
 
@@ -34,10 +45,10 @@ export default function App() {
           </div>
           <div className="flex items-center gap-3">
             <button 
-              onClick={() => setTheme(prev => prev === 'theme-dark' ? 'theme-brutalist' : 'theme-dark')}
-              className="text-xs font-black px-3.5 py-2 border-2 border-color-app bg-white text-slate-800 rounded-app-btn shadow-app-small transition-all hover:bg-[#F26522] hover:text-white cursor-pointer"
+              onClick={() => handleChangeTheme(theme === 'theme-dark' ? 'theme-brutalist' : 'theme-dark')}
+              className="text-xs font-black px-3.5 py-2 border-2 border-color-app bg-white text-slate-850 rounded-app-btn shadow-app-small transition-all hover:bg-[#F26522] hover:text-white cursor-pointer"
             >
-              {theme === 'theme-dark' ? '☀️ Light Brutalist' : '🌙 Warm Dark'}
+              {theme === 'theme-dark' ? '☀️ Light' : '🌙 Dark'}
             </button>
             <span className="text-xs text-[#F26522] bg-orange-50 border-2 border-color-app px-3.5 py-1.5 rounded-full font-bold uppercase tracking-wider print:hidden">
               Workspace

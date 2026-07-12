@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Header } from '@shared/components/Header';
 import { FFLogo } from '@shared/components/FFLogo';
 import { Footer } from '@shared/components/Footer';
@@ -249,6 +249,10 @@ export default function ProjectIntakeScan() {
     setTheme(newTheme);
     localStorage.setItem('app-theme', newTheme);
   };
+
+  useEffect(() => {
+    document.documentElement.className = theme;
+  }, [theme]);
 
   const [currentView, setCurrentView] = useState('dashboard');
   const [projectInfo, setProjectInfo] = useState({
