@@ -7,6 +7,9 @@
   --color-text-app: var(--text-app);
   --color-brand-primary: var(--accent-app);
   
+  --color-bg-card: var(--bg-card);
+  --color-text-card: var(--text-card);
+  
   --border-width-app: var(--border-app-width);
   --border-color-app: var(--border-app-color);
   

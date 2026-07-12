@@ -39,24 +39,12 @@ export const Footer: React.FC<FooterProps> = ({
             <div className="flex items-center gap-2">
               <span className="text-[10px] font-bold text-slate-400 uppercase mr-1">Thema:</span>
               <button 
-                onClick={() => onChangeTheme('theme-brutalist')}
-                className={`px-2.5 py-1 border-2 border-slate-800 rounded-lg text-[10px] font-black uppercase transition-all shadow-[1px_1px_0px_0px_rgba(30,41,59,1)] cursor-pointer ${
-                  theme === 'theme-brutalist' 
-                    ? 'bg-slate-900 text-white' 
-                    : 'bg-white text-slate-850 hover:bg-slate-50'
-                }`}
+                onClick={() => onChangeTheme(theme === 'theme-brutalist' ? 'theme-dark' : 'theme-brutalist')}
+                className="w-8 h-8 border-2 border-slate-800 rounded-xl bg-white hover:bg-slate-50 text-slate-800 transition-all shadow-[2px_2px_0px_0px_rgba(30,41,59,1)] hover:translate-y-[1px] hover:shadow-[1px_1px_0px_0px_rgba(30,41,59,1)] cursor-pointer flex items-center justify-center text-xs font-black"
+                title={theme === 'theme-brutalist' ? 'Schakel naar donker thema' : 'Schakel naar licht thema'}
+                aria-label="Schakel thema"
               >
-                ☀️ Light
-              </button>
-              <button 
-                onClick={() => onChangeTheme('theme-dark')}
-                className={`px-2.5 py-1 border-2 border-slate-800 rounded-lg text-[10px] font-black uppercase transition-all shadow-[1px_1px_0px_0px_rgba(30,41,59,1)] cursor-pointer ${
-                  theme === 'theme-dark' 
-                    ? 'bg-slate-900 text-white' 
-                    : 'bg-white text-slate-850 hover:bg-slate-50'
-                }`}
-              >
-                🌙 Dark
+                {theme === 'theme-brutalist' ? '🌙' : '☀️'}
               </button>
             </div>
           )}

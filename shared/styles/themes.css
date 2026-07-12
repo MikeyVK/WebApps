@@ -2,6 +2,8 @@
   --bg-app: #fffdf9;
   --text-app: #1e293b;
   --accent-app: #f26522; /* Fokus orange */
+  --bg-card: #ffffff;
+  --text-card: #0f172a;
   --border-app-width: 4px;
   --border-app-color: #1e293b;
   --shadow-app: 6px 6px 0px 0px rgba(30, 41, 59, 1);
@@ -14,12 +16,59 @@
   --bg-app: #0f172a;
   --text-app: #f1f5f9;
   --accent-app: #f19d76; /* Peach orange */
+  --bg-card: #1e293b;
+  --text-card: #f8fafc;
   --border-app-width: 2px;
-  --border-app-color: rgba(51, 65, 85, 0.6);
+  --border-app-color: rgba(71, 85, 105, 0.8);
   --shadow-app: 0px 10px 15px -3px rgba(0, 0, 0, 0.4);
   --shadow-app-small: 0px 4px 6px -2px rgba(0, 0, 0, 0.3);
   --radius-card: 32px;
   --radius-btn: 16px;
+}
+
+/* Theme dark overrides for standard slate text and backgrounds */
+.theme-dark .text-slate-900,
+.theme-dark .text-slate-800,
+.theme-dark .text-slate-700,
+.theme-dark .text-slate-650,
+.theme-dark .text-slate-600 {
+  color: var(--text-app) !important;
+}
+
+.theme-dark .text-slate-500,
+.theme-dark .text-slate-400 {
+  color: #94a3b8 !important;
+}
+
+.theme-dark .bg-white {
+  background-color: var(--bg-card) !important;
+  color: var(--text-app) !important;
+}
+
+.theme-dark .bg-slate-50 {
+  background-color: var(--bg-app) !important;
+  color: var(--text-app) !important;
+}
+
+.theme-dark .border-slate-800,
+.theme-dark .border-color-app {
+  border-color: var(--border-app-color) !important;
+}
+
+.theme-dark input,
+.theme-dark textarea,
+.theme-dark select {
+  background-color: var(--bg-app) !important;
+  color: var(--text-app) !important;
+  border-color: var(--border-app-color) !important;
+}
+
+.theme-dark .shadow-app {
+  box-shadow: var(--shadow-app) !important;
+}
+
+.theme-dark .shadow-app-small {
+  box-shadow: var(--shadow-app-small) !important;
 }
 
 /* Print utility classes shared by scans */
