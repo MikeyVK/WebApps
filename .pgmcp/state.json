@@ -2,7 +2,7 @@
   "branch": "feature/issue-5-digital-checklist",
   "issue_number": 5,
   "workflow_name": "feature",
-  "current_phase": "implementation",
+  "current_phase": "documentation",
   "current_cycle": 1,
   "last_cycle": 1,
   "cycle_history": [],
@@ -16,7 +16,7 @@
     "ready"
   ],
   "execution_mode": "interactive",
-  "skip_reason": "User wants to redesign block checks structure",
+  "skip_reason": "Update walkthrough document inside documentation phase",
   "issue_title": "Create digital Instroom Checklist scan matching original A4 design",
   "parent_branch": "main",
   "created_at": "2026-07-12T06:27:24.402714+00:00",
@@ -60,8 +60,40 @@
       "human_approval": "APPROVED",
       "forced": true,
       "skip_reason": "User wants to redesign block checks structure"
+    },
+    {
+      "from_phase": "implementation",
+      "to_phase": "validation",
+      "timestamp": "2026-07-12T08:12:49.488779+00:00",
+      "human_approval": null,
+      "forced": false,
+      "skip_reason": null
+    },
+    {
+      "from_phase": "validation",
+      "to_phase": "documentation",
+      "timestamp": "2026-07-12T08:12:52.203875+00:00",
+      "human_approval": null,
+      "forced": false,
+      "skip_reason": null
+    },
+    {
+      "from_phase": "documentation",
+      "to_phase": "ready",
+      "timestamp": "2026-07-12T08:12:55.456861+00:00",
+      "human_approval": null,
+      "forced": false,
+      "skip_reason": null
+    },
+    {
+      "from_phase": "ready",
+      "to_phase": "documentation",
+      "timestamp": "2026-07-12T14:10:45.496767+00:00",
+      "human_approval": "APPROVED",
+      "forced": true,
+      "skip_reason": "Update walkthrough document inside documentation phase"
     }
   ],
   "reconstructed": false,
-  "current_sub_phase": "green"
+  "current_sub_phase": null
 }
