@@ -463,12 +463,14 @@ export default function ProjectIntakeChecklist() {
                       onChange={e => setProjectDescription(e.target.value)}
                       placeholder="Beschrijf kort de uitdaging en de beoogde oplossing..."
                       rows={2}
-                      maxLength={150}
+                      maxLength={250}
                       className="w-full bg-slate-50 border-2 border-slate-800 rounded-xl px-4 py-2 text-sm font-semibold focus:outline-none focus:bg-white print:border-slate-300"
                     />
                     <div className="flex justify-between items-center mt-1 print:hidden">
-                      <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Maximaal 150 tekens (voor A4-print)</span>
-                      <span className="text-[10px] font-bold text-slate-400">{projectDescription.length}/150</span>
+                      <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Projectomschrijving</span>
+                      <span className="text-[10px] font-bold text-slate-400">
+                        {250 - projectDescription.length} tekens resterend
+                      </span>
                     </div>
                   </div>
                 </div>
@@ -491,13 +493,13 @@ export default function ProjectIntakeChecklist() {
                 {projectDescription && (
                   <div className="hidden print:block border-b border-slate-200 pb-3 mb-5 text-xs text-slate-700">
                     <span className="font-black block uppercase tracking-wider text-[10px] text-slate-400 mb-1">Projectomschrijving</span>
-                    <p className="leading-relaxed italic print:max-h-[3.6em] print:overflow-hidden print:text-ellipsis break-words">
-                      {projectDescription.slice(0, 150) + (projectDescription.length > 150 ? '...' : '')}
+                    <p className="leading-relaxed italic print:max-h-[5em] print:overflow-hidden print:text-ellipsis break-words">
+                      {projectDescription.slice(0, 250) + (projectDescription.length > 250 ? '...' : '')}
                     </p>
                   </div>
                 )}
 
-                <div className="space-y-6 print:space-y-0 print:grid print:grid-cols-2 print:gap-4">
+                <div className="space-y-6 print:space-y-0 print:grid print:grid-cols-2 print:gap-3">
                   {CHECKLIST_BLOCKS.map(block => {
                     const blockChecked = block.checkboxes.every(c => checks[c.id] === true);
                     return (
@@ -512,7 +514,7 @@ export default function ProjectIntakeChecklist() {
                         }`}
                       >
                         {/* Header bar of the block */}
-                        <div className={`py-2.5 px-4 print:py-2 print:px-4 flex items-center justify-between border-b-2 border-slate-800 print:border-slate-300 ${block.headerBg}`}>
+                        <div className={`py-2.5 px-4 print:py-1.5 print:px-3 flex items-center justify-between border-b-2 border-slate-800 print:border-slate-300 ${block.headerBg}`}>
                           <h3 className="font-black text-sm uppercase tracking-wider text-slate-900">{block.title}</h3>
                           <div 
                             role="button"
@@ -525,11 +527,11 @@ export default function ProjectIntakeChecklist() {
                         </div>
 
                         {/* Integrated clickable bullet checklist */}
-                        <div className="p-4 print:p-3.5 bg-white flex items-start gap-4">
+                        <div className="p-4 print:p-3 bg-white flex items-start gap-4">
                           {renderBlockIcon(block.id)}
-                          <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-2 print:gap-y-1.5 flex-1">
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-2 print:gap-y-1 flex-1">
                             {block.checkboxes.map(cb => (
-                              <label key={cb.id} className="flex items-start gap-3 print:gap-2.5 cursor-pointer group text-xs font-semibold text-slate-700 py-1 print:py-1 leading-normal">
+                              <label key={cb.id} className="flex items-start gap-3 print:gap-2.5 cursor-pointer group text-xs font-semibold text-slate-700 py-1 print:py-0.75 leading-normal">
                                 {/* Screen Checkbox Input */}
                                 <input 
                                   type="checkbox"
@@ -553,19 +555,21 @@ export default function ProjectIntakeChecklist() {
 
                 {/* Opmerkingenveld voor afdrukken */}
                 {notes && (
-                  <div className="hidden print:block mt-6 border-t-2 border-slate-300 pt-4">
+                  <div className="hidden print:block mt-4 border-t-2 border-slate-300 pt-3">
                     <h3 className="text-xs font-black uppercase text-slate-900 mb-1">Opmerkingen / Notities:</h3>
-                    <p className="text-xs text-slate-700 leading-relaxed italic">{notes}</p>
+                    <p className="text-xs text-slate-700 leading-relaxed italic print:max-h-[5em] print:overflow-hidden print:text-ellipsis break-words">
+                      {notes.slice(0, 250) + (notes.length > 250 ? '...' : '')}
+                    </p>
                   </div>
                 )}
 
                 {/* Handtekeningen voor afdrukken */}
-                <div className="hidden print:grid grid-cols-2 gap-8 mt-6 pt-4 border-t-2 border-slate-800">
-                  <div className="space-y-10">
+                <div className="hidden print:grid grid-cols-2 gap-8 mt-4 pt-3 border-t-2 border-slate-800">
+                  <div className="space-y-6">
                     <p className="text-xs font-bold text-slate-500">Handtekening Uitdager:</p>
                     <div className="border-b border-slate-400 w-48"></div>
                   </div>
-                  <div className="space-y-10">
+                  <div className="space-y-6">
                     <p className="text-xs font-bold text-slate-500">Handtekening FysiekFabriek Coach:</p>
                     <div className="border-b border-slate-400 w-48"></div>
                   </div>
@@ -615,8 +619,15 @@ export default function ProjectIntakeChecklist() {
                     onChange={e => setNotes(e.target.value)}
                     placeholder="Opmerkingen, specifieke twijfels of toelichtingen bij de intake..."
                     rows={3}
+                    maxLength={250}
                     className="w-full bg-slate-50 border-2 border-slate-800 rounded-xl px-4 py-2 text-xs font-semibold focus:outline-none focus:bg-white"
                   />
+                  <div className="flex justify-between items-center mt-1">
+                    <span className="text-[9px] font-bold uppercase tracking-wider text-slate-400">Opmerkingen</span>
+                    <span className="text-[9px] font-bold text-slate-400">
+                      {250 - notes.length} tekens resterend
+                    </span>
+                  </div>
                 </div>
 
                 {/* Actions */}
