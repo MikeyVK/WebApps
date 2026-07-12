@@ -486,14 +486,14 @@ export default function ProjectIntakeChecklist() {
                           </div>
                           
                           {/* Inner Checkbox Controls (hidden in print, replaced by visual checks) */}
-                          <div className="border-t md:border-t-0 md:border-l border-slate-200 pt-3 md:pt-0 md:pl-4 space-y-2 flex-[2] print:hidden">
+                          <div className="border-t md:border-t-0 md:border-l border-slate-200 pt-3 md:pt-0 md:pl-4 space-y-2.5 flex-[2] print:hidden">
                             {block.checkboxes.map(cb => (
-                              <label key={cb.id} className="flex items-center gap-2 cursor-pointer group text-[11px] font-bold text-slate-700">
+                              <label key={cb.id} className="flex items-start gap-3 cursor-pointer group text-xs font-semibold text-slate-700 py-1 leading-normal">
                                 <input 
                                   type="checkbox"
                                   checked={!!checks[cb.id]}
                                   onChange={() => handleCheckboxChange(cb.id)}
-                                  className="w-4 h-4 border-2 border-slate-800 rounded checked:bg-slate-900 cursor-pointer"
+                                  className="shrink-0 mt-0.5"
                                 />
                                 <span className="group-hover:text-slate-900 transition-colors">{cb.label}</span>
                               </label>
