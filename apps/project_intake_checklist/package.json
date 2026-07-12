@@ -1,0 +1,24 @@
+{
+  "name": "project_intake_checklist",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "main": "./src/pages/ProjectIntakeChecklist.tsx",
+  "exports": {
+    ".": "./src/pages/ProjectIntakeChecklist.tsx"
+  },
+  "scripts": {
+    "dev": "vite --port 5178",
+    "build": "tsc && vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "react": "^19.2.6",
+    "react-dom": "^19.2.6",
+    "lucide-react": "^1.24.0"
+  },
+  "peerDependencies": {
+    "react": "^19.2.6",
+    "react-dom": "^19.2.6"
+  }
+}

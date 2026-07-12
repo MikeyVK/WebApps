@@ -1,0 +1,19 @@
+{
+  "5": {
+    "issue_title": "Create digital Instroom Checklist scan matching original A4 design",
+    "workflow_name": "feature",
+    "execution_mode": "interactive",
+    "required_phases": [
+      "research",
+      "design",
+      "planning",
+      "implementation",
+      "validation",
+      "documentation",
+      "ready"
+    ],
+    "skip_reason": null,
+    "parent_branch": "main",
+    "created_at": "2026-07-12T06:27:24.391482+00:00"
+  }
+}

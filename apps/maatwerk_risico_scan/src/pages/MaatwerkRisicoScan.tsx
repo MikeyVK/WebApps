@@ -1,7 +1,5 @@
 import React, { useState } from 'react';
 import { Home, Plus } from 'lucide-react';
-import metadata from '../../../../apps-metadata.json';
-import { AppMetadata } from '@shared/types/metadata';
 import { Header } from '@shared/components/Header';
 import { FFLogo } from '@shared/components/FFLogo';
 import { Footer } from '@shared/components/Footer';
@@ -85,8 +83,14 @@ interface TriageResult {
 }
 
 export default function MaatwerkRisicoScan() {
-  const appMeta = (metadata.apps as AppMetadata[]).find(app => app.id === 'maatwerk_risico_scan');
-  const appTheme = appMeta?.defaultTheme || 'theme-brutalist';
+  const [theme, setTheme] = useState<'theme-brutalist' | 'theme-dark'>(
+    (localStorage.getItem('app-theme') as 'theme-brutalist' | 'theme-dark') || 'theme-brutalist'
+  );
+
+  const handleChangeTheme = (newTheme: 'theme-brutalist' | 'theme-dark') => {
+    setTheme(newTheme);
+    localStorage.setItem('app-theme', newTheme);
+  };
 
   const [step, setStep] = useState<'dashboard' | 'setup' | 'wizard' | 'result'>('dashboard');
   const [activeScanId, setActiveScanId] = useState<number | null>(null);
@@ -543,7 +547,7 @@ Gegenereerd met de FysiekFabriek Scan Tool.
   const glowClass = getCurrentGlow();
 
   return (
-    <div className={`min-h-screen ${appTheme} bg-bg-app text-text-app flex flex-col font-sans relative overflow-x-hidden antialiased`}>
+    <div className={`min-h-screen ${theme} bg-bg-app text-text-app flex flex-col font-sans relative overflow-x-hidden antialiased`}>
       {/* Confetti Animation Layer */}
       {/* Header */}
       <Header 
@@ -1356,6 +1360,8 @@ Gegenereerd met de FysiekFabriek Scan Tool.
       <Footer 
         copyright="© 2026 FysiekFabriek & Michel Verkaik Adaptatietechniek. Alle rechten voorbehouden." 
         notes={['Deze scan is gebaseerd op de EU MDR 2017/745 verordeningen en de risico-evaluatiemethodiek van Michel Verkaik.']} 
+        theme={theme}
+        onChangeTheme={handleChangeTheme}
       />
     </div>
   );

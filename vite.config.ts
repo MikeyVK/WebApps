@@ -23,8 +23,13 @@ export default defineConfig({
         changeOrigin: true,
         ws: true
       },
-      // Proxy alle andere routes (inclusief root / en assets) naar de hoofdportal (poort 5174)
-      '^/(?!fysiek_fabriek_portal|project_intake_scan|maatwerk_risico_scan)(.*)': {
+      // Proxy /project_intake_checklist naar poort 5178
+      '/project_intake_checklist': {
+        target: 'http://localhost:5178',
+        changeOrigin: true,
+        ws: true
+      },
+      '^/(?!fysiek_fabriek_portal|project_intake_scan|maatwerk_risico_scan|project_intake_checklist)(.*)': {
         target: 'http://localhost:5174',
         changeOrigin: true,
         ws: true

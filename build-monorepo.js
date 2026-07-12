@@ -20,7 +20,7 @@ console.log('Copying apps/portal/dist to dist root...');
 fs.cpSync(path.join(__dirname, 'apps/portal/dist'), distRoot, { recursive: true });
 
 // Copy sub-apps to their respective directories in dist
-const subApps = ['fysiek_fabriek_portal', 'project_intake_scan', 'maatwerk_risico_scan'];
+const subApps = ['fysiek_fabriek_portal', 'project_intake_scan', 'maatwerk_risico_scan', 'project_intake_checklist'];
 
 subApps.forEach(app => {
   console.log(`Copying apps/${app}/dist to dist/${app}...`);

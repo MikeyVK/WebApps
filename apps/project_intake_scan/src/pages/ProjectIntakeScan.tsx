@@ -1,6 +1,4 @@
 import React, { useState } from 'react';
-import metadata from '../../../../apps-metadata.json';
-import { AppMetadata } from '@shared/types/metadata';
 import { Header } from '@shared/components/Header';
 import { FFLogo } from '@shared/components/FFLogo';
 import { Footer } from '@shared/components/Footer';
@@ -243,8 +241,14 @@ interface ProjectScanResult {
 }
 
 export default function ProjectIntakeScan() {
-  const appMeta = (metadata.apps as AppMetadata[]).find(app => app.id === 'project_intake_scan');
-  const appTheme = appMeta?.defaultTheme || 'theme-brutalist';
+  const [theme, setTheme] = useState<'theme-brutalist' | 'theme-dark'>(
+    (localStorage.getItem('app-theme') as 'theme-brutalist' | 'theme-dark') || 'theme-brutalist'
+  );
+
+  const handleChangeTheme = (newTheme: 'theme-brutalist' | 'theme-dark') => {
+    setTheme(newTheme);
+    localStorage.setItem('app-theme', newTheme);
+  };
 
   const [currentView, setCurrentView] = useState('dashboard');
   const [projectInfo, setProjectInfo] = useState({
@@ -388,7 +392,7 @@ export default function ProjectIntakeScan() {
   const isBrownHeaderChecked = answers[11] === false;
 
   return (
-    <div className={`min-h-screen ${appTheme} bg-bg-app text-text-app font-sans flex flex-col selection:bg-orange-100 print:bg-white print:text-black`}>
+    <div className={`min-h-screen ${theme} bg-bg-app text-text-app font-sans flex flex-col selection:bg-orange-100 print:bg-white print:text-black`}>
 
       <Header 
         logo={<FFLogo onClick={() => setCurrentView('dashboard')} />}
@@ -1122,6 +1126,8 @@ export default function ProjectIntakeScan() {
       <Footer 
         copyright="© 2026 Fokus FysiekFabriek. Alle rechten voorbehouden." 
         notes={['Deze scan is gebaseerd op de Fokus-formule voor co-creatie van hulpmiddelen.']} 
+        theme={theme}
+        onChangeTheme={handleChangeTheme}
       />
 
     </div>
