@@ -129,11 +129,18 @@
   box-shadow: var(--shadow-app-small) !important;
 }
 
+/* History dashboard row hover fix in dark theme */
+.theme-dark .hover\:bg-slate-50:hover {
+  background-color: var(--bg-app) !important;
+}
+
 /* Print utility classes shared by scans */
 @media print {
-  body {
+  body, html,
+  .theme-dark body, .theme-dark html,
+  .theme-brutalist body, .theme-brutalist html {
     background-color: #ffffff !important;
-    color: #000000 !important;
+    color: #1e293b !important;
   }
   .print-hidden,
   header,
@@ -151,7 +158,59 @@
     box-shadow: none !important;
   }
   /* Remove shadow offset on paper */
-  .shadow-app, .shadow-app-small {
+  .shadow-app, .shadow-app-small,
+  .theme-dark .shadow-app, .theme-dark .shadow-app-small {
     box-shadow: none !important;
+  }
+  
+  /* Force light contrast on icon boxes on paper for all themes */
+  .w-14.bg-amber-100, .theme-dark .w-14.bg-amber-100 { background-color: #fef3c7 !important; }
+  .w-14.bg-slate-100, .theme-dark .w-14.bg-slate-100 { background-color: #f1f5f9 !important; }
+  .w-14.bg-orange-100, .theme-dark .w-14.bg-orange-100 { background-color: #ffedd5 !important; }
+  .w-14.bg-red-100, .theme-dark .w-14.bg-red-100 { background-color: #fee2e2 !important; }
+  .w-14.bg-amber-50, .theme-dark .w-14.bg-amber-50 { background-color: #fffbeb !important; }
+  .w-14.bg-purple-100, .theme-dark .w-14.bg-purple-100 { background-color: #f3e8ff !important; }
+  
+  /* Force dark stroke on all SVG icons on paper */
+  .w-14 svg, svg,
+  .theme-dark .w-14 svg, .theme-dark svg {
+    stroke: #1e293b !important;
+    color: #1e293b !important;
+  }
+  
+  /* Force original block card headers background/text on paper */
+  .bg-\[\#F9D448\], .theme-dark .bg-\[\#F9D448\] { background-color: #F9D448 !important; color: #1e293b !important; }
+  .bg-\[\#CBD5E1\], .theme-dark .bg-\[\#CBD5E1\] { background-color: #CBD5E1 !important; color: #1e293b !important; }
+  .bg-\[\#FDCF9E\], .theme-dark .bg-\[\#FDCF9E\] { background-color: #FDCF9E !important; color: #1e293b !important; }
+  .bg-\[\#F8C1C1\], .theme-dark .bg-\[\#F8C1C1\] { background-color: #F8C1C1 !important; color: #1e293b !important; }
+  .bg-\[\#E2C6A9\], .theme-dark .bg-\[\#E2C6A9\] { background-color: #E2C6A9 !important; color: #1e293b !important; }
+  .bg-\[\#D1C4E9\], .theme-dark .bg-\[\#D1C4E9\] { background-color: #D1C4E9 !important; color: #1e293b !important; }
+  
+  /* Force borders to match on paper */
+  .border-\[\#F9D448\], .theme-dark .border-\[\#F9D448\] { border-color: #F9D448 !important; }
+  .border-\[\#CBD5E1\], .theme-dark .border-\[\#CBD5E1\] { border-color: #CBD5E1 !important; }
+  .border-\[\#FDCF9E\], .theme-dark .border-\[\#FDCF9E\] { border-color: #FDCF9E !important; }
+  .border-\[\#F8C1C1\], .theme-dark .border-\[\#F8C1C1\] { border-color: #F8C1C1 !important; }
+  .border-\[\#E2C6A9\], .theme-dark .border-\[\#E2C6A9\] { border-color: #E2C6A9 !important; }
+  .border-\[\#D1C4E9\], .theme-dark .border-\[\#D1C4E9\] { border-color: #D1C4E9 !important; }
+
+  /* Force all background container overrides to white card color on paper */
+  .bg-white, .theme-dark .bg-white {
+    background-color: #ffffff !important;
+    color: #1e293b !important;
+  }
+  .bg-slate-50, .theme-dark .bg-slate-50 {
+    background-color: #ffffff !important;
+    color: #1e293b !important;
+  }
+
+  /* Force all text elements to be dark slate on paper */
+  h1, h2, h3, h4, h5, h6, span, p, li, td, th, label,
+  .theme-dark h1, .theme-dark h2, .theme-dark h3, .theme-dark h4, .theme-dark h5, .theme-dark h6,
+  .theme-dark span, .theme-dark p, .theme-dark li, .theme-dark td, .theme-dark th, .theme-dark label,
+  .theme-dark .text-slate-900, .theme-dark .text-slate-800, .theme-dark .text-slate-700,
+  .theme-dark .text-slate-650, .theme-dark .text-slate-600, .theme-dark .text-slate-500,
+  .theme-dark .text-slate-400 {
+    color: #1e293b !important;
   }
 }
