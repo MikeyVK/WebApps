@@ -155,6 +155,46 @@ export default function ProjectIntakeChecklist() {
     localStorage.setItem('app-theme', newTheme);
   };
 
+  const migrateChecks = (oldChecks: Record<string, boolean>): Record<string, boolean> => {
+    if (!oldChecks) return {};
+    const newChecks: Record<string, boolean> = { ...oldChecks };
+    
+    // Map uitdager_1 -> beperking, meerderjarig, regie
+    if (oldChecks.uitdager_1) {
+      newChecks.beperking = true;
+      newChecks.meerderjarig = true;
+      newChecks.regie = true;
+    }
+    // Map uitdaging -> eigen_leven, activiteit, comfortdoel
+    if (oldChecks.uitdaging) {
+      newChecks.eigen_leven = true;
+      newChecks.activiteit = true;
+      newChecks.comfortdoel = true;
+    }
+    // Map uitdager_2 -> lichaam_kennis, advies_gehad
+    if (oldChecks.uitdager_2) {
+      newChecks.lichaam_kennis = true;
+      newChecks.advies_gehad = true;
+    }
+    // Map wat_kan_niet -> geen_vitale, geen_gewicht, geen_software
+    if (oldChecks.wat_kan_niet) {
+      newChecks.geen_vitale = true;
+      newChecks.geen_gewicht = true;
+      newChecks.geen_software = true;
+    }
+    // Map aanpassing -> geen_constructieve_wijziging, klemverbinding
+    if (oldChecks.aanpassing) {
+      newChecks.geen_constructieve_wijziging = true;
+      newChecks.klemverbinding = true;
+    }
+    // Map overig -> geen_overige_risicos
+    if (oldChecks.overig) {
+      newChecks.geen_overige_risicos = true;
+    }
+
+    return newChecks;
+  };
+
   useEffect(() => {
     document.documentElement.className = theme;
   }, [theme]);
@@ -164,7 +204,12 @@ export default function ProjectIntakeChecklist() {
     const history = localStorage.getItem('project_intake_checklist_history');
     if (history) {
       try {
-        setSavedChecklists(JSON.parse(history));
+        const parsed: SavedChecklist[] = JSON.parse(history);
+        const migrated = parsed.map(item => ({
+          ...item,
+          checks: migrateChecks(item.checks)
+        }));
+        setSavedChecklists(migrated);
       } catch (e) {
         console.error('Error parsing checklist history:', e);
       }
@@ -236,7 +281,7 @@ export default function ProjectIntakeChecklist() {
     setProjectDescription(item.projectDescription);
     setChallengerName(item.challengerName);
     setDate(item.date);
-    setChecks(item.checks);
+    setChecks(migrateChecks(item.checks));
     setNotes(item.notes);
     setValidationError('');
     setShowSuccessModal(false);
@@ -450,7 +495,7 @@ export default function ProjectIntakeChecklist() {
                   </div>
                 )}
 
-                <div className="space-y-6 print:space-y-0 print:grid print:grid-cols-2 print:gap-3">
+                <div className="space-y-6 print:space-y-0 print:grid print:grid-cols-2 print:gap-4">
                   {CHECKLIST_BLOCKS.map(block => {
                     const blockChecked = block.checkboxes.every(c => checks[c.id] === true);
                     return (
@@ -465,7 +510,7 @@ export default function ProjectIntakeChecklist() {
                         }`}
                       >
                         {/* Header bar of the block */}
-                        <div className={`py-2.5 px-4 print:py-1.5 print:px-3 flex items-center justify-between border-b-2 border-slate-800 print:border-slate-300 ${block.headerBg}`}>
+                        <div className={`py-2.5 px-4 print:py-2 print:px-4 flex items-center justify-between border-b-2 border-slate-800 print:border-slate-300 ${block.headerBg}`}>
                           <h3 className="font-black text-sm uppercase tracking-wider text-slate-900">{block.title}</h3>
                           <div 
                             role="button"
@@ -478,11 +523,11 @@ export default function ProjectIntakeChecklist() {
                         </div>
 
                         {/* Integrated clickable bullet checklist */}
-                        <div className="p-4 print:p-2.5 bg-white flex items-start gap-4">
+                        <div className="p-4 print:p-3.5 bg-white flex items-start gap-4">
                           {renderBlockIcon(block.id)}
-                          <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-2 print:gap-y-1 flex-1">
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-2 print:gap-y-1.5 flex-1">
                             {block.checkboxes.map(cb => (
-                              <label key={cb.id} className="flex items-start gap-3 print:gap-2 cursor-pointer group text-xs font-semibold text-slate-700 py-1 print:py-0.5 leading-normal">
+                              <label key={cb.id} className="flex items-start gap-3 print:gap-2.5 cursor-pointer group text-xs font-semibold text-slate-700 py-1 print:py-1 leading-normal">
                                 {/* Screen Checkbox Input */}
                                 <input 
                                   type="checkbox"
