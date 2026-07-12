@@ -1,7 +1,12 @@
 import React, { useState } from 'react';
-import { 
-  User, 
-  ChevronRight, 
+import metadata from '../../../../apps-metadata.json';
+import { AppMetadata } from '@shared/types/metadata';
+import { Header } from '@shared/components/Header';
+import { FFLogo } from '@shared/components/FFLogo';
+import { Footer } from '@shared/components/Footer';
+import {
+  User,
+  ChevronRight,
   ChevronLeft, 
   Check, 
   X, 
@@ -21,7 +26,8 @@ import {
   Info, 
   ArrowRight,
   Ban,
-  Eye
+  Eye,
+  Trash2
 } from 'lucide-react';
 
 interface Question {
@@ -237,6 +243,9 @@ interface ProjectScanResult {
 }
 
 export default function ProjectIntakeScan() {
+  const appMeta = (metadata.apps as AppMetadata[]).find(app => app.id === 'project_intake_scan');
+  const appTheme = appMeta?.defaultTheme || 'theme-brutalist';
+
   const [currentView, setCurrentView] = useState('dashboard');
   const [projectInfo, setProjectInfo] = useState({
     title: "",
@@ -379,67 +388,32 @@ export default function ProjectIntakeScan() {
   const isBrownHeaderChecked = answers[11] === false;
 
   return (
-    <div className="min-h-screen bg-amber-50/20 text-slate-900 font-sans flex flex-col selection:bg-orange-100 print:bg-white print:text-black">
-      
-      <style>{`
-        @media print {
-          body, html {
-            background-color: white !important;
-            color: black !important;
-          }
-          header, footer, .print-hidden, button, .print-hide {
-            display: none !important;
-          }
-          .print-full-layout {
-            width: 100% !important;
-            max-width: 100% !important;
-            border: none !important;
-            box-shadow: none !important;
-            margin: 0 !important;
-            padding: 0 !important;
-          }
-        }
-      `}</style>
+    <div className={`min-h-screen ${appTheme} bg-bg-app text-text-app font-sans flex flex-col selection:bg-orange-100 print:bg-white print:text-black`}>
 
-      {/* Brand Header */}
-      <header className="bg-white border-b-4 border-slate-800 sticky top-0 z-40 print:hidden shadow-[0_4px_0px_0px_rgba(30,41,59,0.1)]">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
-          <div className="flex items-center space-x-3 cursor-pointer" onClick={() => setCurrentView('dashboard')}>
-            <div className="bg-slate-900 text-white p-3 border-2 border-slate-900 rounded-2xl flex items-center justify-center transform rotate-[-2deg] shadow-[2px_2px_0px_0px_rgba(242,101,34,1)]">
-              <span className="font-extrabold text-lg tracking-wider">FF</span>
-            </div>
-            <div className="flex flex-col">
-              <span className="text-xs font-black uppercase tracking-widest text-slate-400">Fokus</span>
-              <span className="font-black text-2xl tracking-tight text-slate-900 uppercase">
-                Fysiek<span className="text-[#F26522]">Fabriek</span>
-              </span>
-            </div>
-          </div>
-
-          <div className="flex items-center space-x-3">
-            <a 
-              href="../"
-              className="px-4 py-2 bg-slate-100 hover:bg-slate-200 border-2 border-slate-800 rounded-xl text-xs font-bold uppercase tracking-wider transition-all shadow-[2px_2px_0px_0px_rgba(30,41,59,1)] hover:translate-y-[1px] hover:shadow-[1px_1px_0px_0px_rgba(30,41,59,1)] text-slate-800 flex items-center gap-1"
-            >
-              <Home className="w-3.5 h-3.5" />
-              <span>Naar Home Portal</span>
-            </a>
-            <button 
-              onClick={() => setCurrentView('dashboard')}
-              className={`px-4 py-2 border-2 border-slate-800 rounded-xl text-xs font-bold uppercase tracking-wider transition-all shadow-[2px_2px_0px_0px_rgba(30,41,59,1)] hover:translate-y-[1px] hover:shadow-[1px_1px_0px_0px_rgba(30,41,59,1)] ${currentView === 'dashboard' ? 'text-white bg-slate-900' : 'text-slate-800 bg-white'}`}
-            >
-              Geschiedenis
-            </button>
-            <button 
-              onClick={handleStartNew}
-              className="bg-[#F26522] hover:bg-orange-600 border-2 border-slate-800 text-white px-5 py-2.5 rounded-xl text-xs font-bold uppercase tracking-wider transition-all shadow-[3px_3px_0px_0px_rgba(30,41,59,1)] hover:translate-y-[2px] hover:shadow-[1px_1px_0px_0px_rgba(30,41,59,1)] flex items-center space-x-1.5"
-            >
-              <Plus className="w-4 h-4" />
-              <span>Nieuwe Intake</span>
-            </button>
-          </div>
-        </div>
-      </header>
+      <Header 
+        logo={<FFLogo onClick={() => setCurrentView('dashboard')} />}
+        subtitle="Project Intake Scan"
+        actions={[
+          {
+            label: 'Home',
+            icon: <Home className="w-3.5 h-3.5" />,
+            href: '../fysiek_fabriek_portal/',
+            variant: 'secondary'
+          },
+          {
+            label: 'Geschiedenis',
+            onClick: () => setCurrentView('dashboard'),
+            isActive: currentView === 'dashboard',
+            variant: 'secondary'
+          },
+          {
+            label: 'Nieuwe Scan',
+            icon: <Plus className="w-4 h-4" />,
+            onClick: handleStartNew,
+            variant: 'primary'
+          }
+        ]}
+      />
 
       {/* Main Content */}
       <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 flex flex-col justify-start">
@@ -449,12 +423,12 @@ export default function ProjectIntakeScan() {
           <div className="space-y-8 animate-fadeIn max-w-5xl mx-auto w-full">
             
             {/* Welkomst hero card */}
-            <div className="border-4 border-slate-800 bg-white p-8 sm:p-12 text-slate-900 rounded-3xl shadow-[6px_6px_0px_0px_rgba(30,41,59,1)] space-y-6 relative overflow-hidden">
+            <div className="border-width-app border-color-app bg-white p-8 sm:p-12 text-slate-900 rounded-app-card shadow-app space-y-6 relative overflow-hidden">
               <div className="absolute right-[-20px] top-[-20px] w-40 h-40 bg-amber-100/50 rounded-full blur-3xl pointer-events-none" />
-              <div className="border-b-4 border-slate-800 pb-6">
+              <div className="border-b-app border-color-app pb-6">
                 <span className="text-xs font-black uppercase tracking-widest text-[#F26522]">Welkom Bij Fokus FysiekFabriek</span>
                 <h1 className="text-4xl sm:text-5xl font-black tracking-tight uppercase mt-1 leading-none text-slate-900">
-                  Checklist uitdagingen
+                  Scan uitdagingen
                 </h1>
                 <p className="text-lg font-bold text-slate-500 mt-2">Toetsing & intake-verificatie voor maatwerk hulpmiddelen.</p>
               </div>
@@ -470,9 +444,9 @@ export default function ProjectIntakeScan() {
                   </div>
                   <button 
                     onClick={handleStartNew}
-                    className="mt-4 bg-slate-900 hover:bg-slate-800 border-2 border-slate-900 text-white font-bold uppercase tracking-wider text-xs py-3.5 px-6 rounded-xl transition-all shadow-[3px_3px_0px_0px_rgba(242,101,34,1)] flex items-center justify-center space-x-2"
+                    className="mt-4 bg-slate-900 hover:bg-slate-800 border-2 border-slate-900 text-white font-bold uppercase tracking-wider text-xs py-3.5 px-6 rounded-app-btn transition-all shadow-[3px_3px_0px_0px_rgba(242,101,34,1)] flex items-center justify-center space-x-2"
                   >
-                    <span>Start de Checklist</span>
+                    <span>Start de Scan</span>
                     <ArrowRight className="w-4 h-4 text-white" />
                   </button>
                 </div>
@@ -481,7 +455,7 @@ export default function ProjectIntakeScan() {
 
             {/* List of previously tested challenges */}
             <div className="space-y-4">
-              <div className="flex items-center justify-between border-b-4 border-slate-800 pb-2">
+              <div className="flex items-center justify-between border-b-app border-color-app pb-2">
                 <h2 className="text-lg font-black uppercase tracking-widest text-slate-700 flex items-center space-x-2">
                   <ClipboardList className="w-5 h-5 text-[#F26522]" />
                   <span>Beoordeelde Uitdagingen</span>
@@ -515,19 +489,18 @@ export default function ProjectIntakeScan() {
                     >
                       <button 
                         onClick={(e) => handleDeleteProject(p.id, e)}
-                        className="absolute top-4 right-4 text-slate-300 hover:text-rose-500 p-1.5 rounded-lg hover:bg-rose-50 transition-colors opacity-0 group-hover:opacity-100"
+                        className="absolute top-4 right-4 text-slate-400 hover:text-rose-600 p-1.5 rounded-lg hover:bg-slate-100 transition-colors cursor-pointer"
                         title="Verwijder dossier"
                       >
-                        <X className="w-4 h-4" />
+                        <Trash2 className="w-4 h-4" />
                       </button>
-
                       <div className="space-y-4">
-                        <div className="flex items-center justify-between">
+                        <div className="flex items-center space-x-2 mr-8">
                           <span className="text-[10px] font-black text-slate-400 uppercase tracking-wider">{p.date}</span>
                           {p.status === 'success' ? (
-                            <span className="bg-emerald-100 border-2 border-slate-800 text-emerald-800 text-[10px] font-black uppercase px-3 py-1 rounded-full">Geschikt</span>
+                            <span className="bg-emerald-100 border-2 border-color-app text-emerald-800 text-[10px] font-black uppercase px-3 py-1 rounded-full">Geschikt</span>
                           ) : (
-                            <span className="bg-rose-100 border-2 border-slate-800 text-rose-800 text-[10px] font-black uppercase px-3 py-1 rounded-full">Uitsluiting</span>
+                            <span className="bg-rose-100 border-2 border-color-app text-rose-800 text-[10px] font-black uppercase px-3 py-1 rounded-full">Uitsluiting</span>
                           )}
                         </div>
 
@@ -539,7 +512,7 @@ export default function ProjectIntakeScan() {
                       </div>
 
                       <div className="pt-4 mt-4 border-t-2 border-slate-100 flex items-center justify-between text-[10px] text-slate-400 font-bold">
-                        <span>Checklist voltooid</span>
+                        <span>Scan voltooid</span>
                         <span className="text-slate-900 font-black uppercase hover:underline flex items-center space-x-1">
                           <span>Inzien</span>
                           <ChevronRight className="w-3.5 h-3.5" />
@@ -555,16 +528,16 @@ export default function ProjectIntakeScan() {
 
         {/* VIEW: SETUP PROJECTPASPOORT */}
         {currentView === 'setup' && (
-          <div className="max-w-xl mx-auto w-full bg-white border-4 border-slate-800 rounded-3xl p-8 sm:p-10 space-y-6 shadow-[6px_6px_0px_0px_rgba(30,41,59,1)] animate-fadeIn">
-            <div className="border-b-4 border-slate-800 pb-4">
+          <div className="max-w-xl mx-auto w-full bg-white border-width-app border-color-app rounded-app-card p-8 sm:p-10 space-y-6 shadow-app animate-fadeIn">
+            <div className="border-b-app border-color-app pb-4">
               <span className="text-xs font-black uppercase tracking-widest text-[#F26522]">Dossieraanmaak</span>
               <h2 className="text-2xl font-black uppercase tracking-tight text-slate-900 mt-1">Projectpaspoort</h2>
-              <p className="text-xs text-slate-500 font-bold mt-1">Leg de basisgegevens vast om de checklist te starten.</p>
+              <p className="text-xs text-slate-500 font-bold mt-1">Leg de basisgegevens vast om de scan te starten.</p>
             </div>
 
             <form onSubmit={handleStartWizard} className="space-y-6">
               {formError && (
-                <div className="border-2 border-rose-800 bg-rose-50 text-rose-900 p-4 text-xs font-bold flex items-start space-x-2 rounded-xl">
+                <div className="border-2 border-rose-800 bg-rose-50 text-rose-900 p-4 text-xs font-bold flex items-start space-x-2 rounded-app-btn">
                   <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />
                   <span>{formError}</span>
                 </div>
@@ -580,7 +553,7 @@ export default function ProjectIntakeScan() {
                   placeholder="Bijv. Rolstoel-bekerhouder of Klembare schildersezel"
                   value={projectInfo.title}
                   onChange={(e) => setProjectInfo({ ...projectInfo, title: e.target.value })}
-                  className="w-full px-4 py-3 border-2 border-slate-800 rounded-xl focus:border-[#F26522] outline-none text-sm transition-colors shadow-[2px_2px_0px_0px_rgba(30,41,59,1)]"
+                  className="w-full px-4 py-3 border-2 border-color-app rounded-app-btn focus:border-brand-primary outline-none text-sm transition-colors shadow-app-small"
                 />
               </div>
 
@@ -594,7 +567,7 @@ export default function ProjectIntakeScan() {
                   placeholder="Bijv. Mijzelf of Sophie"
                   value={projectInfo.targetUser}
                   onChange={(e) => setProjectInfo({ ...projectInfo, targetUser: e.target.value })}
-                  className="w-full px-4 py-3 border-2 border-slate-800 rounded-xl focus:border-[#F26522] outline-none text-sm transition-colors shadow-[2px_2px_0px_0px_rgba(30,41,59,1)]"
+                  className="w-full px-4 py-3 border-2 border-color-app rounded-app-btn focus:border-brand-primary outline-none text-sm transition-colors shadow-app-small"
                 />
               </div>
 
@@ -608,7 +581,7 @@ export default function ProjectIntakeScan() {
                   placeholder="Wat is er precies nodig en welke dagelijkse handeling moet hiermee worden vergemakkelijkt?"
                   value={projectInfo.description}
                   onChange={(e) => setProjectInfo({ ...projectInfo, description: e.target.value })}
-                  className="w-full px-4 py-3 border-2 border-slate-800 rounded-xl focus:border-[#F26522] outline-none text-sm transition-colors shadow-[2px_2px_0px_0px_rgba(30,41,59,1)]"
+                  className="w-full px-4 py-3 border-2 border-color-app rounded-app-btn focus:border-brand-primary outline-none text-sm transition-colors shadow-app-small"
                 />
               </div>
 
@@ -616,13 +589,13 @@ export default function ProjectIntakeScan() {
                 <button 
                   type="button"
                   onClick={() => setCurrentView('dashboard')}
-                  className="text-slate-500 hover:text-slate-900 text-xs font-black uppercase tracking-wider py-2 px-4 rounded-lg"
+                  className="text-slate-500 hover:text-slate-900 text-xs font-black uppercase tracking-wider py-2 px-4 rounded-app-btn"
                 >
                   Annuleren
                 </button>
                 <button 
                   type="submit"
-                  className="bg-slate-900 hover:bg-slate-800 border-2 border-slate-900 text-white px-5 py-3 rounded-xl text-xs font-black uppercase tracking-wider transition-all shadow-[3px_3px_0px_0px_rgba(242,101,34,1)] flex items-center space-x-1.5"
+                  className="bg-slate-900 hover:bg-slate-800 border-2 border-slate-900 text-white px-5 py-3 rounded-app-btn text-xs font-black uppercase tracking-wider transition-all shadow-app-small flex items-center space-x-1.5"
                 >
                   <span>Start de Toetsing</span>
                   <ChevronRight className="w-4 h-4" />
@@ -766,21 +739,21 @@ export default function ProjectIntakeScan() {
 
             </div>
 
-            {/* Right Column: Live Visual Checklist Preview */}
+            {/* Right Column: Live Visual Scan Preview */}
             <div className="space-y-4">
-              <div className="bg-white border-4 border-slate-800 rounded-3xl p-6 space-y-6 shadow-[4px_4px_0px_0px_rgba(30,41,59,1)]">
-                <div className="border-b-2 border-slate-800 pb-3 flex justify-between items-center">
-                  <span className="text-[10px] font-black uppercase tracking-widest text-slate-400">Checklist Uitdagingen</span>
+              <div className="bg-white border-width-app border-color-app rounded-app-card p-6 space-y-6 shadow-app-small">
+                <div className="border-b-app border-color-app pb-3 flex justify-between items-center">
+                  <span className="text-[10px] font-black uppercase tracking-widest text-slate-400">Scan Uitdagingen</span>
                   <Eye className="w-4 h-4 text-slate-500" />
                 </div>
 
                 <div className="space-y-4 text-xs font-bold text-slate-900">
                   
                   {/* Card 1 Yellow */}
-                  <div className="border-2 border-slate-800 rounded-xl overflow-hidden shadow-[2px_2px_0px_0px_rgba(30,41,59,1)]">
-                    <div className="bg-[#F6D55C] px-3 py-1.5 border-b-2 border-slate-800 flex justify-between items-center">
+                  <div className="border-2 border-color-app rounded-app-btn overflow-hidden shadow-app-small">
+                    <div className="bg-[#F6D55C] px-3 py-1.5 border-b-2 border-color-app flex justify-between items-center">
                       <span className="font-black text-[10px] uppercase text-slate-950">De uitdager</span>
-                      <div className={`w-5 h-5 border-2 border-slate-800 rounded flex items-center justify-center transition-all duration-200 ${
+                      <div className={`w-5 h-5 border-2 border-color-app rounded flex items-center justify-center transition-all duration-200 ${
                         isYellowHeaderChecked ? 'bg-slate-900 border-slate-900' : 'bg-white'
                       }`}>
                         {isYellowHeaderChecked && (
@@ -957,7 +930,7 @@ export default function ProjectIntakeScan() {
                 <div className="pt-2">
                   <button
                     onClick={() => currentResult.failedAtQuestion && handleGoBackToQuestion(currentResult.failedAtQuestion.id)}
-                    className="inline-flex items-center space-x-1.5 bg-[#F26522] border-2 border-slate-800 hover:bg-orange-600 text-white px-5 py-2.5 rounded-xl text-xs font-black uppercase tracking-wider shadow-[2px_2px_0px_0px_rgba(30,41,59,1)] transition-all cursor-pointer"
+                    className="inline-flex items-center space-x-1.5 bg-[#F26522] border-2 border-slate-800 hover:bg-orange-600 text-white px-5 py-2.5 rounded-app-btn text-xs font-black uppercase tracking-wider shadow-app-small transition-all cursor-pointer"
                   >
                     <ChevronLeft className="w-4 h-4" />
                     <span>Pas antwoord aan</span>
@@ -967,25 +940,25 @@ export default function ProjectIntakeScan() {
             )}
 
             {/* Official Report Container */}
-            <div className="bg-white border-4 border-slate-800 rounded-3xl shadow-[6px_6px_0px_0px_rgba(30,41,59,1)] overflow-hidden print-full-layout">
+            <div className="bg-white border-width-app border-color-app rounded-app-card shadow-app overflow-hidden print-full-layout">
               
-              {/* Checklist Sheet Header */}
-              <div className="p-8 sm:p-10 border-b-4 border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-slate-50 print-full-layout">
+              {/* Scan Sheet Header */}
+              <div className="p-8 sm:p-10 border-b-app border-color-app flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-slate-50 print-full-layout">
                 <div>
                   <span className="text-[10px] font-black tracking-widest text-slate-400 uppercase">Fokus FysiekFabriek Dossier</span>
-                  <h3 className="text-2xl font-black uppercase tracking-tight mt-1">Checklist Uitdagingen</h3>
+                  <h3 className="text-2xl font-black uppercase tracking-tight mt-1">Scan Uitdagingen</h3>
                 </div>
                 <div className="flex items-center space-x-2 print:hidden">
                   <button 
                     onClick={handlePrint}
-                    className="border-2 border-slate-800 bg-white hover:bg-slate-50 px-4 py-2.5 rounded-xl text-xs font-bold uppercase tracking-wider transition-all shadow-[2px_2px_0px_0px_rgba(30,41,59,1)] cursor-pointer"
+                    className="border-2 border-color-app bg-white hover:bg-slate-50 px-4 py-2.5 rounded-app-btn text-xs font-bold uppercase tracking-wider transition-all shadow-app-small cursor-pointer"
                   >
                     <Printer className="w-4 h-4 inline mr-1" />
                     <span>Opslaan als PDF</span>
                   </button>
                   <button 
                     onClick={handleStartNew}
-                    className="bg-slate-900 border-2 border-slate-900 hover:bg-slate-800 text-white px-4 py-2.5 rounded-xl text-xs font-bold uppercase tracking-wider transition-all shadow-[2px_2px_0px_0px_rgba(242,101,34,1)] cursor-pointer"
+                    className="bg-slate-900 border-2 border-slate-900 hover:bg-slate-800 text-white px-4 py-2.5 rounded-app-btn text-xs font-bold uppercase tracking-wider transition-all shadow-app-small cursor-pointer"
                   >
                     <RotateCw className="w-4 h-4 inline mr-1" />
                     <span>Nieuwe Toetsing</span>
@@ -1073,9 +1046,9 @@ export default function ProjectIntakeScan() {
                   )}
                 </div>
 
-                {/* Section C: Complete checklist visualization */}
+                {/* Section C: Complete scan visualization */}
                 <div className="space-y-3">
-                  <h4 className="text-[10px] font-black uppercase tracking-widest text-slate-400 border-b-2 border-slate-100 pb-1.5 font-mono">Gezamenlijke Checklist Toetsing</h4>
+                  <h4 className="text-[10px] font-black uppercase tracking-widest text-slate-400 border-b-2 border-slate-100 pb-1.5 font-mono">Gezamenlijke Scan Toetsing</h4>
                   
                   <div className="space-y-2">
                     {QUESTIONS.map((q, i) => {
@@ -1101,9 +1074,9 @@ export default function ProjectIntakeScan() {
                         <div 
                           key={q.id} 
                           onClick={() => isClickable && handleGoBackToQuestion(q.id)}
-                          className={`flex items-center justify-between p-3.5 border-2 rounded-xl text-xs font-bold transition-all ${
+                          className={`flex items-center justify-between p-3.5 border-2 rounded-app-btn text-xs font-bold transition-all ${
                             isClickable 
-                              ? 'border-slate-800 text-slate-900 hover:bg-slate-50 cursor-pointer shadow-[2px_2px_0px_0px_rgba(30,41,59,1)]' 
+                              ? 'border-color-app text-slate-900 hover:bg-slate-50 cursor-pointer shadow-app-small' 
                               : 'border-slate-200 text-slate-400 cursor-default bg-slate-50/50'
                           }`}
                         >
@@ -1116,7 +1089,7 @@ export default function ProjectIntakeScan() {
                               <span className="text-[9px] text-[#F26522] uppercase font-black hover:underline mr-2 print:hidden">Aanpassen</span>
                             )}
                             <span className="text-[9px] font-black uppercase tracking-wider">{statusText}</span>
-                            <div className="w-5 h-5 border-2 border-slate-800 bg-white rounded flex items-center justify-center">
+                            <div className="w-5 h-5 border-2 border-color-app bg-white rounded flex items-center justify-center">
                               {indicator}
                             </div>
                           </div>
@@ -1128,20 +1101,14 @@ export default function ProjectIntakeScan() {
 
               </div>
 
-              {/* Official print timestamp footer */}
-              <div className="hidden print:block text-center text-[9px] text-slate-400 p-8 border-t border-slate-100">
-                Gegenereerd door Fokus FysiekFabriek Checklisttoets op {currentResult.date}
-              </div>
-
             </div>
-
+              {/* Official print timestamp footer */}
             {/* Back to Dashboard Button */}
             <div className="text-center print:hidden">
               <button 
                 onClick={() => setCurrentView('dashboard')}
-                className="text-slate-600 hover:text-slate-900 font-bold text-xs uppercase tracking-wider flex items-center space-x-1.5 mx-auto py-2.5 px-4 rounded-xl border-2 border-transparent hover:border-slate-850 cursor-pointer"
+                className="text-slate-600 hover:text-slate-900 font-bold text-xs uppercase tracking-wider flex items-center space-x-1.5 mx-auto py-2.5 px-4 rounded-app-btn border-2 border-transparent hover:border-slate-850 cursor-pointer"
               >
-                <Home className="w-4 h-4" />
                 <span>Terug naar dashboard</span>
               </button>
             </div>
@@ -1151,12 +1118,11 @@ export default function ProjectIntakeScan() {
 
       </main>
 
-      {/* Footer block */}
-      <footer className="bg-white border-t-4 border-slate-800 py-6 text-center text-[10px] font-black uppercase tracking-wider text-slate-400 mt-auto print:hidden">
-        <div className="max-w-7xl mx-auto px-4">
-          <p>© 2026 Fokus FysiekFabriek. Alle rechten voorbehouden.</p>
-        </div>
-      </footer>
+      {/* Footer */}
+      <Footer 
+        copyright="© 2026 Fokus FysiekFabriek. Alle rechten voorbehouden." 
+        notes={['Deze scan is gebaseerd op de Fokus-formule voor co-creatie van hulpmiddelen.']} 
+      />
 
     </div>
   );
