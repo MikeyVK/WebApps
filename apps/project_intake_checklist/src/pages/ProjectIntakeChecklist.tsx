@@ -243,6 +243,8 @@ export default function ProjectIntakeChecklist() {
   };
 
   const handleSave = () => {
+    if (showSuccessModal) return;
+
     if (!projectName.trim()) {
       setValidationError('Vul a.u.b. een projectnaam in.');
       return;
@@ -837,6 +839,7 @@ export default function ProjectIntakeChecklist() {
             </div>
             <button 
               onClick={() => setShowSuccessModal(false)}
+              autoFocus
               className="w-full bg-[#F26522] hover:bg-orange-600 border-2 border-slate-800 text-white font-bold text-xs uppercase py-3 rounded-xl tracking-wider shadow-[3px_3px_0px_0px_rgba(30,41,59,1)] hover:translate-y-[1px] hover:shadow-[1px_1px_0px_0px_rgba(30,41,59,1)] transition-all cursor-pointer"
             >
               Sluiten
