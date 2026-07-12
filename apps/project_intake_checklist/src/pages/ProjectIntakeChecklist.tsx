@@ -339,7 +339,7 @@ export default function ProjectIntakeChecklist() {
   const suitability = getSuitabilityStatus();
 
   return (
-    <div className={`min-h-screen ${theme} bg-bg-app text-text-app flex flex-col font-sans relative overflow-x-clip antialiased`}>
+    <div className={`min-h-screen print:min-h-0 print:h-auto ${theme} bg-bg-app text-text-app flex flex-col font-sans relative overflow-x-clip antialiased`}>
       <Header 
         logo={<FFLogo onClick={handleStartNew} />}
         subtitle="Project Intake Checklist"
@@ -366,12 +366,12 @@ export default function ProjectIntakeChecklist() {
       />
 
       {/* Main Content Area */}
-      <main className="flex-1 max-w-7xl w-full mx-auto p-4 md:p-8 flex flex-col justify-start">
+      <main className="flex-1 max-w-7xl w-full mx-auto p-4 md:p-8 flex flex-col justify-start print:flex-none print:p-0">
         {currentView === 'form' ? (
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start print:block print:w-full">
             
             {/* Left Column: Form & Checklist Grid (A4 view) */}
-            <div className="lg:col-span-8 space-y-6 print:w-full print:border-none print:shadow-none">
+            <div className="lg:col-span-8 space-y-6 print:block print:w-full print:space-y-0">
               
               {/* Projectpaspoort Block */}
               <div className="bg-white border-width-app border-color-app p-6 rounded-app-card shadow-app print:hidden">
@@ -426,9 +426,8 @@ export default function ProjectIntakeChecklist() {
 
               {/* Digital A4 Checklist Grid */}
               <div className="bg-white border-width-app border-color-app p-8 rounded-app-card shadow-app relative print:border-none print:p-0 print:shadow-none">
-                
-                {/* Print Title Block */}
-                <div className="hidden print:flex items-center justify-between border-b-2 border-slate-800 pb-3 mb-5">
+                               {/* Print Title Block */}
+                <div className="hidden print:flex items-center justify-between border-b-2 border-slate-800 pb-3 mb-4">
                   <div>
                     <h1 className="text-2xl font-black uppercase text-slate-900">Checklist uitdagingen</h1>
                     <p className="text-xs text-slate-500 font-bold uppercase tracking-widest mt-0.5">Fokus FysiekFabriek</p>
@@ -437,13 +436,16 @@ export default function ProjectIntakeChecklist() {
                     <p>Project: <span className="font-black text-slate-900">{projectName || 'N.v.t.'}</span></p>
                     <p>Uitdager: <span className="font-black text-slate-900">{challengerName || 'N.v.t.'}</span></p>
                     <p>Datum: <span className="font-black text-slate-900">{date}</span></p>
-                    {projectDescription && (
-                      <p className="text-[10px] text-slate-500 italic font-medium mt-1 leading-tight text-right break-words max-w-[240px]">
-                        Omschrijving: {projectDescription}
-                      </p>
-                    )}
                   </div>
                 </div>
+
+                {/* Dedicated Print Project Description Block */}
+                {projectDescription && (
+                  <div className="hidden print:block border-b border-slate-200 pb-3 mb-5 text-xs text-slate-700">
+                    <span className="font-black block uppercase tracking-wider text-[10px] text-slate-400 mb-1">Projectomschrijving</span>
+                    <p className="leading-relaxed italic">{projectDescription}</p>
+                  </div>
+                )}
 
                 <div className="space-y-6 print:space-y-0 print:grid print:grid-cols-2 print:gap-4">
                   {CHECKLIST_BLOCKS.map(block => {

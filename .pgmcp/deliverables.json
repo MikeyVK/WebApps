@@ -1,0 +1,19 @@
+{
+  "7": {
+    "issue_title": "Fix empty print pages on desktop and mobile viewports",
+    "workflow_name": "bug",
+    "execution_mode": "interactive",
+    "required_phases": [
+      "research",
+      "design",
+      "planning",
+      "implementation",
+      "validation",
+      "documentation",
+      "ready"
+    ],
+    "skip_reason": null,
+    "parent_branch": "main",
+    "created_at": "2026-07-12T18:30:07.546331+00:00"
+  }
+}
