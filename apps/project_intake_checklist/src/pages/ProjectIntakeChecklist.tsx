@@ -463,12 +463,12 @@ export default function ProjectIntakeChecklist() {
                       onChange={e => setProjectDescription(e.target.value)}
                       placeholder="Beschrijf kort de uitdaging en de beoogde oplossing..."
                       rows={2}
-                      maxLength={200}
+                      maxLength={150}
                       className="w-full bg-slate-50 border-2 border-slate-800 rounded-xl px-4 py-2 text-sm font-semibold focus:outline-none focus:bg-white print:border-slate-300"
                     />
                     <div className="flex justify-between items-center mt-1 print:hidden">
-                      <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Maximaal 200 tekens (voor A4-print)</span>
-                      <span className="text-[10px] font-bold text-slate-400">{projectDescription.length}/200</span>
+                      <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Maximaal 150 tekens (voor A4-print)</span>
+                      <span className="text-[10px] font-bold text-slate-400">{projectDescription.length}/150</span>
                     </div>
                   </div>
                 </div>
@@ -491,7 +491,9 @@ export default function ProjectIntakeChecklist() {
                 {projectDescription && (
                   <div className="hidden print:block border-b border-slate-200 pb-3 mb-5 text-xs text-slate-700">
                     <span className="font-black block uppercase tracking-wider text-[10px] text-slate-400 mb-1">Projectomschrijving</span>
-                    <p className="leading-relaxed italic print:line-clamp-3">{projectDescription}</p>
+                    <p className="leading-relaxed italic print:max-h-[3.6em] print:overflow-hidden print:text-ellipsis break-words">
+                      {projectDescription.slice(0, 150) + (projectDescription.length > 150 ? '...' : '')}
+                    </p>
                   </div>
                 )}
 
