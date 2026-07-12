@@ -470,7 +470,7 @@ export default function ProjectIntakeChecklist() {
                         {/* Integrated clickable bullet checklist */}
                         <div className="p-4 bg-white flex items-start gap-4">
                           {renderBlockIcon(block.id)}
-                          <div className="space-y-2 flex-1">
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-2 flex-1">
                             {block.checkboxes.map(cb => (
                               <label key={cb.id} className="flex items-start gap-3 cursor-pointer group text-xs font-semibold text-slate-700 py-1 leading-normal">
                                 {/* Screen Checkbox Input */}
