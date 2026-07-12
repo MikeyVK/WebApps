@@ -418,8 +418,13 @@ export default function ProjectIntakeChecklist() {
                       onChange={e => setProjectDescription(e.target.value)}
                       placeholder="Beschrijf kort de uitdaging en de beoogde oplossing..."
                       rows={2}
+                      maxLength={200}
                       className="w-full bg-slate-50 border-2 border-slate-800 rounded-xl px-4 py-2 text-sm font-semibold focus:outline-none focus:bg-white print:border-slate-300"
                     />
+                    <div className="flex justify-between items-center mt-1 print:hidden">
+                      <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Maximaal 200 tekens (voor A4-print)</span>
+                      <span className="text-[10px] font-bold text-slate-400">{projectDescription.length}/200</span>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -437,17 +442,15 @@ export default function ProjectIntakeChecklist() {
                     <p>Uitdager: <span className="font-black text-slate-900">{challengerName || 'N.v.t.'}</span></p>
                     <p>Datum: <span className="font-black text-slate-900">{date}</span></p>
                   </div>
-                </div>
-
-                {/* Dedicated Print Project Description Block */}
+                </div>                 {/* Dedicated Print Project Description Block */}
                 {projectDescription && (
                   <div className="hidden print:block border-b border-slate-200 pb-3 mb-5 text-xs text-slate-700">
                     <span className="font-black block uppercase tracking-wider text-[10px] text-slate-400 mb-1">Projectomschrijving</span>
-                    <p className="leading-relaxed italic">{projectDescription}</p>
+                    <p className="leading-relaxed italic print:line-clamp-3">{projectDescription}</p>
                   </div>
                 )}
 
-                <div className="space-y-6 print:space-y-0 print:grid print:grid-cols-2 print:gap-4">
+                <div className="space-y-6 print:space-y-0 print:grid print:grid-cols-2 print:gap-3">
                   {CHECKLIST_BLOCKS.map(block => {
                     const blockChecked = block.checkboxes.every(c => checks[c.id] === true);
                     return (
@@ -462,7 +465,7 @@ export default function ProjectIntakeChecklist() {
                         }`}
                       >
                         {/* Header bar of the block */}
-                        <div className={`py-2.5 px-4 flex items-center justify-between border-b-2 border-slate-800 print:border-slate-300 ${block.headerBg}`}>
+                        <div className={`py-2.5 px-4 print:py-1.5 print:px-3 flex items-center justify-between border-b-2 border-slate-800 print:border-slate-300 ${block.headerBg}`}>
                           <h3 className="font-black text-sm uppercase tracking-wider text-slate-900">{block.title}</h3>
                           <div 
                             role="button"
@@ -475,11 +478,11 @@ export default function ProjectIntakeChecklist() {
                         </div>
 
                         {/* Integrated clickable bullet checklist */}
-                        <div className="p-4 bg-white flex items-start gap-4">
+                        <div className="p-4 print:p-2.5 bg-white flex items-start gap-4">
                           {renderBlockIcon(block.id)}
-                          <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-2 flex-1">
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-2 print:gap-y-1 flex-1">
                             {block.checkboxes.map(cb => (
-                              <label key={cb.id} className="flex items-start gap-3 cursor-pointer group text-xs font-semibold text-slate-700 py-1 leading-normal">
+                              <label key={cb.id} className="flex items-start gap-3 print:gap-2 cursor-pointer group text-xs font-semibold text-slate-700 py-1 print:py-0.5 leading-normal">
                                 {/* Screen Checkbox Input */}
                                 <input 
                                   type="checkbox"
