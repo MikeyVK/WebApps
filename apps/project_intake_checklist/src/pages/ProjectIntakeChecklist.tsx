@@ -374,7 +374,7 @@ export default function ProjectIntakeChecklist() {
             <div className="lg:col-span-8 space-y-6 print:w-full print:border-none print:shadow-none">
               
               {/* Projectpaspoort Block */}
-              <div className="bg-white border-width-app border-color-app p-6 rounded-app-card shadow-app print:border-slate-300 print:shadow-none">
+              <div className="bg-white border-width-app border-color-app p-6 rounded-app-card shadow-app print:hidden">
                 <h2 className="text-lg font-black uppercase tracking-tight text-slate-900 border-b-2 border-slate-200 pb-2 mb-4">
                   Projectpaspoort
                 </h2>
@@ -425,22 +425,27 @@ export default function ProjectIntakeChecklist() {
               </div>
 
               {/* Digital A4 Checklist Grid */}
-              <div className="bg-white border-width-app border-color-app p-8 rounded-app-card shadow-app relative print:border-slate-300 print:shadow-none">
+              <div className="bg-white border-width-app border-color-app p-8 rounded-app-card shadow-app relative print:border-none print:p-0 print:shadow-none">
                 
                 {/* Print Title Block */}
-                <div className="hidden print:flex items-center justify-between border-b-4 border-slate-900 pb-4 mb-6">
+                <div className="hidden print:flex items-center justify-between border-b-2 border-slate-800 pb-3 mb-5">
                   <div>
-                    <h1 className="text-3xl font-black uppercase text-slate-900">Checklist uitdagingen</h1>
-                    <p className="text-xs text-slate-500 font-bold uppercase tracking-widest mt-1">Fokus FysiekFabriek</p>
+                    <h1 className="text-2xl font-black uppercase text-slate-900">Checklist uitdagingen</h1>
+                    <p className="text-xs text-slate-500 font-bold uppercase tracking-widest mt-0.5">Fokus FysiekFabriek</p>
                   </div>
-                  <div className="text-right text-xs font-bold text-slate-700">
+                  <div className="text-right text-xs font-bold text-slate-700 max-w-sm">
                     <p>Project: <span className="font-black text-slate-900">{projectName || 'N.v.t.'}</span></p>
                     <p>Uitdager: <span className="font-black text-slate-900">{challengerName || 'N.v.t.'}</span></p>
                     <p>Datum: <span className="font-black text-slate-900">{date}</span></p>
+                    {projectDescription && (
+                      <p className="text-[10px] text-slate-500 italic font-medium mt-1 leading-tight text-right break-words max-w-[240px]">
+                        Omschrijving: {projectDescription}
+                      </p>
+                    )}
                   </div>
                 </div>
 
-                <div className="space-y-6">
+                <div className="space-y-6 print:space-y-0 print:grid print:grid-cols-2 print:gap-4">
                   {CHECKLIST_BLOCKS.map(block => {
                     const blockChecked = block.checkboxes.every(c => checks[c.id] === true);
                     return (
@@ -503,14 +508,14 @@ export default function ProjectIntakeChecklist() {
                 )}
 
                 {/* Handtekeningen voor afdrukken */}
-                <div className="hidden print:grid grid-cols-2 gap-8 mt-12 pt-8 border-t-4 border-slate-900">
-                  <div className="space-y-12">
+                <div className="hidden print:grid grid-cols-2 gap-8 mt-6 pt-4 border-t-2 border-slate-800">
+                  <div className="space-y-10">
                     <p className="text-xs font-bold text-slate-500">Handtekening Uitdager:</p>
-                    <div className="border-b-2 border-slate-400 w-48"></div>
+                    <div className="border-b border-slate-400 w-48"></div>
                   </div>
-                  <div className="space-y-12">
+                  <div className="space-y-10">
                     <p className="text-xs font-bold text-slate-500">Handtekening FysiekFabriek Coach:</p>
-                    <div className="border-b-2 border-slate-400 w-48"></div>
+                    <div className="border-b border-slate-400 w-48"></div>
                   </div>
                 </div>
 
